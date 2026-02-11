@@ -1,0 +1,8223 @@
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
+const canvasEntryOverlay = document.getElementById("canvasEntryOverlay");
+const canvasOverlayImageBtn = document.getElementById("canvasOverlayImageBtn");
+const canvasOverlayWebcamBtn = document.getElementById("canvasOverlayWebcamBtn");
+
+const imageInput = document.getElementById("imageInput");
+const inputSpecs = document.getElementById("inputSpecs");
+const presetSelect = document.getElementById("presetSelect");
+const fractalPattern = document.getElementById("fractalPattern");
+const fractalSource = document.getElementById("fractalSource");
+const webcamBtn = document.getElementById("webcamBtn");
+const cameraDeviceSelect = document.getElementById("cameraDeviceSelect");
+const refreshCamsBtn = document.getElementById("refreshCamsBtn");
+const quick3dBtn = document.getElementById("quick3dBtn");
+const quick3dCleanBtn = document.getElementById("quick3dCleanBtn");
+const randomBtn = document.getElementById("randomBtn");
+const reseedBtn = document.getElementById("reseedBtn");
+const exportVideoBtn = document.getElementById("exportVideoBtn");
+const exportGifBtn = document.getElementById("exportGifBtn");
+const exportPhotoBtn = document.getElementById("exportPhotoBtn");
+const resetBtn = document.getElementById("resetBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const webcamVideo = document.getElementById("webcam");
+const camStaticBtn = document.getElementById("camStaticBtn");
+const camCursorBtn = document.getElementById("camCursorBtn");
+const camOrbitBtn = document.getElementById("camOrbitBtn");
+const camSweepBtn = document.getElementById("camSweepBtn");
+const camPulseBtn = document.getElementById("camPulseBtn");
+const camHelixBtn = document.getElementById("camHelixBtn");
+const camDriftBtn = document.getElementById("camDriftBtn");
+const camLiquidBtn = document.getElementById("camLiquidBtn");
+const cameraMoveSpeed = document.getElementById("cameraMoveSpeed");
+const micBtn = document.getElementById("micBtn");
+const audioInputSource = document.getElementById("audioInputSource");
+const audioTarget = document.getElementById("audioTarget");
+const audioAnimation = document.getElementById("audioAnimation");
+const bgMode = document.getElementById("bgMode");
+const bgPalette = document.getElementById("bgPalette");
+const bgColorA = document.getElementById("bgColorA");
+const bgColorB = document.getElementById("bgColorB");
+const recordStartBtn = document.getElementById("recordStartBtn");
+const recordPauseBtn = document.getElementById("recordPauseBtn");
+const recordSaveBtn = document.getElementById("recordSaveBtn");
+const recordSource = document.getElementById("recordSource");
+const recordingIndicator = document.getElementById("recordingIndicator");
+const recordingStatusText = document.getElementById("recordingStatusText");
+const aspectRatioSelect = document.getElementById("aspectRatioSelect");
+const cameraDeckControls = document.getElementById("cameraDeckControls");
+const openCleanOutputBtn = document.getElementById("openCleanOutputBtn");
+const closeCleanOutputBtn = document.getElementById("closeCleanOutputBtn");
+const uiLiveBtn = document.getElementById("uiLiveBtn");
+const uiEditBtn = document.getElementById("uiEditBtn");
+const modSource = document.getElementById("modSource");
+const modTarget = document.getElementById("modTarget");
+const modAmount = document.getElementById("modAmount");
+const modSmoothing = document.getElementById("modSmoothing");
+const modClamp = document.getElementById("modClamp");
+const performanceStatus = document.getElementById("performanceStatus");
+const performanceHint = document.getElementById("performanceHint");
+const freezeBtn = document.getElementById("freezeBtn");
+const panicBtn = document.getElementById("panicBtn");
+const snapshotSaveBtn = document.getElementById("snapshotSaveBtn");
+const snapshotSlots = [...document.querySelectorAll(".snapshot-slot")];
+const depthPad = document.getElementById("depthPad");
+const depthPadDot = document.getElementById("depthPadDot");
+const liveModeGlitchBtn = document.getElementById("liveModeGlitchBtn");
+const liveMode3dBtn = document.getElementById("liveMode3dBtn");
+const liveModeParticlesBtn = document.getElementById("liveModeParticlesBtn");
+const livePaneGlitch = document.getElementById("livePaneGlitch");
+const livePane3d = document.getElementById("livePane3d");
+const livePaneParticles = document.getElementById("livePaneParticles");
+const liveGlitchIntensity = document.getElementById("liveGlitchIntensity");
+const liveGlitchColor = document.getElementById("liveGlitchColor");
+const liveGlitchError = document.getElementById("liveGlitchError");
+const liveGlitchTracking = document.getElementById("liveGlitchTracking");
+const liveGlitchTrail = document.getElementById("liveGlitchTrail");
+const liveGlitchAnim = document.getElementById("liveGlitchAnim");
+const live3dPoints = document.getElementById("live3dPoints");
+const live3dMesh = document.getElementById("live3dMesh");
+const live3dSeparation = document.getElementById("live3dSeparation");
+const live3dBackground = document.getElementById("live3dBackground");
+const live3dOrganic = document.getElementById("live3dOrganic");
+const live3dLightingMode = document.getElementById("live3dLightingMode");
+const live3dLight = document.getElementById("live3dLight");
+const live3dFxMode = document.getElementById("live3dFxMode");
+const live3dFxAmount = document.getElementById("live3dFxAmount");
+const live3dAnaglyph = document.getElementById("live3dAnaglyph");
+const live3dAnaglyphStrength = document.getElementById("live3dAnaglyphStrength");
+const liveCameraMode = document.getElementById("liveCameraMode");
+const liveGlitchPad = document.getElementById("liveGlitchPad");
+const liveGlitchPadDot = document.getElementById("liveGlitchPadDot");
+const liveGlitchPadB = document.getElementById("liveGlitchPadB");
+const liveGlitchPadBDot = document.getElementById("liveGlitchPadBDot");
+const liveGlitchPadC = document.getElementById("liveGlitchPadC");
+const liveGlitchPadCDot = document.getElementById("liveGlitchPadCDot");
+const live3dPointsPad = document.getElementById("live3dPointsPad");
+const live3dPointsPadDot = document.getElementById("live3dPointsPadDot");
+const live3dMeshPad = document.getElementById("live3dMeshPad");
+const live3dMeshPadDot = document.getElementById("live3dMeshPadDot");
+const live3dPadB = document.getElementById("live3dPadB");
+const live3dPadBDot = document.getElementById("live3dPadBDot");
+const live3dCamPad = document.getElementById("live3dCamPad");
+const live3dCamPadDot = document.getElementById("live3dCamPadDot");
+const live3dRotPad = document.getElementById("live3dRotPad");
+const live3dRotPadDot = document.getElementById("live3dRotPadDot");
+const live3dColorPad = document.getElementById("live3dColorPad");
+const live3dColorPadDot = document.getElementById("live3dColorPadDot");
+const liveParticlesCount = document.getElementById("liveParticlesCount");
+const liveParticlesEmitter = document.getElementById("liveParticlesEmitter");
+const liveParticlesSize = document.getElementById("liveParticlesSize");
+const liveParticlesDepth = document.getElementById("liveParticlesDepth");
+const liveParticlesNoise = document.getElementById("liveParticlesNoise");
+const liveParticlesAttractor = document.getElementById("liveParticlesAttractor");
+const liveParticlesFlow = document.getElementById("liveParticlesFlow");
+const liveParticlesCamX = document.getElementById("liveParticlesCamX");
+const liveParticlesCamY = document.getElementById("liveParticlesCamY");
+const liveParticlesCamZ = document.getElementById("liveParticlesCamZ");
+const liveParticlesColorMode = document.getElementById("liveParticlesColorMode");
+const liveParticlesHue = document.getElementById("liveParticlesHue");
+const liveParticlesAudio = document.getElementById("liveParticlesAudio");
+const liveParticlesAudioAmount = document.getElementById("liveParticlesAudioAmount");
+const liveParticlesDamping = document.getElementById("liveParticlesDamping");
+const liveParticlesVortex = document.getElementById("liveParticlesVortex");
+const liveParticlesSpawn = document.getElementById("liveParticlesSpawn");
+const liveParticlesMotionThreshold = document.getElementById("liveParticlesMotionThreshold");
+const liveOutputView = document.getElementById("liveOutputView");
+const domeSourceMap = document.getElementById("domeSourceMap");
+const domeWarp = document.getElementById("domeWarp");
+const domeTilt = document.getElementById("domeTilt");
+let domeRotate = document.getElementById("domeRotate");
+let domeAutoRotate = document.getElementById("domeAutoRotate");
+let domeAutoRotateSpeed = document.getElementById("domeAutoRotateSpeed");
+const domeGrid = document.getElementById("domeGrid");
+const modCurve = document.getElementById("modCurve");
+const liveModPad = document.getElementById("liveModPad");
+const liveModPadDot = document.getElementById("liveModPadDot");
+const languageSelect = document.getElementById("languageSelect");
+const workflowTabs = [...document.querySelectorAll(".workflow-tab")];
+const studioModeGlitchBtn = document.getElementById("studioModeGlitchBtn");
+const studioMode3dBtn = document.getElementById("studioMode3dBtn");
+const workspacePanels = {
+  setup: document.getElementById("panelSetup"),
+  live: document.getElementById("panelLive"),
+  studio: document.getElementById("panelStudio"),
+};
+const audioHelpText = document.getElementById("audioHelpText");
+const audioRouteStatus = document.getElementById("audioRouteStatus");
+const modeInputs = [...document.querySelectorAll('input[name="mode"]')];
+const modeGroups = [...document.querySelectorAll(".mode-group")];
+
+const glitchIds = [
+  "rgbShift",
+  "lineJitter",
+  "noiseAmount",
+  "saltPepper",
+  "pixelSize",
+  "waveDistort",
+  "blockShift",
+  "dataBands",
+  "byteCorrupt",
+  "chromaBleed",
+  "pixelSort",
+  "ditherAmount",
+  "colorBlend",
+  "pixelMelt",
+  "subjectGhost",
+  "ghostCopies",
+  "ghostShift",
+  "polygonTrack",
+  "scanlineIntensity",
+  "bloom",
+  "posterize",
+  "hueShift",
+  "saturation",
+  "contrast",
+  "invertBlend",
+  "solarize",
+  "motionTrail",
+  "trailDecay",
+  "trailThreshold",
+  "trailSoftness",
+  "trailMotionOnly",
+  "animDistort",
+  "animSpeed",
+  "errorComplexity",
+];
+
+const fractalIds = [
+  "kaleidoSegments",
+  "kaleidoLayers",
+  "layerEcho",
+  "kaleidoTwist",
+  "fractalZoom",
+  "fractalPulse",
+  "spiralAmount",
+  "spiralTurns",
+  "mandalaPetals",
+  "mandalaBloom",
+  "psychedelic",
+  "colorCycle",
+];
+
+const depthIds = [
+  "depthStrength",
+  "depthShift",
+  "depthView",
+  "pointMap",
+  "pointDensity",
+  "pointSize",
+  "pointFloat",
+  "pointOrganic",
+  "pointLift",
+  "pointRotateX",
+  "pointRotateY",
+  "pointRotateZ",
+  "meshMap",
+  "meshDensity",
+  "meshLift",
+  "glitch3d",
+  "ambientLight",
+  "lightEnabled",
+  "flatIllustrated",
+  "lightIntensity",
+  "lightAzimuth",
+  "lightElevation",
+  "sceneExposure",
+  "cameraZoom",
+  "cameraFollow",
+  "autoRotate",
+  "pointColorShift",
+  "meshColorShift",
+  "meshGlow",
+  "pointColorPulse",
+  "depthColorWave",
+  "depthExaggeration",
+  "pointSpread",
+  "bgMotion",
+  "audioSensitivity",
+  "audioTolerance",
+  "audioPointsIntensity",
+  "audioMeshIntensity",
+  "audioAnimVariation",
+];
+
+const allIds = [...glitchIds, ...fractalIds, ...depthIds];
+const controls = Object.fromEntries(allIds.map((id) => [id, document.getElementById(id)]));
+const metaControls = [modAmount, modSmoothing, modClamp].filter(Boolean);
+
+const defaults = {
+  rgbShift: 0,
+  lineJitter: 0,
+  noiseAmount: 0,
+  saltPepper: 0,
+  pixelSize: 1,
+  waveDistort: 0,
+  blockShift: 0,
+  dataBands: 0,
+  byteCorrupt: 0,
+  chromaBleed: 0,
+  pixelSort: 0,
+  ditherAmount: 0,
+  colorBlend: 0,
+  pixelMelt: 0,
+  subjectGhost: 0,
+  ghostCopies: 1,
+  ghostShift: 0,
+  polygonTrack: 0,
+  scanlineIntensity: 0,
+  bloom: 0,
+  posterize: 40,
+  hueShift: 0,
+  saturation: 100,
+  contrast: 100,
+  invertBlend: 0,
+  solarize: 0,
+  motionTrail: 0,
+  trailDecay: 68,
+  trailThreshold: 42,
+  trailSoftness: 40,
+  trailMotionOnly: 80,
+  animDistort: 0,
+  animSpeed: 40,
+  errorComplexity: 0,
+  kaleidoSegments: 1,
+  kaleidoLayers: 1,
+  layerEcho: 0,
+  kaleidoTwist: 0,
+  fractalZoom: 100,
+  fractalPulse: 0,
+  spiralAmount: 0,
+  spiralTurns: 8,
+  mandalaPetals: 8,
+  mandalaBloom: 0,
+  psychedelic: 0,
+  colorCycle: 0,
+  depthStrength: 0,
+  depthShift: 0,
+  depthView: 0,
+  pointMap: 0,
+  pointDensity: 20,
+  pointSize: 2,
+  pointFloat: 0,
+  pointOrganic: 0,
+  pointLift: 0,
+  pointRotateX: 0,
+  pointRotateY: 0,
+  pointRotateZ: 0,
+  meshMap: 0,
+  meshDensity: 34,
+  meshLift: 0,
+  glitch3d: 0,
+  ambientLight: 35,
+  lightEnabled: 100,
+  flatIllustrated: 0,
+  lightIntensity: 80,
+  lightAzimuth: -40,
+  lightElevation: 30,
+  sceneExposure: 110,
+  cameraZoom: 86,
+  cameraFollow: 35,
+  autoRotate: 0,
+  pointColorShift: 0,
+  meshColorShift: 0,
+  meshGlow: 0,
+  pointColorPulse: 0,
+  depthColorWave: 0,
+  depthExaggeration: 100,
+  pointSpread: 0,
+  bgMotion: 35,
+  audioSensitivity: 75,
+  audioTolerance: 18,
+  audioPointsIntensity: 120,
+  audioMeshIntensity: 120,
+  audioAnimVariation: 100,
+};
+
+const ranges = Object.fromEntries(
+  allIds.map((id) => [id, [Number(controls[id].min), Number(controls[id].max)]])
+);
+
+const modulableTargets = [
+  "pointLift",
+  "pointFloat",
+  "meshLift",
+  "depthExaggeration",
+  "pointColorPulse",
+  "depthColorWave",
+  "glitch3d",
+  "rgbShift",
+  "noiseAmount",
+  "lineJitter",
+  "colorBlend",
+  "pixelMelt",
+  "polygonTrack",
+  "depthStrength",
+  "pointMap",
+  "lightIntensity",
+];
+
+const parameterStore = Object.fromEntries(
+  allIds.map((id) => [
+    id,
+    {
+      name: id,
+      min: ranges[id][0],
+      max: ranges[id][1],
+      defaultValue: defaults[id],
+      isModulable: modulableTargets.includes(id),
+      smoothingDefault: 0.6,
+    },
+  ])
+);
+
+const presets = {
+  none: [{ label: "Clean", values: {} }],
+  glitch: [
+    {
+      label: "VHS degrade",
+      values: {
+        rgbShift: 14,
+        lineJitter: 18,
+        noiseAmount: 22,
+        saltPepper: 8,
+        pixelSize: 3,
+        waveDistort: 20,
+        blockShift: 25,
+        dataBands: 20,
+        byteCorrupt: 10,
+        chromaBleed: 18,
+        pixelSort: 18,
+        ditherAmount: 10,
+        colorBlend: 14,
+        pixelMelt: 10,
+        subjectGhost: 12,
+        ghostCopies: 2,
+        ghostShift: 22,
+        polygonTrack: 16,
+        scanlineIntensity: 24,
+        bloom: 14,
+        posterize: 14,
+        hueShift: -8,
+        saturation: 126,
+        contrast: 118,
+        errorComplexity: 28,
+      },
+    },
+    {
+      label: "Datamosh hard",
+      values: {
+        rgbShift: 32,
+        lineJitter: 45,
+        noiseAmount: 44,
+        saltPepper: 24,
+        pixelSize: 6,
+        waveDistort: 28,
+        blockShift: 74,
+        dataBands: 56,
+        byteCorrupt: 44,
+        chromaBleed: 48,
+        pixelSort: 42,
+        ditherAmount: 24,
+        colorBlend: 34,
+        pixelMelt: 30,
+        subjectGhost: 36,
+        ghostCopies: 4,
+        ghostShift: 60,
+        polygonTrack: 38,
+        scanlineIntensity: 36,
+        bloom: 22,
+        posterize: 8,
+        hueShift: 18,
+        saturation: 142,
+        contrast: 148,
+        errorComplexity: 74,
+      },
+    },
+  ],
+  fractal: [
+    {
+      label: "Kaleido classic",
+      pattern: "kaleido",
+      source: "original",
+      values: {
+        kaleidoSegments: 8,
+        kaleidoLayers: 2,
+        layerEcho: 22,
+        kaleidoTwist: 18,
+        fractalZoom: 96,
+        fractalPulse: 22,
+        spiralAmount: 8,
+        spiralTurns: 9,
+        mandalaPetals: 8,
+        mandalaBloom: 10,
+        psychedelic: 26,
+        colorCycle: 25,
+      },
+    },
+    {
+      label: "Sacred geometry",
+      pattern: "hybrid",
+      source: "glitch",
+      values: {
+        kaleidoSegments: 12,
+        kaleidoLayers: 4,
+        layerEcho: 44,
+        kaleidoTwist: 46,
+        fractalZoom: 120,
+        fractalPulse: 74,
+        spiralAmount: 32,
+        spiralTurns: 15,
+        mandalaPetals: 14,
+        mandalaBloom: 56,
+        psychedelic: 68,
+        colorCycle: 108,
+      },
+    },
+  ],
+  depth: [
+    {
+      label: "3D starter",
+      values: {
+        depthStrength: 64,
+        depthShift: 24,
+        depthView: 8,
+        pointMap: 76,
+        pointDensity: 16,
+        pointSize: 3,
+        pointFloat: 24,
+        pointLift: 56,
+        pointRotateX: 10,
+        pointRotateY: -10,
+        pointRotateZ: 0,
+        meshMap: 42,
+        meshDensity: 28,
+        meshLift: 48,
+        glitch3d: 10,
+        ambientLight: 38,
+        lightIntensity: 110,
+        lightAzimuth: -30,
+        lightElevation: 26,
+        sceneExposure: 122,
+        cameraZoom: 82,
+        cameraFollow: 35,
+        autoRotate: 12,
+        pointColorShift: 32,
+        pointColorPulse: 28,
+        depthColorWave: 34,
+        depthExaggeration: 128,
+        pointSpread: 18,
+        bgMotion: 42,
+      },
+    },
+    {
+      label: "Scanner mesh",
+      values: {
+        depthStrength: 76,
+        depthShift: 32,
+        depthView: 18,
+        pointMap: 44,
+        pointDensity: 20,
+        pointSize: 2,
+        pointFloat: 30,
+        pointLift: 66,
+        pointRotateX: 18,
+        pointRotateY: 14,
+        pointRotateZ: 8,
+        meshMap: 88,
+        meshDensity: 20,
+        meshLift: 72,
+        glitch3d: 26,
+        ambientLight: 28,
+        lightIntensity: 124,
+        lightAzimuth: 38,
+        lightElevation: 22,
+        sceneExposure: 138,
+        cameraZoom: 90,
+        cameraFollow: 24,
+        autoRotate: 24,
+        pointColorShift: 88,
+        pointColorPulse: 46,
+        depthColorWave: 52,
+        depthExaggeration: 172,
+        pointSpread: 34,
+        bgMotion: 58,
+      },
+    },
+  ],
+  mix: [
+    {
+      label: "Neo rave total",
+      pattern: "hybrid",
+      source: "glitch",
+      values: {
+        rgbShift: 18,
+        lineJitter: 24,
+        noiseAmount: 24,
+        saltPepper: 12,
+        pixelSize: 3,
+        waveDistort: 14,
+        blockShift: 30,
+        dataBands: 24,
+        byteCorrupt: 18,
+        chromaBleed: 20,
+        pixelSort: 24,
+        ditherAmount: 18,
+        colorBlend: 26,
+        pixelMelt: 20,
+        subjectGhost: 18,
+        ghostCopies: 3,
+        ghostShift: 38,
+        polygonTrack: 24,
+        scanlineIntensity: 20,
+        bloom: 14,
+        posterize: 16,
+        hueShift: 22,
+        saturation: 162,
+        contrast: 132,
+        errorComplexity: 46,
+        kaleidoSegments: 10,
+        kaleidoLayers: 3,
+        layerEcho: 30,
+        kaleidoTwist: 30,
+        fractalZoom: 104,
+        fractalPulse: 48,
+        spiralAmount: 26,
+        spiralTurns: 12,
+        mandalaPetals: 10,
+        mandalaBloom: 38,
+        psychedelic: 52,
+        colorCycle: 74,
+        depthStrength: 56,
+        depthShift: 22,
+        depthView: 6,
+        pointMap: 58,
+        pointDensity: 18,
+        pointSize: 3,
+        pointFloat: 18,
+        pointLift: 56,
+        pointRotateX: 10,
+        pointRotateY: -12,
+        pointRotateZ: 7,
+        meshMap: 48,
+        meshDensity: 30,
+        meshLift: 46,
+        glitch3d: 14,
+        ambientLight: 34,
+        lightIntensity: 108,
+        lightAzimuth: -25,
+        lightElevation: 24,
+        sceneExposure: 130,
+        cameraZoom: 86,
+        cameraFollow: 35,
+        autoRotate: 14,
+        pointColorShift: 60,
+        pointColorPulse: 32,
+        depthColorWave: 28,
+        depthExaggeration: 142,
+        pointSpread: 22,
+        bgMotion: 46,
+      },
+    },
+  ],
+};
+
+let mode = "none";
+let originalImageData = null;
+let renderPending = false;
+let randomSeed = 1;
+let pointerTiltX = 0;
+let pointerTiltY = 0;
+let dragRotateX = 0;
+let dragRotateY = 0;
+let isDragging3D = false;
+let lastDragX = 0;
+let lastDragY = 0;
+let isDraggingDome = false;
+let lastDomeDragX = 0;
+let lastDomeDragY = 0;
+let domeViewYaw = 0;
+let domeViewPitch = 0;
+let domeAutoSeamU = 0.5;
+let domeSeamCacheKey = "";
+let domeAutoYaw = 0;
+let domeAutoYawVel = 0;
+let lastDomeAnimTs = performance.now();
+let particlesBufferN = 0;
+let particlesBufferW = 0;
+let particlesBufferH = 0;
+let particlesX = null;
+let particlesY = null;
+let particlesZ = null;
+let particlesVX = null;
+let particlesVY = null;
+let particlesVZ = null;
+let particlesLife = null;
+let particlesU = null;
+let particlesV = null;
+let particlesSeed = null;
+let particlesActiveN = 0;
+let particlesDrawStride = 1;
+let particlesPerfStreak = 0;
+let particlesCamXSmooth = 0;
+let particlesCamYSmooth = 0;
+let particlesCamZSmooth = 0;
+let particlesGpuReady = false;
+let particlesGpuTriedInit = false;
+let particlesGpu = null;
+let particlesGpuForcedOff = true;
+let smoothCamFollow = null;
+let smoothCamZoom = null;
+let smoothRotX = null;
+let smoothRotY = null;
+let smoothRotZ = null;
+let targetPanX = null;
+let targetPanY = null;
+let targetCamFollow = null;
+let targetCamZoom = null;
+let targetRotX = null;
+let targetRotY = null;
+let targetRotZ = null;
+let cameraFlowEase = 0;
+let gestureBaseZoom = null;
+let targetPointHue = null;
+let targetMeshHue = null;
+let smoothPointHue = null;
+let smoothMeshHue = null;
+let targetMeshAmount = null;
+let targetMeshLift = null;
+let smoothMeshAmount = null;
+let smoothMeshLift = null;
+let webcamStream = null;
+let webcamActive = false;
+let selectedCameraDeviceId = "";
+let recordingActive = false;
+let cameraMode = "cursor";
+let micStream = null;
+let micActive = false;
+let audioCtx = null;
+let analyser = null;
+let audioData = null;
+let audioLevel = 0;
+let liveRecorder = null;
+let liveRecordingStream = null;
+let liveDisplayStream = null;
+let liveRecordingChunks = [];
+let liveRecordingState = "idle";
+let liveRecordingExt = "webm";
+let liveRecordingMimeType = "";
+let livePausePending = false;
+let liveFinalizePending = false;
+let faceDetector = null;
+let handDetector = null;
+let detectedFaces = [];
+let detectedHands = [];
+let lastFaceDetectTs = 0;
+let trackingDetectBusy = false;
+let cleanOutputWindow = null;
+let cleanOutputCanvas = null;
+let cleanOutputCtx = null;
+let loadedImage = null;
+let locale = "es";
+let uiMode = "live";
+let liveActiveTab = "glitch";
+let studioActiveTab = "glitch";
+let currentWorkspacePanel = "setup";
+let liveGlitchPadDragging = false;
+let liveGlitchPadBDragging = false;
+let liveGlitchPadCDragging = false;
+let freezeFrame = false;
+let frozenImageData = null;
+let fps = 60;
+let lastFpsTs = performance.now();
+let fpsFrames = 0;
+let lastRenderTs = performance.now();
+let perfScale = 1;
+let modSignalSmoothed = 0;
+let transientEnergy = 0;
+let lastBandEnergy = 0;
+let currentSnapshotSlot = 1;
+let bgSyncMode = false;
+const snapshots = new Array(8).fill(null);
+const audioFeatures = {
+  rms: 0,
+  bands: [0, 0, 0, 0],
+  transient: 0,
+};
+const visualFeatures = {
+  luma: 0,
+  motion: 0,
+};
+let prevVisualProbe = null;
+const cameraKeyState = { up: false, down: false, left: false, right: false };
+let cameraPanX = 0;
+let cameraPanY = 0;
+let smoothCameraModeSpeed = 1;
+let cameraAnimTime = 0;
+let lastCameraAnimTs = performance.now();
+let stageGeomPrevCx = null;
+let stageGeomPrevCy = null;
+let stageGeomMotionX = 0;
+let stageGeomMotionY = 0;
+let bgColorTween = null;
+let glitchTrailBuffer = null;
+let glitchPrevFrame = null;
+let glitchTrailW = 0;
+let glitchTrailH = 0;
+let cleanFront3dActive = false;
+let cleanFront3dSnapshot = null;
+let lastCameraShuffleTs = 0;
+let cameraShufflePhase = Math.random() * Math.PI * 2;
+let renderErrorCount = 0;
+
+const LIVE_CANVAS_MAX_W = 1180;
+const LIVE_CANVAS_MAX_H = 760;
+const EXPORT_CANVAS_MAX_W = 3840;
+const EXPORT_CANVAS_MAX_H = 2160;
+
+const i18n = {
+  es: {
+    brand_left: "PIXEL ERROR LAB 2000",
+    brand_right: "B.ZU.AL Studios",
+    aspect_ratio: "Relación de aspecto",
+    language: "Idioma",
+    ui_live: "Live",
+    ui_edit: "Edit",
+    tab_setup: "Setup",
+    tab_live: "Live",
+    tab_studio: "Studio",
+    setup_title: "Entrada + Ruteo",
+    live_title: "Performance Rack",
+    studio_title: "Studio Avanzado",
+    studio_glitch: "Studio Glitch",
+    studio_3d: "Studio 3D",
+    load_image: "Cargar Imagen",
+    preset: "Preset",
+    enable_webcam: "Activar webcam",
+    camera_device: "Dispositivo de cámara",
+    camera_auto: "Automática",
+    refresh_cameras: "Refrescar cámaras",
+    enable_mic: "Activar mic",
+    mode_clean: "Clean",
+    mode_glitch: "Glitch",
+    mode_fractal: "Fractal",
+    mode_depth: "3D Stage",
+    mode_particles: "Partículas",
+    mode_mix: "Mix All",
+    audio_reactive: "Audio Reactivo",
+    audio_input: "Entrada de Audio",
+    audio_input_mic: "Micrófono",
+    audio_input_system: "Audio interno / dispositivo",
+    audio_target: "Objetivo",
+    audio_target_points: "Puntos",
+    audio_target_mesh: "Malla",
+    audio_target_both: "Ambos",
+    audio_animation: "Animación",
+    audio_anim_lift: "Elevación",
+    audio_anim_wave: "Onda",
+    audio_anim_color: "Color",
+    audio_anim_all: "Todo",
+    audio_sensitivity: "Sensibilidad de Audio",
+    audio_tolerance: "Tolerancia de Audio",
+    audio_points_intensity: "Intensidad Audio en Puntos",
+    audio_mesh_intensity: "Intensidad Audio en Malla",
+    audio_anim_variation: "Variación de Animación Audio",
+    audio_help:
+      "El audio del sistema usa compartir pantalla/pestaña en navegadores. Activa 'Share audio' en el selector.",
+    status_realtime: "Realtime ON. Clean mode = imagen original.",
+    quick3d: "3D Starter",
+    quick3d_clean: "3D Limpio Frontal (M)",
+    modulation: "Modulación",
+    mod_source: "Fuente",
+    mod_target: "Destino",
+    mod_amount: "Cantidad",
+    mod_smoothing: "Suavizado",
+    mod_clamp: "Clamp",
+    freeze: "Freeze",
+    panic: "Panic",
+    snapshot_save: "Snapshot Save",
+    random: "Random",
+    reseed: "Re-seed",
+    reset: "Reset",
+    save_png: "Guardar PNG",
+    visualization_deck: "Visualization Deck",
+    camera_modes: "Modos de Cámara",
+    cam_static: "Static",
+    cam_cursor: "Cursor",
+    cam_orbit: "Orbit",
+    cam_sweep: "Sweep X",
+    cam_pulse: "Dolly Pulse",
+    cam_helix: "Helix",
+    cam_drift: "Drift Glitch",
+    cam_liquid: "Líquido",
+    camera_move_speed: "Velocidad de Cámara",
+    fx3d_filter: "Filtro FX 3D",
+    fx3d_amount: "Cantidad FX 3D",
+    recording: "Grabación",
+    record_source: "Fuente de Grabación",
+    record_source_canvas: "Canva limpio",
+    record_source_screen: "Pantalla",
+    record: "Grabar",
+    record_start: "Grabar",
+    record_pause: "Pausar",
+    record_resume: "Reanudar",
+    record_status_idle: "IDLE",
+    record_status_recording: "REC",
+    record_status_paused: "PAUSA",
+    save_recording: "Guardar Grabación",
+    exports: "Exportes",
+    export_video: "Exportar Video 5s",
+    export_gif: "Exportar GIF 5s*",
+    export_photo: "Foto HQ",
+    clean_output: "Salida Limpia",
+    open_clean_output: "Abrir Salida Limpia",
+    close_clean_output: "Cerrar Salida Limpia",
+    footer_mouse: "Mouse: inclinación 3D + arrastre orbital",
+    footer_engine: "Render Engine 2K",
+    pause: "Pausar",
+    webcam_enable: "Activar webcam",
+    webcam_disable: "Desactivar webcam",
+    mic_enable: "Activar mic",
+    mic_disable: "Desactivar mic",
+    resume: "Reanudar",
+    no_preset: "Sin preset",
+    placeholder_title: "CARGA IMAGEN // MODO CLEAN",
+    placeholder_subtitle: "Deck listo: glitch / 3d stage / live",
+    popup_blocked: "No pude abrir la salida limpia. Permite popups para este sitio.",
+    image_load_error: "No pude cargar esa imagen.",
+    webcam_unavailable: "Tu navegador no permite cámara aquí. Abre la app en https:// o en http://localhost.",
+    webcam_secure: "La webcam requiere contexto seguro. Usa https:// o http://localhost (no file://).",
+    webcam_fail: "No se pudo activar la webcam",
+    mic_unavailable: "Tu navegador no permite micrófono aquí. Usa https:// o http://localhost.",
+    mic_secure: "El micrófono requiere contexto seguro. Usa https:// o http://localhost.",
+    mic_fail: "No se pudo activar el micrófono",
+    mic_hint_system:
+      "Para audio del sistema: usa Chrome/Edge, comparte pantalla/pestaña y activa 'Share audio'. En macOS no siempre hay audio de sistema disponible.",
+    mic_hint_regular: "Revisa permisos del navegador y del sistema.",
+    export_unsupported: "Tu navegador no soporta exportar video desde canvas.",
+    export_gif_fallback: "GIF no está soportado por este navegador; exporté WebM.",
+    export_mp4_fallback: "MP4 no está soportado en este navegador para MediaRecorder; exporté WebM.",
+    recording_unsupported: "Tu navegador no soporta grabación desde canvas.",
+    recording_screen_fail:
+      "No se pudo iniciar grabación de pantalla. En Safari debes permitir compartir pantalla y elegir la ventana/pantalla correcta.",
+    recording_mp4_required:
+      "MP4 no está disponible en este navegador/configuración. En Safari actualizado suele estar disponible; si no, prueba la opción de Canvas o usa Chrome.",
+    recording_webm_notice: "Tu navegador grabó en WebM; MP4 no está habilitado por MediaRecorder en este entorno.",
+    audio_help_mic: "Micrófono normal: toma audio de tu entrada física.",
+    audio_help_system:
+      "Audio del sistema: el navegador pide compartir pantalla/pestaña para capturar sonido interno.",
+    audio_status_idle: "Audio: inactivo",
+    audio_status_mic: "Audio: micrófono activo",
+    audio_status_system: "Audio: captura de sistema/pestaña activa",
+    input_none: "Entrada: ninguna",
+    input_webcam: "Entrada: Webcam",
+    input_image: "Entrada: Imagen",
+    input_frame: "Entrada: Frame",
+    auto_performance: "Auto rendimiento",
+    slot_saved: "guardado",
+    slot_empty: "vacío",
+  },
+  en: {
+    brand_left: "PIXEL ERROR LAB 2000",
+    brand_right: "B.ZU.AL Studios",
+    aspect_ratio: "Aspect Ratio",
+    language: "Language",
+    ui_live: "Live",
+    ui_edit: "Edit",
+    tab_setup: "Setup",
+    tab_live: "Live",
+    tab_studio: "Studio",
+    setup_title: "Input + Routing",
+    live_title: "Performance Rack",
+    studio_title: "Advanced Studio",
+    studio_glitch: "Glitch Studio",
+    studio_3d: "3D Studio",
+    load_image: "Load Image",
+    preset: "Preset",
+    enable_webcam: "Enable Webcam",
+    camera_device: "Camera Device",
+    camera_auto: "Auto",
+    refresh_cameras: "Refresh Cameras",
+    enable_mic: "Enable Mic",
+    mode_clean: "Clean",
+    mode_glitch: "Glitch",
+    mode_fractal: "Fractal",
+    mode_depth: "3D Stage",
+    mode_particles: "Particles",
+    mode_mix: "Mix All",
+    audio_reactive: "Audio Reactive",
+    audio_input: "Audio Input",
+    audio_input_mic: "Microphone",
+    audio_input_system: "System / Device Audio",
+    audio_target: "Target",
+    audio_target_points: "Points",
+    audio_target_mesh: "Mesh",
+    audio_target_both: "Both",
+    audio_animation: "Animation",
+    audio_anim_lift: "Lift",
+    audio_anim_wave: "Wave",
+    audio_anim_color: "Color",
+    audio_anim_all: "All",
+    audio_sensitivity: "Audio Sensitivity",
+    audio_tolerance: "Audio Tolerance",
+    audio_points_intensity: "Points Audio Intensity",
+    audio_mesh_intensity: "Mesh Audio Intensity",
+    audio_anim_variation: "Audio Animation Variation",
+    audio_help: "System audio uses screen/tab sharing on browsers. Enable 'Share audio' in the picker.",
+    status_realtime: "Realtime ON. Clean mode = original image.",
+    quick3d: "3D Starter",
+    quick3d_clean: "3D Clean Front (M)",
+    modulation: "Modulation",
+    mod_source: "Source",
+    mod_target: "Target",
+    mod_amount: "Amount",
+    mod_smoothing: "Smoothing",
+    mod_clamp: "Clamp",
+    freeze: "Freeze",
+    panic: "Panic",
+    snapshot_save: "Snapshot Save",
+    random: "Random",
+    reseed: "Re-seed",
+    reset: "Reset",
+    save_png: "Save PNG",
+    visualization_deck: "Visualization Deck",
+    camera_modes: "Camera Modes",
+    cam_static: "Static",
+    cam_cursor: "Cursor",
+    cam_orbit: "Orbit",
+    cam_sweep: "Sweep X",
+    cam_pulse: "Dolly Pulse",
+    cam_helix: "Helix",
+    cam_drift: "Drift Glitch",
+    cam_liquid: "Liquid",
+    camera_move_speed: "Camera Speed",
+    fx3d_filter: "3D FX Filter",
+    fx3d_amount: "3D FX Amount",
+    recording: "Recording",
+    record_source: "Record Source",
+    record_source_canvas: "Clean Canvas",
+    record_source_screen: "Screen",
+    record: "Record",
+    record_start: "Record",
+    record_pause: "Pause",
+    record_resume: "Resume",
+    record_status_idle: "IDLE",
+    record_status_recording: "REC",
+    record_status_paused: "PAUSED",
+    save_recording: "Save Recording",
+    exports: "Exports",
+    export_video: "Export 5s Video",
+    export_gif: "Export 5s GIF*",
+    export_photo: "Photo HQ",
+    clean_output: "Clean Output",
+    open_clean_output: "Open Clean Output",
+    close_clean_output: "Close Clean Output",
+    footer_mouse: "Mouse: 3D tilt + drag orbit",
+    footer_engine: "Render Engine 2K",
+    pause: "Pause",
+    webcam_enable: "Enable Webcam",
+    webcam_disable: "Disable Webcam",
+    mic_enable: "Enable Mic",
+    mic_disable: "Disable Mic",
+    resume: "Resume",
+    no_preset: "No preset",
+    placeholder_title: "LOAD IMAGE // CLEAN MODE",
+    placeholder_subtitle: "Deck ready: glitch / 3d stage / live",
+    popup_blocked: "Could not open clean output. Please allow popups for this site.",
+    image_load_error: "Could not load that image.",
+    webcam_unavailable: "Your browser cannot access camera here. Open the app on https:// or http://localhost.",
+    webcam_secure: "Webcam needs a secure context. Use https:// or http://localhost (not file://).",
+    webcam_fail: "Could not enable webcam",
+    mic_unavailable: "Your browser cannot access microphone here. Use https:// or http://localhost.",
+    mic_secure: "Microphone needs a secure context. Use https:// or http://localhost.",
+    mic_fail: "Could not enable microphone",
+    mic_hint_system:
+      "For system audio: use Chrome/Edge, share screen or tab, and enable 'Share audio'. On macOS, system audio is not always available.",
+    mic_hint_regular: "Check browser and OS permissions.",
+    export_unsupported: "Your browser does not support canvas video export.",
+    export_gif_fallback: "GIF is not supported in this browser; exported WebM instead.",
+    export_mp4_fallback: "MP4 is not supported by MediaRecorder here; exported WebM instead.",
+    recording_unsupported: "Your browser does not support recording from canvas.",
+    recording_screen_fail:
+      "Could not start screen recording. In Safari, allow screen sharing and select the correct window/screen.",
+    recording_mp4_required:
+      "MP4 is not available in this browser/setup. Updated Safari usually supports it; if not, try Canvas source or Chrome.",
+    recording_webm_notice: "Your browser recorded WebM; MP4 is not available via MediaRecorder in this environment.",
+    audio_help_mic: "Regular mic mode: captures sound from your physical microphone.",
+    audio_help_system:
+      "System audio mode: browser asks for screen/tab sharing to capture internal audio.",
+    audio_status_idle: "Audio: idle",
+    audio_status_mic: "Audio: microphone active",
+    audio_status_system: "Audio: system/tab capture active",
+    input_none: "Input: none",
+    input_webcam: "Input: Webcam",
+    input_image: "Input: Image",
+    input_frame: "Input: Frame",
+    auto_performance: "Auto performance",
+    slot_saved: "saved",
+    slot_empty: "empty",
+  },
+};
+
+const fxCanvas = document.createElement("canvas");
+const fxCtx = fxCanvas.getContext("2d", { willReadFrequently: true });
+const fractalCanvas = document.createElement("canvas");
+const fractalCtx = fractalCanvas.getContext("2d", { willReadFrequently: true });
+const tileCanvas = document.createElement("canvas");
+const tileCtx = tileCanvas.getContext("2d", { willReadFrequently: true });
+const stageFxCanvas = document.createElement("canvas");
+const stageFxCtx = stageFxCanvas.getContext("2d", { willReadFrequently: true });
+const stagePrevCanvas = document.createElement("canvas");
+const stagePrevCtx = stagePrevCanvas.getContext("2d", { willReadFrequently: true });
+const glitchTrailCanvas = document.createElement("canvas");
+const glitchTrailCtx = glitchTrailCanvas.getContext("2d", { willReadFrequently: true });
+const glitchTrailTempCanvas = document.createElement("canvas");
+const glitchTrailTempCtx = glitchTrailTempCanvas.getContext("2d", { willReadFrequently: true });
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function t(key) {
+  return i18n[locale]?.[key] || i18n.es[key] || key;
+}
+
+const extendedLocaleTexts = {
+  es: {
+    selectors: {
+      "#liveModeGlitchBtn span:last-child": "Glitch Live",
+      "#liveMode3dBtn span:last-child": "3D Live",
+      "#liveModeParticlesBtn span:last-child": "Partículas Live",
+      "#livePaneGlitch h2": "Esenciales Glitch",
+      "#livePane3d h2": "Esenciales 3D",
+      "#livePaneParticles h2": "Esenciales Partículas",
+      "#livePane3d .micro-tip": "Tip: usa WASD/flechas para paneo 3D y arrastra para orbitar.",
+      "#livePaneGlitch .micro-tip": "Tip: webcam + tracking FX da glitch facial/manos en tiempo real.",
+      "#livePaneParticles .micro-tip": "Tip: módulo independiente con partículas XYZ audio-reactivas y auto performance.",
+      "#liveOutputGroup h2": "Vista de salida",
+      "#liveDomeSummary": "Módulo Vista Domo",
+      "#liveGlitchPadLabel": "GL Glitch Pad (X=Intensidad / Y=Color)",
+      "#liveGlitchPadBLabel": "FX2 Glitch Pad B (X=Error / Y=Tracking)",
+      "#liveGlitchPadCLabel": "FX3 Glitch Pad C (X=Estela / Y=Dist. animada)",
+      "#live3dPointsPadLabel": "PTS Points Pad (X=Cantidad / Y=Tamaño)",
+      "#live3dMeshPadLabel": "MSH Mesh Pad (X=Cantidad / Y=Elevación)",
+      "#live3dPadBLabel": "SEP Pad B (X=Separación / Y=Fondo)",
+      "#live3dCamPadLabel": "CAM Camera Pad (X=Follow / Y=Zoom)",
+      "#live3dRotPadLabel": "ROT Rotation Pad (X=Rotate Y / Y=Rotate X)",
+      "#live3dColorPadLabel": "CLR Color Mix Pad (X=Tono Punto / Y=Tono Malla)",
+      "#liveModPadLabel": "Pad Mod (X=Cantidad / Y=Suavizado)",
+      "#panelStudio .group[data-modes='glitch'] > h2": "Rack Glitch",
+      "#panelStudio .group.legacy-fractal > h2": "Rack Fractal",
+      "#panelStudio #depthControlsGroup > h2": "Escenario 3D",
+      "#panelStudio #depthControlsGroup .micro-tip": "Tip: empieza con \"3D Starter\" y mueve el mouse en el viewport.",
+      "#panelStudio #depthControlsGroup details summary": "3D Avanzado",
+      "#panelStudio #depthControlsGroup details h3": "Iluminación",
+      "#panelStudio .group[data-modes='glitch'] .subgroup-title:nth-of-type(1)": "Pixel Art / Mezcla de Color",
+      "#panelStudio .group[data-modes='glitch'] .subgroup-title:nth-of-type(2)": "Glitch con Máscara de Sujeto",
+      "#panelStudio .group[data-modes='glitch'] .subgroup-title:nth-of-type(3)": "Color / Acabado",
+      "#panelStudio .group.legacy-fractal .subgroup-title:nth-of-type(1)": "Espiral / Mandala",
+      "#panelStudio .group.legacy-fractal .subgroup-title:nth-of-type(2)": "Color Psicodélico",
+      "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(1)": "Geometría 3D / Movimiento",
+      "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(2)": "Estética / FX de Luz",
+      "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(3)": "Fondo 3D",
+      "#canvasEntryOverlay .canvas-entry-title": "Iniciar entrada",
+      "#canvasEntryOverlay .canvas-entry-sub": "Elige una entrada para comenzar el performance visual",
+      "#canvasOverlayImageBtn span:last-child": "Cargar imagen",
+      "#canvasOverlayWebcamBtn span:last-child": "Activar webcam",
+    },
+    labels: {
+      liveGlitchIntensity: "Intensidad",
+      liveGlitchColor: "Mezcla de color",
+      liveGlitchError: "Complejidad de error",
+      liveGlitchTracking: "Tracking FX",
+      liveGlitchTrail: "Estela de movimiento",
+      liveGlitchAnim: "Distorsión animada",
+      liveCameraMode: "Movimiento de cámara",
+      live3dPoints: "Puntos",
+      live3dMesh: "Malla",
+      live3dSeparation: "Separación Punto/Malla",
+      live3dBackground: "Energía de fondo",
+      live3dOrganic: "Interacción orgánica",
+      live3dLightingMode: "Modo de iluminación",
+      live3dLight: "Potencia de iluminación",
+      live3dFxMode: "Filtro FX 3D",
+      live3dFxAmount: "Cantidad FX 3D",
+      live3dAnaglyph: "Anaglifo 3D",
+      live3dAnaglyphStrength: "Profundidad anaglifo",
+      liveParticlesCount: "Cantidad de partículas",
+      liveParticlesEmitter: "Emisor",
+      liveParticlesSize: "Tamaño",
+      liveParticlesDepth: "Profundidad / Z",
+      liveParticlesNoise: "Ruido",
+      liveParticlesAttractor: "Atracción",
+      liveParticlesFlow: "Flujo",
+      liveParticlesCamX: "Cámara X",
+      liveParticlesCamY: "Cámara Y",
+      liveParticlesCamZ: "Cámara Z",
+      liveParticlesColorMode: "Modo de color",
+      liveParticlesHue: "Desfase de tono",
+      liveParticlesAudio: "Audio reactivo",
+      liveParticlesAudioAmount: "Cantidad de audio",
+      liveParticlesDamping: "Damping",
+      liveParticlesVortex: "Vórtice",
+      liveParticlesSpawn: "Tasa de spawn",
+      liveParticlesMotionThreshold: "Umbral de movimiento",
+      liveOutputView: "Vista de salida",
+      domeSourceMap: "Mapa de fuente Domo",
+      domeWarp: "Warp Domo",
+      domeTilt: "Tilt Domo",
+      domeRotate: "Rotación Domo",
+      domeAutoRotate: "Auto rotación Domo",
+      domeAutoRotateSpeed: "Velocidad auto Domo",
+      domeGrid: "Guía de grilla Domo",
+      modCurve: "Curva",
+      rgbShift: "Desfase RGB",
+      lineJitter: "Jitter de líneas",
+      noiseAmount: "Ruido",
+      saltPepper: "Sal y pimienta",
+      pixelSize: "Pixelado",
+      waveDistort: "Distorsión de onda",
+      blockShift: "Desplazamiento de bloques",
+      dataBands: "Bandas de datos",
+      byteCorrupt: "Corrupción de bytes",
+      chromaBleed: "Sangrado cromático",
+      pixelSort: "Pixel sort",
+      ditherAmount: "Matriz dither",
+      colorBlend: "Mezcla neón",
+      pixelMelt: "Derretido de píxel",
+      subjectGhost: "Fantasma de máscara",
+      ghostCopies: "Copias fantasma",
+      ghostShift: "Desplazamiento fantasma",
+      polygonTrack: "Tracking poligonal",
+      scanlineIntensity: "Scanlines",
+      bloom: "Bloom",
+      posterize: "Posterizado",
+      hueShift: "Desplazamiento de tono",
+      saturation: "Saturación",
+      contrast: "Contraste",
+      invertBlend: "Mezcla invertida",
+      solarize: "Solarizar",
+      motionTrail: "FX estela de movimiento",
+      trailDecay: "Decaimiento de estela",
+      trailThreshold: "Umbral de movimiento",
+      trailSoftness: "Suavizado de máscara",
+      trailMotionOnly: "Solo movimiento",
+      animDistort: "Distorsión animada",
+      animSpeed: "Velocidad de animación",
+      errorComplexity: "Complejidad de error",
+      fractalPattern: "Patrón",
+      fractalSource: "Fuente fractal",
+      kaleidoSegments: "Segmentos (espejo)",
+      kaleidoLayers: "Capas",
+      layerEcho: "Eco de capa",
+      kaleidoTwist: "Giro",
+      fractalZoom: "Zoom fractal",
+      fractalPulse: "Pulso fractal",
+      spiralAmount: "Cantidad espiral",
+      spiralTurns: "Vueltas espiral",
+      mandalaPetals: "Pétalos mandala",
+      mandalaBloom: "Bloom mandala",
+      psychedelic: "Psicodélico",
+      colorCycle: "Ciclo de color",
+      depthStrength: "Fuerza de profundidad",
+      pointMap: "Mapa de puntos",
+      pointDensity: "Densidad de puntos",
+      pointSize: "Tamaño de puntos",
+      pointFloat: "Flotación de puntos",
+      pointOrganic: "Interacción orgánica",
+      pointLift: "Elevación Z de puntos",
+      meshMap: "Mapa de malla",
+      meshDensity: "Densidad de malla",
+      meshLift: "Elevación Z de malla",
+      pointColorShift: "Desfase de color de puntos",
+      meshColorShift: "Desfase de color de malla",
+      meshGlow: "Brillo de malla",
+      ambientLight: "Luz ambiente",
+      lightIntensity: "Potencia de luz",
+      sceneExposure: "Exposición",
+      depthExaggeration: "Exageración de profundidad",
+      pointSpread: "Separación de puntos",
+      depthShift: "Desplazamiento de profundidad",
+      depthView: "Vista de profundidad",
+      pointRotateX: "Rotación X",
+      pointRotateY: "Rotación Y",
+      pointRotateZ: "Rotación Z",
+      glitch3d: "Jitter glitch 3D",
+      lightEnabled: "Iluminación activa",
+      flatIllustrated: "Plano ilustrado",
+      lightAzimuth: "Azimut de luz",
+      lightElevation: "Elevación de luz",
+      cameraZoom: "Zoom de cámara",
+      cameraFollow: "Cámara con cursor",
+      autoRotate: "Auto rotación",
+      pointColorPulse: "Pulso de color de puntos",
+      depthColorWave: "Onda de color en profundidad",
+      bgMode: "Modo de fondo",
+      bgPalette: "Paleta de fondo",
+      bgColorA: "Color A de fondo",
+      bgColorB: "Color B de fondo",
+      bgMotion: "Movimiento de fondo",
+    },
+    options: {
+      liveCameraMode: {
+        static: "Estática",
+        cursor: "Cursor",
+        orbit: "Órbita",
+        sweep: "Barrido",
+        pulse: "Pulso Dolly",
+        helix: "Hélice",
+        drift: "Deriva",
+        liquid: "Líquido",
+      },
+      live3dLightingMode: { lit: "Iluminado", flat: "Plano / Ilustrado" },
+      live3dFxMode: {
+        none: "Ninguno",
+        delay: "Delay",
+        echo: "Eco visual",
+        colortrail: "Estela de color",
+        prism: "Deriva prisma",
+      },
+      liveParticlesCount: {
+        low: "Baja",
+        med: "Media",
+        high: "Alta",
+        ultra: "Ultra",
+      },
+      liveParticlesEmitter: {
+        grid: "Grid",
+        volume: "Volumen",
+        motion: "Movimiento",
+      },
+      liveParticlesColorMode: {
+        source: "Desde fuente",
+        palette: "Paleta",
+        audio: "Mapa calor audio",
+      },
+      liveOutputView: { normal: "Normal", dome: "Domo" },
+      domeSourceMap: {
+        standard: "Warp estándar",
+        equirect: "360 Equirect -> 180 Domo",
+      },
+      modCurve: { smooth: "Suave", linear: "Lineal", punch: "Punch", step: "Step" },
+      bgMode: {
+        black: "Negro",
+        solid: "Sólido",
+        "gradient-linear": "Degradado lineal",
+        "gradient-radial": "Degradado radial",
+        animated: "Animado",
+        grid: "Grilla en movimiento",
+        "psychedelic-fractal": "Fractal psicodélico",
+      },
+      bgPalette: {
+        custom: "Personalizada",
+        cyber: "Cyber",
+        sunset: "Atardecer",
+        ocean: "Océano",
+        toxic: "Tóxico",
+      },
+      fractalPattern: {
+        kaleido: "Kaleido Espejo",
+        spiral: "Espiral",
+        mandala: "Mandala",
+        hybrid: "Híbrido",
+      },
+      fractalSource: {
+        original: "Imagen original",
+        glitch: "Imagen base glitch",
+      },
+    },
+  },
+  en: {
+    selectors: {
+      "#liveModeGlitchBtn span:last-child": "Glitch Live",
+      "#liveMode3dBtn span:last-child": "3D Live",
+      "#liveModeParticlesBtn span:last-child": "Particles Live",
+      "#livePaneGlitch h2": "Glitch Essentials",
+      "#livePane3d h2": "3D Essentials",
+      "#livePaneParticles h2": "Particles Essentials",
+      "#livePane3d .micro-tip": "Tip: use WASD/arrows for 3D panning and drag to orbit.",
+      "#livePaneGlitch .micro-tip": "Tip: webcam + tracking FX gives real-time face/hand glitch.",
+      "#livePaneParticles .micro-tip": "Tip: independent module with XYZ audio-reactive particles and auto performance.",
+      "#liveOutputGroup h2": "Output View",
+      "#liveDomeSummary": "Dome View Module",
+      "#liveGlitchPadLabel": "GL Glitch Pad (X=Intensity / Y=Color)",
+      "#liveGlitchPadBLabel": "FX2 Glitch Pad B (X=Error / Y=Tracking)",
+      "#liveGlitchPadCLabel": "FX3 Glitch Pad C (X=Trail / Y=Anim Distort)",
+      "#live3dPointsPadLabel": "PTS Points Pad (X=Amount / Y=Size)",
+      "#live3dMeshPadLabel": "MSH Mesh Pad (X=Amount / Y=Lift)",
+      "#live3dPadBLabel": "SEP Pad B (X=Separation / Y=Background)",
+      "#live3dCamPadLabel": "CAM Camera Pad (X=Follow / Y=Zoom)",
+      "#live3dRotPadLabel": "ROT Rotation Pad (X=Rotate Y / Y=Rotate X)",
+      "#live3dColorPadLabel": "CLR Color Mix Pad (X=Point Hue / Y=Mesh Hue)",
+      "#liveModPadLabel": "Mod Pad (X=Amount / Y=Smoothing)",
+      "#panelStudio .group[data-modes='glitch'] > h2": "Glitch Rack",
+      "#panelStudio .group.legacy-fractal > h2": "Fractal Rack",
+      "#panelStudio #depthControlsGroup > h2": "3D Stage",
+      "#panelStudio #depthControlsGroup .micro-tip": "Tip: start with \"3D Starter\" and move the mouse in the viewport.",
+      "#panelStudio #depthControlsGroup details summary": "Advanced 3D",
+      "#panelStudio #depthControlsGroup details h3": "Lighting",
+      "#panelStudio .group[data-modes='glitch'] .subgroup-title:nth-of-type(1)": "Pixel Art / Color Blend",
+      "#panelStudio .group[data-modes='glitch'] .subgroup-title:nth-of-type(2)": "Subject Mask Glitch",
+      "#panelStudio .group[data-modes='glitch'] .subgroup-title:nth-of-type(3)": "Color / Finish",
+      "#panelStudio .group.legacy-fractal .subgroup-title:nth-of-type(1)": "Spiral / Mandala",
+      "#panelStudio .group.legacy-fractal .subgroup-title:nth-of-type(2)": "Psychedelic Color",
+      "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(1)": "3D Geometry / Motion",
+      "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(2)": "Aesthetic / Light FX",
+      "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(3)": "3D Background",
+      "#canvasEntryOverlay .canvas-entry-title": "Start Input",
+      "#canvasEntryOverlay .canvas-entry-sub": "Choose an input to begin visual performance",
+      "#canvasOverlayImageBtn span:last-child": "Load Image",
+      "#canvasOverlayWebcamBtn span:last-child": "Enable Webcam",
+    },
+    labels: {
+      liveGlitchIntensity: "Intensity",
+      liveGlitchColor: "Color Mix",
+      liveGlitchError: "Error Complexity",
+      liveGlitchTracking: "Tracking FX",
+      liveGlitchTrail: "Motion Trail",
+      liveGlitchAnim: "Anim Distort",
+      liveCameraMode: "Camera Move",
+      live3dPoints: "Points",
+      live3dMesh: "Mesh",
+      live3dSeparation: "Point/Mesh Separation",
+      live3dBackground: "Background Energy",
+      live3dOrganic: "Organic Interaction",
+      live3dLightingMode: "Lighting Mode",
+      live3dLight: "Lighting Power",
+      live3dFxMode: "3D FX Filter",
+      live3dFxAmount: "3D FX Amount",
+      live3dAnaglyph: "3D Anaglyph",
+      live3dAnaglyphStrength: "Anaglyph Depth",
+      liveParticlesCount: "Particle Count",
+      liveParticlesEmitter: "Emitter",
+      liveParticlesSize: "Size",
+      liveParticlesDepth: "Depth / Z",
+      liveParticlesNoise: "Noise",
+      liveParticlesAttractor: "Attractor",
+      liveParticlesFlow: "Flow",
+      liveParticlesCamX: "Camera X",
+      liveParticlesCamY: "Camera Y",
+      liveParticlesCamZ: "Camera Z",
+      liveParticlesColorMode: "Color Mode",
+      liveParticlesHue: "Hue Shift",
+      liveParticlesAudio: "Audio React",
+      liveParticlesAudioAmount: "Audio Amount",
+      liveParticlesDamping: "Damping",
+      liveParticlesVortex: "Vortex",
+      liveParticlesSpawn: "Spawn Rate",
+      liveParticlesMotionThreshold: "Motion Threshold",
+      liveOutputView: "Output View",
+      domeSourceMap: "Dome Source Map",
+      domeWarp: "Dome Warp",
+      domeTilt: "Dome Tilt",
+      domeRotate: "Dome Rotation",
+      domeAutoRotate: "Dome Auto Rotate",
+      domeAutoRotateSpeed: "Dome Auto Speed",
+      domeGrid: "Dome Grid Guide",
+      modCurve: "Curve",
+      rgbShift: "RGB Shift",
+      lineJitter: "Line Jitter",
+      noiseAmount: "Noise",
+      saltPepper: "Salt & Pepper",
+      pixelSize: "Pixelate",
+      waveDistort: "Wave Distort",
+      blockShift: "Block Shift",
+      dataBands: "Data Bands",
+      byteCorrupt: "Byte Corrupt",
+      chromaBleed: "Chroma Bleed",
+      pixelSort: "Pixel Sort",
+      ditherAmount: "Dither Matrix",
+      colorBlend: "Neon Blend",
+      pixelMelt: "Pixel Melt",
+      subjectGhost: "Mask Ghost",
+      ghostCopies: "Ghost Copies",
+      ghostShift: "Ghost Shift",
+      polygonTrack: "Polygon Tracking",
+      scanlineIntensity: "Scanlines",
+      bloom: "Bloom",
+      posterize: "Posterize",
+      hueShift: "Hue Shift",
+      saturation: "Saturation",
+      contrast: "Contrast",
+      invertBlend: "Invert Blend",
+      solarize: "Solarize",
+      motionTrail: "Motion Trail FX",
+      trailDecay: "Trail Decay",
+      trailThreshold: "Motion Threshold",
+      trailSoftness: "Mask Softness",
+      trailMotionOnly: "Motion Only",
+      animDistort: "Animated Distortion",
+      animSpeed: "Animation Speed",
+      errorComplexity: "Error Complexity",
+      fractalPattern: "Pattern",
+      fractalSource: "Fractal Source",
+      kaleidoSegments: "Segments (mirror)",
+      kaleidoLayers: "Layers",
+      layerEcho: "Layer Echo",
+      kaleidoTwist: "Twist",
+      fractalZoom: "Fractal Zoom",
+      fractalPulse: "Fractal Pulse",
+      spiralAmount: "Spiral Amount",
+      spiralTurns: "Spiral Turns",
+      mandalaPetals: "Mandala Petals",
+      mandalaBloom: "Mandala Bloom",
+      psychedelic: "Psychedelic",
+      colorCycle: "Color Cycle",
+      depthStrength: "Depth Strength",
+      pointMap: "Point Map",
+      pointDensity: "Point Density",
+      pointSize: "Point Size",
+      pointFloat: "Point Float",
+      pointOrganic: "Organic Interaction",
+      pointLift: "Point Lift Z",
+      meshMap: "Mesh Map",
+      meshDensity: "Mesh Density",
+      meshLift: "Mesh Lift Z",
+      pointColorShift: "Point Color Shift",
+      meshColorShift: "Mesh Color Shift",
+      meshGlow: "Mesh Glow",
+      ambientLight: "Ambient",
+      lightIntensity: "Light Power",
+      sceneExposure: "Exposure",
+      depthExaggeration: "Depth Exaggeration",
+      pointSpread: "Point Spread",
+      depthShift: "Depth Shift",
+      depthView: "Depth View",
+      pointRotateX: "Rotate X",
+      pointRotateY: "Rotate Y",
+      pointRotateZ: "Rotate Z",
+      glitch3d: "3D Glitch Jitter",
+      lightEnabled: "Lighting Enable",
+      flatIllustrated: "Flat Illustrated",
+      lightAzimuth: "Light Azimuth",
+      lightElevation: "Light Elevation",
+      cameraZoom: "Camera Zoom",
+      cameraFollow: "Cursor Camera",
+      autoRotate: "Auto Rotate",
+      pointColorPulse: "Point Color Pulse",
+      depthColorWave: "Depth Color Wave",
+      bgMode: "Background Mode",
+      bgPalette: "Background Palette",
+      bgColorA: "Background Color A",
+      bgColorB: "Background Color B",
+      bgMotion: "Background Motion",
+    },
+    options: {
+      liveCameraMode: {
+        static: "Static",
+        cursor: "Cursor",
+        orbit: "Orbit",
+        sweep: "Sweep",
+        pulse: "Dolly Pulse",
+        helix: "Helix",
+        drift: "Drift",
+        liquid: "Liquid",
+      },
+      live3dLightingMode: { lit: "Lit", flat: "Flat / Illustrated" },
+      live3dFxMode: {
+        none: "None",
+        delay: "Delay",
+        echo: "Visual Echo",
+        colortrail: "Color Trail",
+        prism: "Prism Drift",
+      },
+      liveParticlesCount: {
+        low: "Low",
+        med: "Med",
+        high: "High",
+        ultra: "Ultra",
+      },
+      liveParticlesEmitter: {
+        grid: "Grid",
+        volume: "Volume",
+        motion: "Motion",
+      },
+      liveParticlesColorMode: {
+        source: "From Source",
+        palette: "Palette",
+        audio: "Audio Heatmap",
+      },
+      liveOutputView: { normal: "Normal", dome: "Dome" },
+      domeSourceMap: {
+        standard: "Standard Warp",
+        equirect: "360 Equirect -> 180 Dome",
+      },
+      modCurve: { smooth: "Smooth", linear: "Linear", punch: "Punch", step: "Step" },
+      bgMode: {
+        black: "Black",
+        solid: "Solid",
+        "gradient-linear": "Gradient Linear",
+        "gradient-radial": "Gradient Radial",
+        animated: "Animated",
+        grid: "Grid Motion",
+        "psychedelic-fractal": "Psychedelic Fractal",
+      },
+      bgPalette: {
+        custom: "Custom",
+        cyber: "Cyber",
+        sunset: "Sunset",
+        ocean: "Ocean",
+        toxic: "Toxic",
+      },
+      fractalPattern: {
+        kaleido: "Kaleido Mirror",
+        spiral: "Spiral",
+        mandala: "Mandala",
+        hybrid: "Hybrid",
+      },
+      fractalSource: {
+        original: "Original Image",
+        glitch: "Glitch Base Image",
+      },
+    },
+  },
+};
+
+function setControlLabel(controlId, text) {
+  const control = document.getElementById(controlId);
+  if (!control || !text) return;
+  const label = control.closest("label");
+  if (!label) return;
+  const span = label.querySelector("span");
+  if (span) span.textContent = text;
+}
+
+function setSelectOptionTexts(selectId, mapping) {
+  if (!mapping) return;
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  [...select.options].forEach((opt) => {
+    if (mapping[opt.value]) opt.textContent = mapping[opt.value];
+  });
+}
+
+function applyExtendedLocaleTexts() {
+  const pack = extendedLocaleTexts[locale] || extendedLocaleTexts.es;
+  if (pack.selectors) {
+    Object.entries(pack.selectors).forEach(([selector, text]) => {
+      const node = document.querySelector(selector);
+      if (node && text) node.textContent = text;
+    });
+  }
+  if (pack.labels) {
+    Object.entries(pack.labels).forEach(([controlId, text]) => setControlLabel(controlId, text));
+  }
+  if (pack.options) {
+    Object.entries(pack.options).forEach(([selectId, mapping]) => setSelectOptionTexts(selectId, mapping));
+  }
+}
+
+function applyLocaleTexts() {
+  document.documentElement.lang = locale;
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    const key = node.dataset.i18n;
+    const text = i18n[locale]?.[key];
+    if (text) node.textContent = text;
+  });
+  applyExtendedLocaleTexts();
+  updateDynamicUiTexts();
+  updateInputSpecs();
+  updatePerformanceUI();
+  refreshSnapshotUi();
+  refreshCameraDeviceList(true);
+}
+
+function setWorkspacePanel(name) {
+  currentWorkspacePanel = name;
+  Object.entries(workspacePanels).forEach(([key, panel]) => {
+    if (!panel) return;
+    const active = key === name;
+    panel.hidden = !active;
+    panel.classList.toggle("active", active);
+  });
+  workflowTabs.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.panel === name);
+  });
+  if (name === "studio") {
+    setStudioTab(mode === "depth" || mode === "mix" ? "depth" : "glitch");
+    return;
+  }
+  // Recompute mode-group visibility whenever the workspace tab changes.
+  // Without this, Studio can keep stale hidden states from Live/Setup.
+  syncModeUi();
+  if (name === "live") updateDomeControlsVisibility();
+}
+
+function setStudioTab(tabName) {
+  studioActiveTab = tabName === "depth" ? "depth" : "glitch";
+  if (studioModeGlitchBtn) studioModeGlitchBtn.classList.toggle("active", studioActiveTab === "glitch");
+  if (studioMode3dBtn) studioMode3dBtn.classList.toggle("active", studioActiveTab === "depth");
+  syncModeUi();
+}
+
+function updateAudioRoutingUi() {
+  if (!audioHelpText || !audioRouteStatus) return;
+  const usingSystem = audioInputSource && audioInputSource.value === "system";
+  audioHelpText.textContent = usingSystem ? t("audio_help_system") : t("audio_help_mic");
+
+  if (!micActive) {
+    audioRouteStatus.textContent = t("audio_status_idle");
+    return;
+  }
+  audioRouteStatus.textContent = usingSystem ? t("audio_status_system") : t("audio_status_mic");
+}
+
+function updateDynamicUiTexts() {
+  if (webcamBtn) {
+    webcamBtn.innerHTML = `${webcamActive ? t("webcam_disable") : t("webcam_enable")} <span class="input-entry-icon">CAM</span>`;
+  }
+  if (micBtn) micBtn.textContent = micActive ? t("mic_disable") : t("mic_enable");
+  updateRecordingButtons();
+  updateAudioRoutingUi();
+  updateCanvasEntryOverlay();
+}
+
+function updateInputSpecs() {
+  if (!inputSpecs) return;
+  if (webcamActive && webcamVideo && webcamVideo.videoWidth && webcamVideo.videoHeight) {
+    inputSpecs.textContent = `${t("input_webcam")} ${webcamVideo.videoWidth}x${webcamVideo.videoHeight}`;
+    return;
+  }
+  if (loadedImage && (loadedImage.naturalWidth || loadedImage.width)) {
+    const w = loadedImage.naturalWidth || loadedImage.width;
+    const h = loadedImage.naturalHeight || loadedImage.height;
+    inputSpecs.textContent = `${t("input_image")} ${w}x${h}`;
+    return;
+  }
+  if (canvas.width && canvas.height && originalImageData) {
+    inputSpecs.textContent = `${t("input_frame")} ${canvas.width}x${canvas.height}`;
+    return;
+  }
+  inputSpecs.textContent = t("input_none");
+}
+
+function hasActiveInput() {
+  return Boolean(webcamActive || loadedImage || originalImageData);
+}
+
+function updateCanvasEntryOverlay() {
+  if (!canvasEntryOverlay) return;
+  canvasEntryOverlay.classList.toggle("hidden", hasActiveInput());
+}
+
+async function refreshCameraDeviceList(preserveSelection = true) {
+  if (!cameraDeviceSelect || !navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+  const prevSelection = preserveSelection
+    ? (cameraDeviceSelect.value || selectedCameraDeviceId || "")
+    : "";
+  let videoInputs = [];
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    videoInputs = devices.filter((d) => d.kind === "videoinput");
+  } catch {
+    videoInputs = [];
+  }
+
+  const activeId = webcamStream?.getVideoTracks?.()[0]?.getSettings?.().deviceId || "";
+  cameraDeviceSelect.innerHTML = "";
+  const autoOpt = document.createElement("option");
+  autoOpt.value = "";
+  autoOpt.textContent = t("camera_auto");
+  cameraDeviceSelect.appendChild(autoOpt);
+
+  videoInputs.forEach((dev, idx) => {
+    const opt = document.createElement("option");
+    opt.value = dev.deviceId;
+    opt.textContent = dev.label || `${t("camera_device")} ${idx + 1}`;
+    cameraDeviceSelect.appendChild(opt);
+  });
+
+  const desired = activeId || prevSelection;
+  if (desired && videoInputs.some((d) => d.deviceId === desired)) {
+    cameraDeviceSelect.value = desired;
+  } else {
+    cameraDeviceSelect.value = "";
+  }
+  selectedCameraDeviceId = cameraDeviceSelect.value || "";
+  if (refreshCamsBtn) refreshCamsBtn.disabled = false;
+}
+
+function setUiMode(nextMode) {
+  uiMode = nextMode === "edit" ? "edit" : "live";
+  document.body.classList.toggle("ui-live", uiMode === "live");
+  if (uiLiveBtn) uiLiveBtn.classList.toggle("active", uiMode === "live");
+  if (uiEditBtn) uiEditBtn.classList.toggle("active", uiMode === "edit");
+}
+
+function getModulableIdsForMode(activeMode) {
+  if (activeMode === "glitch") return glitchIds;
+  if (activeMode === "depth") return depthIds;
+  if (activeMode === "mix") return [...glitchIds, ...depthIds];
+  return [];
+}
+
+function populateModTargets() {
+  if (!modTarget) return;
+  const prev = modTarget.value || "none";
+  const allowed = new Set(getModulableIdsForMode(mode));
+  modTarget.innerHTML = "";
+  const none = document.createElement("option");
+  none.value = "none";
+  none.textContent = "None";
+  modTarget.appendChild(none);
+  Object.values(parameterStore)
+    .filter((p) => p.isModulable && allowed.has(p.name))
+    .forEach((p) => {
+      const opt = document.createElement("option");
+      opt.value = p.name;
+      opt.textContent = p.name;
+      modTarget.appendChild(opt);
+    });
+  modTarget.value = [...modTarget.options].some((opt) => opt.value === prev) ? prev : "none";
+}
+
+function updatePerformanceUI() {
+  if (performanceStatus) performanceStatus.textContent = `FPS: ${fps.toFixed(1)}`;
+  if (performanceHint) performanceHint.textContent = `${t("auto_performance")}: ${perfScale < 0.99 ? "ON" : "OFF"}`;
+}
+
+function updatePerfScale() {
+  if (fps < 25) perfScale = Math.max(0.45, perfScale - 0.06);
+  else if (fps < 30) perfScale = Math.max(0.6, perfScale - 0.03);
+  else if (fps > 48) perfScale = Math.min(1, perfScale + 0.03);
+}
+
+function updateAudioAnalysis() {
+  if (!micActive || !analyser || !audioData) {
+    audioFeatures.rms = 0;
+    audioFeatures.bands = [0, 0, 0, 0];
+    audioFeatures.transient = 0;
+    transientEnergy = 0;
+    return;
+  }
+  analyser.getByteFrequencyData(audioData);
+  const n = audioData.length;
+  let sumSq = 0;
+  for (let i = 0; i < n; i++) {
+    const v = audioData[i] / 255;
+    sumSq += v * v;
+  }
+  const rmsRaw = Math.sqrt(sumSq / n);
+
+  const bins = [
+    [0, Math.floor(n * 0.1)],
+    [Math.floor(n * 0.1), Math.floor(n * 0.28)],
+    [Math.floor(n * 0.28), Math.floor(n * 0.6)],
+    [Math.floor(n * 0.6), n],
+  ];
+  const bands = bins.map(([a, b]) => {
+    let s = 0;
+    const len = Math.max(1, b - a);
+    for (let i = a; i < b; i++) s += audioData[i] / 255;
+    return s / len;
+  });
+  const bandEnergy = bands[1] * 0.55 + bands[2] * 0.3 + bands[3] * 0.15;
+  const delta = Math.max(0, bandEnergy - lastBandEnergy);
+  lastBandEnergy = bandEnergy * 0.84 + lastBandEnergy * 0.16;
+  transientEnergy = transientEnergy * 0.82 + delta * 2.2;
+
+  audioFeatures.rms = audioFeatures.rms * 0.72 + rmsRaw * 0.28;
+  audioFeatures.bands = audioFeatures.bands.map((prev, i) => prev * 0.7 + bands[i] * 0.3);
+  audioFeatures.transient = clamp(transientEnergy, 0, 1.4);
+}
+
+function updateVisualAnalysis(imageData) {
+  if (!imageData || !imageData.data) {
+    visualFeatures.luma = visualFeatures.luma * 0.88;
+    visualFeatures.motion = visualFeatures.motion * 0.82;
+    return;
+  }
+  const { width, height, data } = imageData;
+  const sampleX = Math.max(4, Math.floor(width / 20));
+  const sampleY = Math.max(4, Math.floor(height / 20));
+  const probe = [];
+  let lsum = 0;
+  let count = 0;
+  for (let y = 0; y < height; y += sampleY) {
+    for (let x = 0; x < width; x += sampleX) {
+      const i = (y * width + x) * 4;
+      const lum = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+      probe.push(lum);
+      lsum += lum;
+      count += 1;
+    }
+  }
+  const lumaNow = count ? lsum / count : 0;
+  let motionNow = 0;
+  if (prevVisualProbe && prevVisualProbe.length === probe.length) {
+    let md = 0;
+    for (let i = 0; i < probe.length; i++) {
+      md += Math.abs(probe[i] - prevVisualProbe[i]);
+    }
+    motionNow = md / probe.length;
+  }
+  prevVisualProbe = probe;
+  visualFeatures.luma = visualFeatures.luma * 0.8 + lumaNow * 0.2;
+  visualFeatures.motion = visualFeatures.motion * 0.72 + clamp(motionNow * 4.5, 0, 1.2) * 0.28;
+}
+
+function getModSignal(tSec) {
+  if (!modSource) return 0;
+  const source = modSource.value;
+  if (source === "none") return 0;
+  if (source === "manual") return 1;
+  if (source === "lfo") return 0.5 + Math.sin(tSec * 1.2) * 0.5;
+  if (source === "rms") return audioFeatures.rms;
+  if (source === "band1") return audioFeatures.bands[0];
+  if (source === "band2") return audioFeatures.bands[1];
+  if (source === "band3") return audioFeatures.bands[2];
+  if (source === "band4") return audioFeatures.bands[3];
+  if (source === "transient") return audioFeatures.transient;
+  if (source === "visual_luma") return visualFeatures.luma;
+  if (source === "visual_motion") return visualFeatures.motion;
+  return 0;
+}
+
+function applyModulation(settings, tSec) {
+  if (!modSource || !modTarget) return settings;
+  const target = modTarget.value;
+  if (!target || target === "none" || !parameterStore[target]) return settings;
+  const allowed = new Set(getModulableIdsForMode(mode));
+  if (!allowed.has(target)) return settings;
+  const amount = Number(modAmount ? modAmount.value : 0) / 100;
+  const smooth = Number(modSmoothing ? modSmoothing.value : 60) / 100;
+  const clampPct = Number(modClamp ? modClamp.value : 100) / 100;
+  const signal = clamp(getModSignal(tSec), 0, 1.5);
+  modSignalSmoothed = modSignalSmoothed * smooth + signal * (1 - smooth);
+  const norm = clamp(modSignalSmoothed / 1.5, 0, 1);
+  const curve = modCurve ? modCurve.value : "smooth";
+  let curved = norm;
+  if (curve === "smooth") curved = norm * norm * (3 - 2 * norm);
+  else if (curve === "punch") curved = Math.pow(norm, 0.55);
+  else if (curve === "step") curved = Math.round(norm * 6) / 6;
+  const signalShaped = clamp(curved * 1.5, 0, 1.5);
+  const [mn, mx] = [parameterStore[target].min, parameterStore[target].max];
+  const base = settings[target];
+  const span = mx - mn;
+  const delta = signalShaped * amount * span * clampPct;
+  settings[target] = clamp(base + delta, mn, mx);
+  return settings;
+}
+
+function updateDepthPadDot() {
+  if (!depthPad || !depthPadDot || !controls.pointRotateX || !controls.pointRotateY) return;
+  const nx = clamp((Number(controls.pointRotateY.value) + 90) / 180, 0, 1);
+  const ny = clamp(0.5 - Number(controls.pointRotateX.value) / 180, 0, 1);
+  depthPadDot.style.left = `${nx * 100}%`;
+  depthPadDot.style.top = `${ny * 100}%`;
+}
+
+function updateLiveModPadDot() {
+  if (!liveModPad || !liveModPadDot || !modAmount || !modSmoothing) return;
+  const x = clamp((Number(modAmount.value) + 100) / 200, 0, 1);
+  const y = clamp(1 - Number(modSmoothing.value) / 100, 0, 1);
+  liveModPadDot.style.left = `${x * 100}%`;
+  liveModPadDot.style.top = `${y * 100}%`;
+}
+
+function applyDepthPadFromPointer(clientX, clientY) {
+  if (!depthPad) return;
+  const rect = depthPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  if (controls.pointRotateY) controls.pointRotateY.value = Math.round(nx * 180 - 90);
+  if (controls.pointRotateX) controls.pointRotateX.value = Math.round((0.5 - ny) * 180);
+  if (controls.pointLift) controls.pointLift.value = Math.round(ny * 100);
+  if (controls.pointSpread) controls.pointSpread.value = Math.round(Math.abs(nx - 0.5) * 2 * 200);
+  updateDepthPadDot();
+  updateOutputs();
+  scheduleRender();
+}
+
+function applyLiveModPadFromPointer(clientX, clientY) {
+  if (!liveModPad || !modAmount || !modSmoothing || !modClamp) return;
+  const rect = liveModPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  modAmount.value = String(Math.round((nx * 2 - 1) * 100));
+  modSmoothing.value = String(Math.round((1 - ny) * 100));
+  modClamp.value = String(Math.round(45 + ny * 55));
+  updateOutputs();
+  scheduleRender();
+}
+
+function updateQuickOutputById(id, value) {
+  if (!id) return;
+  const out = document.querySelector(`output[for="${id}"]`);
+  if (out) out.textContent = String(value);
+}
+
+function updateLiveQuickOutputs() {
+  updateQuickOutputById("liveGlitchIntensity", liveGlitchIntensity ? liveGlitchIntensity.value : 0);
+  updateQuickOutputById("liveGlitchColor", liveGlitchColor ? liveGlitchColor.value : 0);
+  updateQuickOutputById("liveGlitchError", liveGlitchError ? liveGlitchError.value : 0);
+  updateQuickOutputById("liveGlitchTracking", liveGlitchTracking ? liveGlitchTracking.value : 0);
+  updateQuickOutputById("liveGlitchTrail", liveGlitchTrail ? liveGlitchTrail.value : 0);
+  updateQuickOutputById("liveGlitchAnim", liveGlitchAnim ? liveGlitchAnim.value : 0);
+  updateQuickOutputById("live3dPoints", live3dPoints ? live3dPoints.value : 0);
+  updateQuickOutputById("live3dMesh", live3dMesh ? live3dMesh.value : 0);
+  updateQuickOutputById("live3dSeparation", live3dSeparation ? live3dSeparation.value : 0);
+  updateQuickOutputById("live3dBackground", live3dBackground ? live3dBackground.value : 0);
+  updateQuickOutputById("live3dOrganic", live3dOrganic ? live3dOrganic.value : 0);
+  updateQuickOutputById("live3dLight", live3dLight ? live3dLight.value : 0);
+  updateQuickOutputById("live3dFxAmount", live3dFxAmount ? live3dFxAmount.value : 0);
+  updateQuickOutputById("live3dAnaglyphStrength", live3dAnaglyphStrength ? live3dAnaglyphStrength.value : 0);
+  updateQuickOutputById("liveParticlesSize", liveParticlesSize ? liveParticlesSize.value : 0);
+  updateQuickOutputById("liveParticlesDepth", liveParticlesDepth ? liveParticlesDepth.value : 0);
+  updateQuickOutputById("liveParticlesNoise", liveParticlesNoise ? liveParticlesNoise.value : 0);
+  updateQuickOutputById("liveParticlesAttractor", liveParticlesAttractor ? liveParticlesAttractor.value : 0);
+  updateQuickOutputById("liveParticlesFlow", liveParticlesFlow ? liveParticlesFlow.value : 0);
+  updateQuickOutputById("liveParticlesCamX", liveParticlesCamX ? liveParticlesCamX.value : 0);
+  updateQuickOutputById("liveParticlesCamY", liveParticlesCamY ? liveParticlesCamY.value : 0);
+  updateQuickOutputById("liveParticlesCamZ", liveParticlesCamZ ? liveParticlesCamZ.value : 0);
+  updateQuickOutputById("liveParticlesHue", liveParticlesHue ? liveParticlesHue.value : 0);
+  updateQuickOutputById("liveParticlesAudioAmount", liveParticlesAudioAmount ? liveParticlesAudioAmount.value : 0);
+  updateQuickOutputById("liveParticlesDamping", liveParticlesDamping ? liveParticlesDamping.value : 0);
+  updateQuickOutputById("liveParticlesVortex", liveParticlesVortex ? liveParticlesVortex.value : 0);
+  updateQuickOutputById("liveParticlesSpawn", liveParticlesSpawn ? liveParticlesSpawn.value : 0);
+  updateQuickOutputById("liveParticlesMotionThreshold", liveParticlesMotionThreshold ? liveParticlesMotionThreshold.value : 0);
+  updateQuickOutputById("domeWarp", domeWarp ? domeWarp.value : 0);
+  updateQuickOutputById("domeTilt", domeTilt ? domeTilt.value : 0);
+  updateQuickOutputById("domeRotate", domeRotate ? domeRotate.value : 0);
+  updateQuickOutputById("domeAutoRotateSpeed", domeAutoRotateSpeed ? domeAutoRotateSpeed.value : 0);
+  updateQuickOutputById("domeGrid", domeGrid ? domeGrid.value : 0);
+}
+
+function updateLiveFxPadDots() {
+  if (liveGlitchPadDot && liveGlitchIntensity && liveGlitchColor) {
+    const gx = clamp(Number(liveGlitchIntensity.value) / 100, 0, 1);
+    const gy = clamp(1 - Number(liveGlitchColor.value) / 100, 0, 1);
+    liveGlitchPadDot.style.left = `${gx * 100}%`;
+    liveGlitchPadDot.style.top = `${gy * 100}%`;
+  }
+  if (liveGlitchPadBDot && liveGlitchError && liveGlitchTracking) {
+    const gx = clamp(Number(liveGlitchError.value) / 100, 0, 1);
+    const gy = clamp(1 - Number(liveGlitchTracking.value) / 100, 0, 1);
+    liveGlitchPadBDot.style.left = `${gx * 100}%`;
+    liveGlitchPadBDot.style.top = `${gy * 100}%`;
+  }
+  if (liveGlitchPadCDot && liveGlitchTrail && liveGlitchAnim) {
+    const gx = clamp(Number(liveGlitchTrail.value) / 100, 0, 1);
+    const gy = clamp(1 - Number(liveGlitchAnim.value) / 100, 0, 1);
+    liveGlitchPadCDot.style.left = `${gx * 100}%`;
+    liveGlitchPadCDot.style.top = `${gy * 100}%`;
+  }
+  if (live3dPointsPadDot && controls.pointMap && controls.pointSize) {
+    const dx = clamp(Number(controls.pointMap.value) / 100, 0, 1);
+    const dy = clamp(1 - (Number(controls.pointSize.value) - 1) / 9, 0, 1);
+    live3dPointsPadDot.style.left = `${dx * 100}%`;
+    live3dPointsPadDot.style.top = `${dy * 100}%`;
+  }
+  if (live3dMeshPadDot && controls.meshMap && controls.meshLift) {
+    const mx = clamp(Number(controls.meshMap.value) / 100, 0, 1);
+    const my = clamp(1 - Number(controls.meshLift.value) / 100, 0, 1);
+    live3dMeshPadDot.style.left = `${mx * 100}%`;
+    live3dMeshPadDot.style.top = `${my * 100}%`;
+  }
+  if (live3dPadBDot && live3dSeparation && live3dBackground) {
+    const sx = clamp(Number(live3dSeparation.value) / 100, 0, 1);
+    const sy = clamp(1 - Number(live3dBackground.value) / 100, 0, 1);
+    live3dPadBDot.style.left = `${sx * 100}%`;
+    live3dPadBDot.style.top = `${sy * 100}%`;
+  }
+  if (live3dCamPadDot && controls.cameraFollow && controls.cameraZoom) {
+    const cx = clamp(Number(controls.cameraFollow.value) / 100, 0, 1);
+    const cy = clamp(1 - (Number(controls.cameraZoom.value) - 40) / 140, 0, 1);
+    live3dCamPadDot.style.left = `${cx * 100}%`;
+    live3dCamPadDot.style.top = `${cy * 100}%`;
+  }
+  if (live3dRotPadDot && controls.pointRotateX && controls.pointRotateY) {
+    const rx = clamp((Number(controls.pointRotateY.value) + 90) / 180, 0, 1);
+    const ry = clamp(1 - (Number(controls.pointRotateX.value) + 90) / 180, 0, 1);
+    live3dRotPadDot.style.left = `${rx * 100}%`;
+    live3dRotPadDot.style.top = `${ry * 100}%`;
+  }
+  if (live3dColorPadDot && controls.pointColorShift && controls.meshColorShift) {
+    const px = clamp(Number(controls.pointColorShift.value) / 360, 0, 1);
+    const py = clamp(1 - Number(controls.meshColorShift.value) / 360, 0, 1);
+    live3dColorPadDot.style.left = `${px * 100}%`;
+    live3dColorPadDot.style.top = `${py * 100}%`;
+  }
+}
+
+function applyLiveGlitchPadFromPointer(clientX, clientY) {
+  if (!liveGlitchPad || !liveGlitchIntensity || !liveGlitchColor) return;
+  const rect = liveGlitchPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  liveGlitchIntensity.value = String(Math.round(nx * 100));
+  liveGlitchColor.value = String(Math.round((1 - ny) * 100));
+  applyLiveGlitchMacros();
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLiveGlitchPadBFromPointer(clientX, clientY) {
+  if (!liveGlitchPadB || !liveGlitchError || !liveGlitchTracking) return;
+  const rect = liveGlitchPadB.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  liveGlitchError.value = String(Math.round(nx * 100));
+  liveGlitchTracking.value = String(Math.round((1 - ny) * 100));
+  applyLiveGlitchMacros();
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLiveGlitchPadCFromPointer(clientX, clientY) {
+  if (!liveGlitchPadC || !liveGlitchTrail || !liveGlitchAnim) return;
+  const rect = liveGlitchPadC.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  liveGlitchTrail.value = String(Math.round(nx * 100));
+  liveGlitchAnim.value = String(Math.round((1 - ny) * 100));
+  applyLiveGlitchMacros();
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLive3dPointsPadFromPointer(clientX, clientY) {
+  if (!live3dPointsPad || !controls.pointMap || !controls.pointSize || !live3dPoints) return;
+  const rect = live3dPointsPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  controls.pointMap.value = String(Math.round(nx * 100));
+  controls.pointSize.value = String(Math.round(1 + (1 - ny) * 9));
+  live3dPoints.value = controls.pointMap.value;
+  updateOutputs();
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLive3dMeshPadFromPointer(clientX, clientY) {
+  if (!live3dMeshPad || !controls.meshMap || !controls.meshLift || !live3dMesh) return;
+  const rect = live3dMeshPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  targetMeshAmount = nx * 100;
+  targetMeshLift = (1 - ny) * 100;
+  if (smoothMeshAmount === null) smoothMeshAmount = Number(controls.meshMap.value);
+  if (smoothMeshLift === null) smoothMeshLift = Number(controls.meshLift.value);
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLive3dPadBFromPointer(clientX, clientY) {
+  if (!live3dPadB || !live3dSeparation || !live3dBackground) return;
+  const rect = live3dPadB.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  live3dSeparation.value = String(Math.round(nx * 100));
+  live3dBackground.value = String(Math.round((1 - ny) * 100));
+  applyLive3dMacros();
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLive3dCamPadFromPointer(clientX, clientY) {
+  if (!live3dCamPad || !controls.cameraFollow || !controls.cameraZoom) return;
+  const rect = live3dCamPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  targetCamFollow = nx * 100;
+  targetCamZoom = 40 + (1 - ny) * 140;
+  if (smoothCamFollow === null) smoothCamFollow = Number(controls.cameraFollow.value);
+  if (smoothCamZoom === null) smoothCamZoom = Number(controls.cameraZoom.value);
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLive3dRotPadFromPointer(clientX, clientY) {
+  if (!live3dRotPad || !controls.pointRotateX || !controls.pointRotateY) return;
+  const rect = live3dRotPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  targetRotY = nx * 180 - 90;
+  targetRotX = (1 - ny) * 180 - 90;
+  if (smoothRotY === null) smoothRotY = Number(controls.pointRotateY.value);
+  if (smoothRotX === null) smoothRotX = Number(controls.pointRotateX.value);
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applyLive3dColorPadFromPointer(clientX, clientY) {
+  if (!live3dColorPad || !controls.pointColorShift || !controls.meshColorShift) return;
+  const rect = live3dColorPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  targetPointHue = nx * 360;
+  targetMeshHue = (1 - ny) * 360;
+  if (smoothPointHue === null) smoothPointHue = Number(controls.pointColorShift.value);
+  if (smoothMeshHue === null) smoothMeshHue = Number(controls.meshColorShift.value);
+  updateLiveFxPadDots();
+  scheduleRender();
+}
+
+function applySmoothCameraTargets() {
+  let changed = false;
+  const lerp = cameraFlowEase > 0.01 ? 0.055 : 0.14;
+
+  if (targetCamFollow !== null && controls.cameraFollow) {
+    if (smoothCamFollow === null) smoothCamFollow = Number(controls.cameraFollow.value);
+    smoothCamFollow += (targetCamFollow - smoothCamFollow) * lerp;
+    if (Math.abs(targetCamFollow - smoothCamFollow) < 0.12) {
+      smoothCamFollow = targetCamFollow;
+      targetCamFollow = null;
+    }
+    controls.cameraFollow.value = String(Math.round(smoothCamFollow));
+    changed = true;
+  }
+
+  if (targetCamZoom !== null && controls.cameraZoom) {
+    if (smoothCamZoom === null) smoothCamZoom = Number(controls.cameraZoom.value);
+    smoothCamZoom += (targetCamZoom - smoothCamZoom) * lerp;
+    if (Math.abs(targetCamZoom - smoothCamZoom) < 0.12) {
+      smoothCamZoom = targetCamZoom;
+      targetCamZoom = null;
+    }
+    controls.cameraZoom.value = String(Math.round(smoothCamZoom));
+    changed = true;
+  }
+
+  if (targetRotY !== null && controls.pointRotateY) {
+    if (smoothRotY === null) smoothRotY = Number(controls.pointRotateY.value);
+    smoothRotY += (targetRotY - smoothRotY) * lerp;
+    if (Math.abs(targetRotY - smoothRotY) < 0.12) {
+      smoothRotY = targetRotY;
+      targetRotY = null;
+    }
+    controls.pointRotateY.value = String(Math.round(smoothRotY));
+    changed = true;
+  }
+
+  if (targetRotX !== null && controls.pointRotateX) {
+    if (smoothRotX === null) smoothRotX = Number(controls.pointRotateX.value);
+    smoothRotX += (targetRotX - smoothRotX) * lerp;
+    if (Math.abs(targetRotX - smoothRotX) < 0.12) {
+      smoothRotX = targetRotX;
+      targetRotX = null;
+    }
+    controls.pointRotateX.value = String(Math.round(smoothRotX));
+    changed = true;
+  }
+
+  if (targetRotZ !== null && controls.pointRotateZ) {
+    if (smoothRotZ === null) smoothRotZ = Number(controls.pointRotateZ.value);
+    smoothRotZ += (targetRotZ - smoothRotZ) * lerp;
+    if (Math.abs(targetRotZ - smoothRotZ) < 0.12) {
+      smoothRotZ = targetRotZ;
+      targetRotZ = null;
+    }
+    controls.pointRotateZ.value = String(Math.round(smoothRotZ));
+    changed = true;
+  }
+
+  if (targetPanX !== null) {
+    cameraPanX += (targetPanX - cameraPanX) * (cameraFlowEase > 0.01 ? 0.08 : 0.14);
+    if (Math.abs(targetPanX - cameraPanX) < 0.0025) {
+      cameraPanX = targetPanX;
+      targetPanX = null;
+    }
+    changed = true;
+  }
+
+  if (targetPanY !== null) {
+    cameraPanY += (targetPanY - cameraPanY) * (cameraFlowEase > 0.01 ? 0.08 : 0.14);
+    if (Math.abs(targetPanY - cameraPanY) < 0.0025) {
+      cameraPanY = targetPanY;
+      targetPanY = null;
+    }
+    changed = true;
+  }
+
+  if (cameraFlowEase > 0.01) {
+    cameraFlowEase *= 0.92;
+    changed = true;
+  } else {
+    cameraFlowEase = 0;
+  }
+
+  if (targetPointHue !== null && controls.pointColorShift) {
+    if (smoothPointHue === null) smoothPointHue = Number(controls.pointColorShift.value);
+    smoothPointHue += (targetPointHue - smoothPointHue) * lerp;
+    if (Math.abs(targetPointHue - smoothPointHue) < 0.2) {
+      smoothPointHue = targetPointHue;
+      targetPointHue = null;
+    }
+    controls.pointColorShift.value = String(Math.round(clamp(smoothPointHue, 0, 360)));
+    changed = true;
+  }
+
+  if (targetMeshHue !== null && controls.meshColorShift) {
+    if (smoothMeshHue === null) smoothMeshHue = Number(controls.meshColorShift.value);
+    smoothMeshHue += (targetMeshHue - smoothMeshHue) * lerp;
+    if (Math.abs(targetMeshHue - smoothMeshHue) < 0.2) {
+      smoothMeshHue = targetMeshHue;
+      targetMeshHue = null;
+    }
+    controls.meshColorShift.value = String(Math.round(clamp(smoothMeshHue, 0, 360)));
+    changed = true;
+  }
+
+  if (targetMeshAmount !== null && controls.meshMap) {
+    if (smoothMeshAmount === null) smoothMeshAmount = Number(controls.meshMap.value);
+    smoothMeshAmount += (targetMeshAmount - smoothMeshAmount) * 0.12;
+    if (Math.abs(targetMeshAmount - smoothMeshAmount) < 0.2) {
+      smoothMeshAmount = targetMeshAmount;
+      targetMeshAmount = null;
+    }
+    controls.meshMap.value = String(Math.round(clamp(smoothMeshAmount, 0, 100)));
+    if (live3dMesh) live3dMesh.value = controls.meshMap.value;
+    changed = true;
+  }
+
+  if (targetMeshLift !== null && controls.meshLift) {
+    if (smoothMeshLift === null) smoothMeshLift = Number(controls.meshLift.value);
+    smoothMeshLift += (targetMeshLift - smoothMeshLift) * 0.12;
+    if (Math.abs(targetMeshLift - smoothMeshLift) < 0.2) {
+      smoothMeshLift = targetMeshLift;
+      targetMeshLift = null;
+    }
+    controls.meshLift.value = String(Math.round(clamp(smoothMeshLift, 0, 100)));
+    changed = true;
+  }
+
+  return changed;
+}
+
+function adjustCanvasZoom(delta, factor = 1) {
+  if ((mode !== "depth" && mode !== "mix" && mode !== "particles") || !controls.cameraZoom) return;
+  const current = Number(controls.cameraZoom.value);
+  const next = clamp(current + delta * factor, 40, 180);
+  controls.cameraZoom.value = String(Math.round(next));
+  smoothCamZoom = next;
+  targetCamZoom = null;
+  updateOutputs();
+  scheduleRender();
+}
+
+function syncLiveQuickControls() {
+  const active = document.activeElement;
+  const isLiveEditing =
+    liveGlitchPadDragging ||
+    liveGlitchPadBDragging ||
+    liveGlitchPadCDragging ||
+    active === liveGlitchIntensity ||
+    active === liveGlitchColor ||
+    active === liveGlitchError ||
+    active === liveGlitchTracking ||
+    active === liveGlitchTrail ||
+    active === liveGlitchAnim ||
+    active === live3dPoints ||
+    active === live3dMesh ||
+    active === live3dSeparation ||
+    active === live3dBackground ||
+    active === live3dOrganic ||
+    active === live3dLight ||
+    active === live3dFxMode ||
+    active === live3dFxAmount ||
+    active === live3dAnaglyph ||
+    active === live3dAnaglyphStrength ||
+    active === live3dLightingMode ||
+    active === liveParticlesCount ||
+    active === liveParticlesEmitter ||
+    active === liveParticlesSize ||
+    active === liveParticlesDepth ||
+    active === liveParticlesNoise ||
+    active === liveParticlesAttractor ||
+    active === liveParticlesFlow ||
+    active === liveParticlesColorMode ||
+    active === liveParticlesHue ||
+    active === liveParticlesAudio ||
+    active === liveParticlesAudioAmount ||
+    active === liveParticlesDamping ||
+    active === liveParticlesVortex ||
+    active === liveParticlesSpawn ||
+    active === liveParticlesMotionThreshold ||
+    active === liveOutputView ||
+    active === domeWarp ||
+    active === domeTilt ||
+    active === domeRotate ||
+    active === domeAutoRotate ||
+    active === domeAutoRotateSpeed ||
+    active === domeGrid;
+
+  if (isLiveEditing) {
+    updateLiveFxPadDots();
+    updateLiveQuickOutputs();
+    return;
+  }
+
+  if (liveGlitchIntensity) {
+    const val =
+      (Number(controls.rgbShift.value) * 0.7 +
+        Number(controls.noiseAmount.value) * 0.4 +
+        Number(controls.blockShift.value) * 0.55) /
+      1.65;
+    liveGlitchIntensity.value = String(Math.round(clamp(val, 0, 100)));
+  }
+  if (liveGlitchColor) {
+    const hueNorm = (Number(controls.hueShift.value) + 180) / 360;
+    const satNorm = Number(controls.saturation.value) / 200;
+    liveGlitchColor.value = String(Math.round(clamp(hueNorm * 50 + satNorm * 50, 0, 100)));
+  }
+  if (liveGlitchError) {
+    liveGlitchError.value = String(Math.round(Number(controls.errorComplexity.value)));
+  }
+  if (liveGlitchTracking) liveGlitchTracking.value = String(Math.round(Number(controls.polygonTrack.value)));
+  if (liveGlitchTrail) liveGlitchTrail.value = String(Math.round(Number(controls.motionTrail.value)));
+  if (liveGlitchAnim) liveGlitchAnim.value = String(Math.round(Number(controls.animDistort.value)));
+
+  if (live3dPoints) live3dPoints.value = String(Math.round(Number(controls.pointMap.value)));
+  if (live3dMesh) live3dMesh.value = String(Math.round(Number(controls.meshMap.value)));
+  if (live3dSeparation) {
+    const sep = Number(controls.pointSpread.value) * 0.55 + Number(controls.depthExaggeration.value) * 0.2;
+    live3dSeparation.value = String(Math.round(clamp(sep / 1.1, 0, 100)));
+  }
+  if (live3dBackground) live3dBackground.value = String(Math.round(Number(controls.bgMotion.value)));
+  if (live3dOrganic) live3dOrganic.value = String(Math.round(Number(controls.pointOrganic.value)));
+  if (live3dLight) {
+    live3dLight.value = String(Math.round(Number(controls.lightEnabled.value)));
+  }
+  if (live3dLightingMode) {
+    live3dLightingMode.value = Number(controls.flatIllustrated.value) > 45 ? "flat" : "lit";
+  }
+  if (liveCameraMode) liveCameraMode.value = cameraMode;
+  updateLiveFxPadDots();
+  updateLiveQuickOutputs();
+}
+
+function applyLiveGlitchMacros() {
+  const i = Number(liveGlitchIntensity ? liveGlitchIntensity.value : 0);
+  const c = Number(liveGlitchColor ? liveGlitchColor.value : 50);
+  const e = Number(liveGlitchError ? liveGlitchError.value : Number(controls.errorComplexity.value));
+  const t = Number(liveGlitchTracking ? liveGlitchTracking.value : 0);
+  const tr = Number(liveGlitchTrail ? liveGlitchTrail.value : Number(controls.motionTrail.value));
+  const ad = Number(liveGlitchAnim ? liveGlitchAnim.value : Number(controls.animDistort.value));
+  const hue = Math.round((c - 50) * 3.6);
+  const saturation = Math.round(70 + c * 1.2);
+  const contrast = Math.round(84 + i * 0.9);
+  setValues({
+    rgbShift: Math.round(i * 0.5),
+    lineJitter: Math.round(i * 0.66),
+    noiseAmount: Math.round(i * 1.2),
+    blockShift: Math.round(i * 0.85),
+    pixelMelt: Math.round(i * 0.72),
+    hueShift: clamp(hue, -180, 180),
+    saturation: clamp(saturation, 0, 200),
+    contrast: clamp(contrast, 40, 220),
+    colorBlend: Math.round(c * 0.85),
+    errorComplexity: Math.round(e),
+    polygonTrack: t,
+    motionTrail: Math.round(clamp(tr, 0, 100)),
+    trailDecay: Math.round(clamp(50 + tr * 0.45, 0, 100)),
+    trailThreshold: Math.round(clamp(28 + (100 - tr) * 0.55, 0, 100)),
+    trailSoftness: Math.round(clamp(22 + tr * 0.62, 0, 100)),
+    trailMotionOnly: Math.round(clamp(35 + t * 0.65, 0, 100)),
+    animDistort: Math.round(clamp(ad, 0, 100)),
+    animSpeed: Math.round(clamp(20 + ad * 0.8 + i * 0.25, 0, 100)),
+  });
+}
+
+function applyLive3dMacros() {
+  const p = Number(live3dPoints ? live3dPoints.value : 55);
+  const m = Number(live3dMesh ? live3dMesh.value : 45);
+  const s = Number(live3dSeparation ? live3dSeparation.value : 30);
+  const bg = Number(live3dBackground ? live3dBackground.value : 35);
+  const o = Number(live3dOrganic ? live3dOrganic.value : 20);
+  const l = Number(live3dLight ? live3dLight.value : 70);
+  const style = live3dLightingMode ? live3dLightingMode.value : "lit";
+  setValues({
+    pointMap: Math.round(clamp(p, 0, 100)),
+    meshMap: Math.round(clamp(m, 0, 100)),
+    depthStrength: Math.round(clamp(35 + p * 0.65, 0, 100)),
+    depthExaggeration: Math.round(clamp(80 + s * 1.8, 40, 320)),
+    pointSpread: Math.round(clamp(s * 1.7, 0, 200)),
+    sceneExposure: style === "flat" ? 105 : Math.round(clamp(95 + l * 0.85, 40, 220)),
+    lightIntensity: Math.round(clamp(35 + l * 1.45, 0, 180)),
+    pointColorShift: Math.round((p * 2.1 + s * 0.9) % 360),
+    meshColorShift: Math.round((m * 2.4 + s * 0.7) % 360),
+    lightEnabled: Math.round(l),
+    flatIllustrated: style === "flat" ? 100 : 0,
+    pointFloat: Math.round(clamp((p * 0.35 + m * 0.42), 0, 100)),
+    pointOrganic: Math.round(clamp(o, 0, 100)),
+    autoRotate: Math.round(clamp((m * 0.45 + s * 0.3), 0, 100)),
+    bgMotion: Math.round(clamp(bg, 0, 100)),
+    ambientLight: style === "flat" ? 58 : 35,
+  });
+}
+
+function syncLiveModeTabsFromMode() {
+  const tab = mode === "depth" ? "depth" : mode === "particles" ? "particles" : "glitch";
+  liveActiveTab = tab;
+  if (liveModeGlitchBtn) liveModeGlitchBtn.classList.toggle("active", tab === "glitch");
+  if (liveMode3dBtn) liveMode3dBtn.classList.toggle("active", tab === "depth");
+  if (liveModeParticlesBtn) liveModeParticlesBtn.classList.toggle("active", tab === "particles");
+  if (livePaneGlitch) livePaneGlitch.hidden = tab !== "glitch";
+  if (livePane3d) livePane3d.hidden = tab !== "depth";
+  if (livePaneParticles) livePaneParticles.hidden = tab !== "particles";
+}
+
+function setLiveModeTab(tabName) {
+  const prevTab = liveActiveTab;
+  liveActiveTab = tabName === "depth" ? "depth" : tabName === "particles" ? "particles" : "glitch";
+  if (liveModeGlitchBtn) liveModeGlitchBtn.classList.toggle("active", liveActiveTab === "glitch");
+  if (liveMode3dBtn) liveMode3dBtn.classList.toggle("active", liveActiveTab === "depth");
+  if (liveModeParticlesBtn) liveModeParticlesBtn.classList.toggle("active", liveActiveTab === "particles");
+  if (livePaneGlitch) livePaneGlitch.hidden = liveActiveTab !== "glitch";
+  if (livePane3d) livePane3d.hidden = liveActiveTab !== "depth";
+  if (livePaneParticles) livePaneParticles.hidden = liveActiveTab !== "particles";
+  const nextMode = liveActiveTab === "depth" ? "depth" : liveActiveTab === "particles" ? "particles" : "glitch";
+  const radio = modeInputs.find((m) => m.value === nextMode);
+  if (radio) radio.checked = true;
+  setMode(nextMode);
+  if (liveActiveTab === "depth" && prevTab !== "depth") {
+    applyLive3dEntryDefaults();
+  }
+}
+
+function applyLive3dEntryDefaults() {
+  if (!controls.flatIllustrated || !bgMode || !bgColorA || !bgColorB) return;
+  controls.flatIllustrated.value = "100";
+  if (controls.lightEnabled) controls.lightEnabled.value = "0";
+  if (live3dLightingMode) live3dLightingMode.value = "flat";
+  if (live3dLight) live3dLight.value = "0";
+  if (bgPalette) bgPalette.value = "custom";
+  bgMode.value = "solid";
+  bgColorA.value = "#000000";
+  bgColorB.value = "#000000";
+  updateOutputs();
+  scheduleRender();
+}
+
+function randHash(x, y, seed) {
+  const n = Math.sin(x * 127.1 + y * 311.7 + seed * 13.37) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+function normalize3(vx, vy, vz) {
+  const len = Math.hypot(vx, vy, vz) || 1;
+  return [vx / len, vy / len, vz / len];
+}
+
+if ("FaceDetector" in window) {
+  try {
+    faceDetector = new FaceDetector({ fastMode: false, maxDetectedFaces: 12 });
+  } catch {
+    faceDetector = null;
+  }
+}
+
+if ("HandDetector" in window) {
+  try {
+    handDetector = new HandDetector({
+      maxDetectedHands: 2,
+      scoreThreshold: 0.45,
+    });
+  } catch {
+    handDetector = null;
+  }
+}
+
+function getCameraMotion(settings, tSec) {
+  const follow = settings.cameraFollow / 100;
+  const speedKnob = cameraMoveSpeed ? Number(cameraMoveSpeed.value) / 100 : 0.28;
+  // Strong low-speed bias for smoother cinematic movement and finer control.
+  const speedCurve = Math.pow(clamp(speedKnob, 0, 1), 2.6);
+  const targetCameraModeSpeed = 0.08 + speedCurve * 0.82;
+  smoothCameraModeSpeed += (targetCameraModeSpeed - smoothCameraModeSpeed) * 0.045;
+  const speed = (0.22 + settings.autoRotate / 120) * smoothCameraModeSpeed;
+  const nowMs = performance.now();
+  const dt = clamp((nowMs - lastCameraAnimTs) / 1000, 0, 0.09);
+  lastCameraAnimTs = nowMs;
+  cameraAnimTime += dt * speed;
+  const phase = cameraAnimTime;
+  const baseCursorX = pointerTiltX * 26 * follow;
+  const baseCursorY = pointerTiltY * 24 * follow;
+
+  let extraRotX = dragRotateX;
+  let extraRotY = dragRotateY;
+  let extraRotZ = 0;
+  let zoomMul = 1;
+  let cursorWeight = 1;
+  const panMul = 0.45 + follow * 0.75;
+
+  if (cameraMode === "static") {
+    cursorWeight = 0;
+  } else if (cameraMode === "cursor") {
+    cursorWeight = 1;
+  } else if (cameraMode === "orbit") {
+    cursorWeight = 0.12;
+    extraRotY += (phase * 44) % 360;
+    extraRotX += Math.sin(phase * 0.6) * 12;
+  } else if (cameraMode === "sweep") {
+    cursorWeight = 0.2;
+    extraRotY += Math.sin(phase * 0.9) * 46;
+    extraRotX += Math.sin(phase * 0.45) * 6;
+  } else if (cameraMode === "pulse") {
+    cursorWeight = 0.3;
+    extraRotZ = Math.sin(phase) * 7;
+    zoomMul = 1 + Math.sin(phase * 1.6) * 0.12;
+  } else if (cameraMode === "helix") {
+    cursorWeight = 0.18;
+    extraRotY += (phase * 30) % 360;
+    extraRotX += Math.sin(phase * 1.4) * 14;
+    extraRotZ += Math.cos(phase * 0.7) * 10;
+    zoomMul = 1 + Math.sin(phase * 1.1) * 0.08;
+  } else if (cameraMode === "drift") {
+    cursorWeight = 0.1;
+    const step = Math.floor(phase * 3.2) % 6;
+    extraRotY += Math.sin(phase * 0.35) * 22 + (step - 2.5) * 2.3;
+    extraRotX += Math.cos(phase * 0.22) * 9;
+    extraRotZ += Math.sin(phase * 0.55) * 13;
+    zoomMul = 1 + Math.sin(phase * 2.1) * 0.06;
+  } else if (cameraMode === "liquid") {
+    cursorWeight = 0.08;
+    extraRotY += Math.sin(phase * 0.28) * 18 + Math.cos(phase * 0.16) * 8;
+    extraRotX += Math.cos(phase * 0.23) * 11;
+    extraRotZ += Math.sin(phase * 0.31) * 7;
+    zoomMul = 1 + Math.sin(phase * 0.62) * 0.05;
+  }
+
+  return {
+    rxDeg: baseCursorY * cursorWeight + extraRotX,
+    ryDeg: baseCursorX * cursorWeight + extraRotY,
+    rzDeg: extraRotZ,
+    zoomMul,
+    panX: cameraPanX * panMul,
+    panY: cameraPanY * panMul,
+  };
+}
+
+function getLiquidWarp(x, y, depth, tSec, strength, seed, w, h) {
+  if (strength <= 0.0001) return [0, 0, 0];
+  const nx = x / Math.max(1, w);
+  const ny = y / Math.max(1, h);
+  const mvx = stageGeomMotionX * (26 + strength * 60);
+  const mvy = stageGeomMotionY * (26 + strength * 60);
+  const waveA = Math.sin((nx * 7.2 + ny * 4.4) + tSec * (0.75 + strength * 1.7) + depth * 8 + seed * 0.0009);
+  const waveB = Math.cos((nx * 4.8 - ny * 6.1) + tSec * (0.6 + strength * 1.35) - depth * 6 + seed * 0.0007);
+  const swirl = Math.sin((nx * nx + ny * ny) * 30 + tSec * (0.42 + strength * 1.05) + seed * 0.0004);
+  const ampXY = (6 + strength * 28) * (0.65 + depth * 0.7);
+  const ampZ = (3 + strength * 36) * (0.6 + depth * 0.8);
+  const wx = (waveA * 0.8 + waveB * 0.55) * ampXY + mvx;
+  const wy = (waveB * 0.82 - waveA * 0.48) * ampXY + mvy;
+  const wz = (swirl * 0.9 + waveA * 0.45) * ampZ;
+  return [wx, wy, wz];
+}
+
+function setCameraMode(modeName) {
+  cameraMode = modeName;
+  const map = {
+    static: camStaticBtn,
+    cursor: camCursorBtn,
+    orbit: camOrbitBtn,
+    sweep: camSweepBtn,
+    pulse: camPulseBtn,
+    helix: camHelixBtn,
+    drift: camDriftBtn,
+    liquid: camLiquidBtn,
+  };
+  Object.values(map).forEach((btn) => {
+    if (!btn) return;
+    btn.classList.remove("active");
+  });
+  if (map[modeName]) map[modeName].classList.add("active");
+  scheduleRender();
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+
+    h /= 6;
+  }
+
+  return [h, s, l];
+}
+
+function hslToRgb(h, s, l) {
+  if (s === 0) {
+    const v = Math.round(l * 255);
+    return [v, v, v];
+  }
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+
+  function hue2rgb(t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  }
+
+  return [
+    Math.round(hue2rgb(h + 1 / 3) * 255),
+    Math.round(hue2rgb(h) * 255),
+    Math.round(hue2rgb(h - 1 / 3) * 255),
+  ];
+}
+
+function hexToRgb(hex) {
+  const raw = hex.replace("#", "");
+  const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw;
+  const n = Number.parseInt(full, 16);
+  return {
+    r: (n >> 16) & 255,
+    g: (n >> 8) & 255,
+    b: n & 255,
+  };
+}
+
+function drawPlaceholder() {
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = "#49f3ff";
+  ctx.font = "700 28px Orbitron";
+  ctx.fillText(t("placeholder_title"), 24, 50);
+
+  ctx.fillStyle = "#a9ff43";
+  ctx.font = "18px Share Tech Mono";
+  ctx.fillText(t("placeholder_subtitle"), 24, 82);
+}
+
+function openCleanOutput() {
+  if (cleanOutputWindow && !cleanOutputWindow.closed) {
+    cleanOutputWindow.focus();
+    return;
+  }
+
+  cleanOutputWindow = window.open("", "bzual-clean-output", "width=1280,height=720");
+  if (!cleanOutputWindow) {
+    alert(t("popup_blocked"));
+    return;
+  }
+
+  cleanOutputWindow.document.write(`<!doctype html><html><head><title>Clean Output</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}canvas{width:100vw;height:100vh;display:block;object-fit:contain;background:#000}</style></head><body><canvas id="out"></canvas></body></html>`);
+  cleanOutputWindow.document.close();
+  cleanOutputCanvas = cleanOutputWindow.document.getElementById("out");
+  cleanOutputCtx = cleanOutputCanvas.getContext("2d");
+  syncCleanOutput();
+}
+
+function closeCleanOutput() {
+  if (cleanOutputWindow && !cleanOutputWindow.closed) cleanOutputWindow.close();
+  cleanOutputWindow = null;
+  cleanOutputCanvas = null;
+  cleanOutputCtx = null;
+}
+
+function syncCleanOutput() {
+  if (!cleanOutputWindow || cleanOutputWindow.closed || !cleanOutputCanvas || !cleanOutputCtx) return;
+  const w = canvas.width;
+  const h = canvas.height;
+  if (!w || !h) return;
+  if (cleanOutputCanvas.width !== w || cleanOutputCanvas.height !== h) {
+    cleanOutputCanvas.width = w;
+    cleanOutputCanvas.height = h;
+  }
+  cleanOutputCtx.drawImage(canvas, 0, 0, w, h);
+}
+
+function copyImageData(src) {
+  return new ImageData(new Uint8ClampedArray(src.data), src.width, src.height);
+}
+
+function getSettings() {
+  const obj = {};
+  allIds.forEach((id) => {
+    obj[id] = Number(controls[id].value);
+  });
+  return obj;
+}
+
+function getParticlesSettings() {
+  return {
+    count: liveParticlesCount ? liveParticlesCount.value : "med",
+    emitter: liveParticlesEmitter ? liveParticlesEmitter.value : "grid",
+    size: liveParticlesSize ? Number(liveParticlesSize.value) : 42,
+    depth: liveParticlesDepth ? Number(liveParticlesDepth.value) : 58,
+    noise: liveParticlesNoise ? Number(liveParticlesNoise.value) : 34,
+    attractor: liveParticlesAttractor ? Number(liveParticlesAttractor.value) : 26,
+    flow: liveParticlesFlow ? Number(liveParticlesFlow.value) : 30,
+    camX: liveParticlesCamX ? Number(liveParticlesCamX.value) : 0,
+    camY: liveParticlesCamY ? Number(liveParticlesCamY.value) : 0,
+    camZ: liveParticlesCamZ ? Number(liveParticlesCamZ.value) : 0,
+    colorMode: liveParticlesColorMode ? liveParticlesColorMode.value : "source",
+    hue: liveParticlesHue ? Number(liveParticlesHue.value) : 0,
+    audioOn: liveParticlesAudio ? liveParticlesAudio.checked : true,
+    audioAmount: liveParticlesAudioAmount ? Number(liveParticlesAudioAmount.value) : 54,
+    damping: liveParticlesDamping ? Number(liveParticlesDamping.value) : 18,
+    vortex: liveParticlesVortex ? Number(liveParticlesVortex.value) : 22,
+    spawn: liveParticlesSpawn ? Number(liveParticlesSpawn.value) : 68,
+    motionThreshold: liveParticlesMotionThreshold ? Number(liveParticlesMotionThreshold.value) : 32,
+  };
+}
+
+function updateOutputs() {
+  allIds.forEach((id) => {
+    const out = controls[id].parentElement.querySelector("output");
+    if (out) out.textContent = controls[id].value;
+  });
+  metaControls.forEach((control) => {
+    const out = control.parentElement.querySelector("output");
+    if (out) out.textContent = control.value;
+  });
+  updateQuickOutputById("cameraMoveSpeed", cameraMoveSpeed ? cameraMoveSpeed.value : 28);
+  updateDepthPadDot();
+  updateLiveModPadDot();
+  syncLiveQuickControls();
+}
+
+function setValues(values) {
+  Object.entries(values).forEach(([id, value]) => {
+    if (controls[id]) controls[id].value = value;
+  });
+  updateOutputs();
+}
+
+function getAspectRatioValue() {
+  return aspectRatioSelect ? aspectRatioSelect.value : "auto";
+}
+
+function parseAspectRatio(value) {
+  if (!value || value === "auto") return null;
+  const [w, h] = value.split(":").map((n) => Number(n));
+  if (!w || !h) return null;
+  return w / h;
+}
+
+function resizeWorkingCanvases(width, height) {
+  canvas.width = width;
+  canvas.height = height;
+  fxCanvas.width = width;
+  fxCanvas.height = height;
+  fractalCanvas.width = width;
+  fractalCanvas.height = height;
+  tileCanvas.width = width;
+  tileCanvas.height = height;
+  glitchTrailCanvas.width = width;
+  glitchTrailCanvas.height = height;
+  glitchTrailTempCanvas.width = width;
+  glitchTrailTempCanvas.height = height;
+  updateCanvasDisplaySize();
+}
+
+function updateCanvasDisplaySize() {
+  if (!canvas || !canvas.parentElement) return;
+  const w = canvas.width || 1;
+  const h = canvas.height || 1;
+  const ar = w / h;
+  const parentW = Math.max(220, canvas.parentElement.clientWidth || w);
+  const maxH = Math.max(220, Math.floor(window.innerHeight * 0.68));
+  let drawW = parentW;
+  let drawH = Math.round(drawW / ar);
+  if (drawH > maxH) {
+    drawH = maxH;
+    drawW = Math.round(drawH * ar);
+  }
+  canvas.style.width = `${drawW}px`;
+  canvas.style.height = `${drawH}px`;
+}
+
+function getLiveCanvasLimits() {
+  let maxW = LIVE_CANVAS_MAX_W;
+  let maxH = LIVE_CANVAS_MAX_H;
+  if (mode === "glitch" || mode === "mix") {
+    maxW = Math.round(maxW * 0.86);
+    maxH = Math.round(maxH * 0.86);
+  }
+  if (webcamActive) {
+    maxW = Math.round(maxW * 0.9);
+    maxH = Math.round(maxH * 0.9);
+  }
+  return {
+    maxW: Math.max(480, maxW),
+    maxH: Math.max(300, maxH),
+  };
+}
+
+function computeCanvasSizeForSource(srcW, srcH, limits = getLiveCanvasLimits()) {
+  const { maxW, maxH } = limits;
+  const ratioOverride =
+    shouldKeepEquirectSource(srcW, srcH) ? null : parseAspectRatio(getAspectRatioValue());
+  if (!ratioOverride) {
+    const scale = Math.min(maxW / srcW, maxH / srcH, 1);
+    return {
+      width: Math.max(2, Math.floor(srcW * scale)),
+      height: Math.max(2, Math.floor(srcH * scale)),
+    };
+  }
+  let width = Math.min(maxW, Math.floor(maxH * ratioOverride));
+  let height = Math.floor(width / ratioOverride);
+  if (height > maxH) {
+    height = maxH;
+    width = Math.floor(height * ratioOverride);
+  }
+  return {
+    width: Math.max(2, width),
+    height: Math.max(2, height),
+  };
+}
+
+function drawImageCover(targetCtx, source, width, height) {
+  const sw = source.naturalWidth || source.videoWidth || source.width || width;
+  const sh = source.naturalHeight || source.videoHeight || source.height || height;
+  const scale = Math.max(width / sw, height / sh);
+  const dw = sw * scale;
+  const dh = sh * scale;
+  const dx = (width - dw) * 0.5;
+  const dy = (height - dh) * 0.5;
+  targetCtx.drawImage(source, dx, dy, dw, dh);
+}
+
+function drawImageContain(targetCtx, source, width, height) {
+  const sw = source.naturalWidth || source.videoWidth || source.width || width;
+  const sh = source.naturalHeight || source.videoHeight || source.height || height;
+  const scale = Math.min(width / sw, height / sh);
+  const dw = sw * scale;
+  const dh = sh * scale;
+  const dx = (width - dw) * 0.5;
+  const dy = (height - dh) * 0.5;
+  targetCtx.drawImage(source, dx, dy, dw, dh);
+}
+
+function isLikelyEquirectSource(srcW, srcH) {
+  if (!srcW || !srcH) return false;
+  const ar = srcW / srcH;
+  return ar > 1.92 && ar < 2.08;
+}
+
+function shouldKeepEquirectSource(srcW, srcH) {
+  return Boolean(
+    domeSourceMap &&
+      domeSourceMap.value === "equirect" &&
+      liveOutputView &&
+      liveOutputView.value === "dome" &&
+      isLikelyEquirectSource(srcW, srcH)
+  );
+}
+
+function renderLoadedImageToCanvas() {
+  if (!loadedImage) return;
+  const srcW = loadedImage.naturalWidth || loadedImage.width;
+  const srcH = loadedImage.naturalHeight || loadedImage.height;
+  const keepEqui = shouldKeepEquirectSource(srcW, srcH);
+  const { width, height } = computeCanvasSizeForSource(
+    srcW,
+    srcH
+  );
+  resizeWorkingCanvases(width, height);
+  ctx.clearRect(0, 0, width, height);
+  if (keepEqui) drawImageContain(ctx, loadedImage, width, height);
+  else drawImageCover(ctx, loadedImage, width, height);
+  originalImageData = ctx.getImageData(0, 0, width, height);
+  updateInputSpecs();
+  updateCanvasEntryOverlay();
+}
+
+function applyAspectRatioChange() {
+  if (webcamActive && webcamVideo && webcamVideo.readyState >= 2) {
+    const { width, height } = computeCanvasSizeForSource(
+      webcamVideo.videoWidth || canvas.width,
+      webcamVideo.videoHeight || canvas.height
+    );
+    resizeWorkingCanvases(width, height);
+    scheduleRender();
+    return;
+  }
+  if (loadedImage) {
+    renderLoadedImageToCanvas();
+    scheduleRender();
+    return;
+  }
+  const { width, height } = computeCanvasSizeForSource(canvas.width || 1000, canvas.height || 680);
+  resizeWorkingCanvases(width, height);
+  drawPlaceholder();
+}
+
+function getCurrentSourceDimensions() {
+  if (webcamActive && webcamVideo && webcamVideo.readyState >= 2) {
+    return {
+      width: webcamVideo.videoWidth || canvas.width || 1280,
+      height: webcamVideo.videoHeight || canvas.height || 720,
+    };
+  }
+  if (loadedImage) {
+    return {
+      width: loadedImage.naturalWidth || loadedImage.width || canvas.width || 1280,
+      height: loadedImage.naturalHeight || loadedImage.height || canvas.height || 720,
+    };
+  }
+  if (originalImageData) {
+    return { width: originalImageData.width, height: originalImageData.height };
+  }
+  return { width: canvas.width || 1280, height: canvas.height || 720 };
+}
+
+function applyCameraKeyPanning() {
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles") return false;
+  const panStep = 0.022;
+  let moved = false;
+  if (cameraKeyState.left) {
+    cameraPanX = clamp(cameraPanX - panStep, -1.4, 1.4);
+    moved = true;
+  }
+  if (cameraKeyState.right) {
+    cameraPanX = clamp(cameraPanX + panStep, -1.4, 1.4);
+    moved = true;
+  }
+  if (cameraKeyState.up) {
+    cameraPanY = clamp(cameraPanY - panStep, -1.2, 1.2);
+    moved = true;
+  }
+  if (cameraKeyState.down) {
+    cameraPanY = clamp(cameraPanY + panStep, -1.2, 1.2);
+    moved = true;
+  }
+  return moved;
+}
+
+function hasCameraPanInput() {
+  return cameraKeyState.up || cameraKeyState.down || cameraKeyState.left || cameraKeyState.right;
+}
+
+function scheduleRender() {
+  if ((!originalImageData && !webcamActive) || renderPending) return;
+  renderPending = true;
+  requestAnimationFrame(() => {
+    renderPending = false;
+    try {
+      renderFrame();
+      renderErrorCount = 0;
+    } catch (err) {
+      renderErrorCount += 1;
+      console.error("Render error", err);
+      // Keep webcam/session responsive if a transient frame fails.
+      if (renderErrorCount <= 4 && (webcamActive || micActive || recordingActive)) {
+        setTimeout(scheduleRender, 16);
+      }
+    }
+  });
+}
+
+function loadImageToCanvas(file) {
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+
+  img.onload = () => {
+    if (webcamActive || webcamStream) {
+      stopWebcamInput();
+    }
+    domeSeamCacheKey = "";
+    domeAutoSeamU = 0.5;
+    domeAutoYaw = 0;
+    domeAutoYawVel = 0;
+    lastDomeAnimTs = performance.now();
+    domeViewYaw = 0;
+    domeViewPitch = 0;
+    isDraggingDome = false;
+    loadedImage = img;
+    renderLoadedImageToCanvas();
+    updateDynamicUiTexts();
+    URL.revokeObjectURL(url);
+    scheduleRender();
+  };
+
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    alert(t("image_load_error"));
+  };
+
+  img.src = url;
+}
+
+function getSourceImageData() {
+  if (freezeFrame && frozenImageData) return frozenImageData;
+  if (webcamActive && webcamVideo && webcamVideo.readyState >= 2) {
+    const w = canvas.width;
+    const h = canvas.height;
+    if (w <= 0 || h <= 0) return null;
+    fxCanvas.width = w;
+    fxCanvas.height = h;
+    const vw = webcamVideo.videoWidth || w;
+    const vh = webcamVideo.videoHeight || h;
+    const scale = Math.max(w / vw, h / vh);
+    const dw = vw * scale;
+    const dh = vh * scale;
+    const dx = (w - dw) * 0.5;
+    const dy = (h - dh) * 0.5;
+    fxCtx.drawImage(webcamVideo, dx, dy, dw, dh);
+    const frame = fxCtx.getImageData(0, 0, w, h);
+    if (freezeFrame) frozenImageData = frame;
+    return frame;
+  }
+  return originalImageData;
+}
+
+function toggleFreeze() {
+  freezeFrame = !freezeFrame;
+  if (freezeBtn) freezeBtn.classList.toggle("active", freezeFrame);
+  if (!freezeFrame) frozenImageData = null;
+  else {
+    const src = getSourceImageData();
+    if (src) frozenImageData = copyImageData(src);
+  }
+  scheduleRender();
+}
+
+function panicReset() {
+  setValues({
+    ...defaults,
+    pointDensity: 20,
+    pointFloat: 22,
+    sceneExposure: 110,
+    pointMap: 55,
+    meshMap: 35,
+    depthStrength: 45,
+    depthExaggeration: 110,
+  });
+  mode = "depth";
+  const depthRadio = modeInputs.find((m) => m.value === "depth");
+  if (depthRadio) depthRadio.checked = true;
+  freezeFrame = false;
+  frozenImageData = null;
+  cameraPanX = 0;
+  cameraPanY = 0;
+  targetPanX = null;
+  targetPanY = null;
+  cameraFlowEase = 0;
+  cameraKeyState.up = false;
+  cameraKeyState.down = false;
+  cameraKeyState.left = false;
+  cameraKeyState.right = false;
+  if (freezeBtn) freezeBtn.classList.remove("active");
+  syncModeUi();
+  scheduleRender();
+}
+
+function refreshSnapshotUi() {
+  snapshotSlots.forEach((btn) => {
+    const slot = Number(btn.dataset.slot);
+    const hasData = Boolean(snapshots[slot - 1]);
+    btn.classList.toggle("filled", hasData);
+    btn.classList.toggle("active", slot === currentSnapshotSlot);
+    btn.title = hasData ? `Slot ${slot}: ${t("slot_saved")}` : `Slot ${slot}: ${t("slot_empty")}`;
+  });
+}
+
+function captureSnapshot(slot) {
+  const idx = clamp(slot - 1, 0, 7);
+  snapshots[idx] = {
+    mode,
+    values: Object.fromEntries(allIds.map((id) => [id, Number(controls[id].value)])),
+    cameraMode,
+    cameraMoveSpeed: cameraMoveSpeed ? Number(cameraMoveSpeed.value) : 28,
+    mod: {
+      source: modSource ? modSource.value : "none",
+      target: modTarget ? modTarget.value : "none",
+      amount: modAmount ? Number(modAmount.value) : 0,
+      smoothing: modSmoothing ? Number(modSmoothing.value) : 60,
+      clamp: modClamp ? Number(modClamp.value) : 100,
+    },
+  };
+  currentSnapshotSlot = slot;
+  refreshSnapshotUi();
+}
+
+function applySnapshot(slot) {
+  const idx = clamp(slot - 1, 0, 7);
+  const snap = snapshots[idx];
+  if (!snap) return;
+  currentSnapshotSlot = slot;
+  setValues(snap.values);
+  setCameraMode(snap.cameraMode || "cursor");
+  if (cameraMoveSpeed) cameraMoveSpeed.value = String(Math.round(snap.cameraMoveSpeed ?? 28));
+  if (modSource) modSource.value = snap.mod.source;
+  if (modTarget) modTarget.value = snap.mod.target;
+  if (modAmount) modAmount.value = snap.mod.amount;
+  if (modSmoothing) modSmoothing.value = snap.mod.smoothing;
+  if (modClamp) modClamp.value = snap.mod.clamp;
+  const modeRadio = modeInputs.find((m) => m.value === snap.mode);
+  if (modeRadio) modeRadio.checked = true;
+  mode = snap.mode;
+  syncModeUi();
+  updateOutputs();
+  refreshSnapshotUi();
+  scheduleRender();
+}
+
+async function updateTrackingFromFrame() {
+  if ((!faceDetector && !handDetector) || !webcamVideo || !webcamActive) return;
+  if (trackingDetectBusy) return;
+  const now = performance.now();
+  if (now - lastFaceDetectTs < 42) return;
+  if (webcamVideo.readyState < 2) return;
+  lastFaceDetectTs = now;
+  trackingDetectBusy = true;
+
+  try {
+    const tasks = [];
+    if (faceDetector) tasks.push(faceDetector.detect(webcamVideo));
+    else tasks.push(Promise.resolve([]));
+    if (handDetector) tasks.push(handDetector.detect(webcamVideo));
+    else tasks.push(Promise.resolve([]));
+    const [faces, hands] = await Promise.all(tasks);
+    const vw = webcamVideo.videoWidth || 1;
+    const vh = webcamVideo.videoHeight || 1;
+    detectedFaces = faces.map((f) => {
+      const b = f.boundingBox;
+      return {
+        x: b.x / vw,
+        y: b.y / vh,
+        width: b.width / vw,
+        height: b.height / vh,
+      };
+    });
+    detectedHands = hands.map((h) => {
+      const points = (h.keypoints || []).map((p) => ({
+        x: p.x / vw,
+        y: p.y / vh,
+      }));
+      return { points };
+    });
+  } catch {
+    detectedFaces = [];
+    detectedHands = [];
+  } finally {
+    trackingDetectBusy = false;
+  }
+}
+
+function shouldRunTracking(settings) {
+  if (!webcamActive) return false;
+  if (mode !== "glitch" && mode !== "mix") return false;
+  if (!settings) return false;
+  return settings.subjectGhost > 0 || settings.polygonTrack > 0;
+}
+
+function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
+  return (
+    mode === "particles" ||
+    webcamActive ||
+    recordingActive ||
+    micActive ||
+    isDomeAutoRotateActive() ||
+    keyPanMoved ||
+    smoothCameraMoved ||
+    hasCameraPanInput() ||
+    ((mode === "depth" || mode === "mix") &&
+      (cameraMode !== "static" ||
+        s.pointColorPulse > 0 ||
+        s.depthColorWave > 0 ||
+        s.bgMotion > 0 ||
+        bgColorTween ||
+        (live3dFxMode && live3dFxMode.value !== "none")))
+  );
+}
+
+function drawTrackingOverlay(settings) {
+  if (!webcamActive || settings.polygonTrack <= 0) return;
+  const amount = settings.polygonTrack / 100;
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 0 || h <= 0) return;
+  const alpha = clamp(0.2 + amount * 0.72, 0.2, 0.92);
+  const lineW = 1 + amount * 2.4;
+  const showText = amount > 0.12;
+  const textAlpha = clamp(alpha + 0.1, 0.25, 0.95);
+
+  const drawSegment = (ax, ay, bx, by, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineW;
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(bx, by);
+    ctx.stroke();
+
+    if (showText) {
+      const dist = Math.hypot(bx - ax, by - ay);
+      const mx = (ax + bx) * 0.5;
+      const my = (ay + by) * 0.5;
+      ctx.fillStyle = `rgba(255,45,45,${textAlpha})`;
+      ctx.font = "11px 'Share Tech Mono', monospace";
+      ctx.fillText(`${Math.round(dist)} px`, mx + 3, my - 3);
+    }
+  };
+
+  const drawPoint = (x, y, color) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, 1.8 + amount * 2.2, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  const faceColor = `rgba(65,255,235,${alpha})`;
+  const handColor = `rgba(255,90,220,${alpha})`;
+  const ringColor = `rgba(255,40,40,${alpha * 0.8})`;
+
+  for (const f of detectedFaces) {
+    const x = f.x * w;
+    const y = f.y * h;
+    const fw = f.width * w;
+    const fh = f.height * h;
+    const cx = x + fw * 0.5;
+    const cy = y + fh * 0.52;
+    const poly = [
+      [cx, y - fh * 0.14],
+      [x + fw * 0.88, y + fh * 0.1],
+      [x + fw * 1.02, cy],
+      [x + fw * 0.88, y + fh * 0.9],
+      [cx, y + fh * 1.08],
+      [x + fw * 0.12, y + fh * 0.9],
+      [x - fw * 0.02, cy],
+      [x + fw * 0.12, y + fh * 0.1],
+    ];
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i];
+      const b = poly[(i + 1) % poly.length];
+      drawSegment(a[0], a[1], b[0], b[1], faceColor);
+      drawPoint(a[0], a[1], ringColor);
+    }
+  }
+
+  const handEdges = [
+    [0, 1], [1, 2], [2, 3], [3, 4],
+    [0, 5], [5, 6], [6, 7], [7, 8],
+    [5, 9], [9, 10], [10, 11], [11, 12],
+    [9, 13], [13, 14], [14, 15], [15, 16],
+    [13, 17], [17, 18], [18, 19], [19, 20],
+    [0, 17],
+  ];
+
+  for (const hand of detectedHands) {
+    const pts = hand.points || [];
+    for (const [a, b] of handEdges) {
+      if (!pts[a] || !pts[b]) continue;
+      const ax = pts[a].x * w;
+      const ay = pts[a].y * h;
+      const bx = pts[b].x * w;
+      const by = pts[b].y * h;
+      drawSegment(ax, ay, bx, by, handColor);
+    }
+    for (const p of pts) {
+      const px = p.x * w;
+      const py = p.y * h;
+      drawPoint(px, py, handColor);
+    }
+  }
+}
+
+function stopWebcamInput() {
+  if (webcamStream) webcamStream.getTracks().forEach((t) => t.stop());
+  webcamStream = null;
+  webcamActive = false;
+  detectedFaces = [];
+  detectedHands = [];
+  if (webcamVideo) webcamVideo.srcObject = null;
+}
+
+async function toggleWebcam() {
+  if (webcamActive) {
+    stopWebcamInput();
+    updateDynamicUiTexts();
+    updateInputSpecs();
+    refreshCameraDeviceList(true);
+    scheduleRender();
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert(t("webcam_unavailable"));
+    return;
+  }
+
+  if (!window.isSecureContext) {
+    alert(t("webcam_secure"));
+    return;
+  }
+
+  try {
+    const selectedId = (cameraDeviceSelect && cameraDeviceSelect.value) || selectedCameraDeviceId || "";
+    const baseVideo = {
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      frameRate: { ideal: 30, max: 60 },
+    };
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: selectedId ? { ...baseVideo, deviceId: { exact: selectedId } } : baseVideo,
+        audio: false,
+      });
+    } catch (err) {
+      if (selectedId) {
+        stream = await navigator.mediaDevices.getUserMedia({ video: baseVideo, audio: false });
+      } else {
+        throw err;
+      }
+    }
+    webcamStream = stream;
+    webcamActive = true;
+    domeSeamCacheKey = "";
+    domeAutoSeamU = 0.5;
+    domeAutoYaw = 0;
+    domeAutoYawVel = 0;
+    lastDomeAnimTs = performance.now();
+    const track = stream.getVideoTracks()[0];
+    const activeDeviceId = track?.getSettings?.().deviceId || "";
+    if (activeDeviceId) selectedCameraDeviceId = activeDeviceId;
+    if (webcamVideo) {
+      webcamVideo.srcObject = stream;
+      const syncWebcamView = () => {
+        applyAspectRatioChange();
+        updateInputSpecs();
+        scheduleRender();
+      };
+      webcamVideo.onloadedmetadata = syncWebcamView;
+      webcamVideo.onloadeddata = syncWebcamView;
+      try {
+        await webcamVideo.play();
+      } catch {
+        // Some browsers can reject first play call even with user gesture.
+      }
+      setTimeout(() => {
+        if (!webcamActive || !webcamVideo) return;
+        if ((webcamVideo.videoWidth || 0) <= 1 || webcamVideo.readyState < 2) {
+          webcamVideo.play().catch(() => {});
+        }
+      }, 500);
+    }
+    await refreshCameraDeviceList(true);
+    if (cameraDeviceSelect && activeDeviceId) {
+      const exists = [...cameraDeviceSelect.options].some((o) => o.value === activeDeviceId);
+      if (exists) cameraDeviceSelect.value = activeDeviceId;
+    }
+    updateDynamicUiTexts();
+    updateInputSpecs();
+    scheduleRender();
+  } catch (err) {
+    const reason = err && err.name ? err.name : "Error desconocido";
+    alert(`${t("webcam_fail")} (${reason}). ${t("mic_hint_regular")}`);
+  }
+}
+
+async function toggleMic() {
+  if (micActive) {
+    if (micStream) micStream.getTracks().forEach((t) => t.stop());
+    micStream = null;
+    micActive = false;
+    audioLevel = 0;
+    updateDynamicUiTexts();
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert(t("mic_unavailable"));
+    return;
+  }
+
+  if (!window.isSecureContext) {
+    alert(t("mic_secure"));
+    return;
+  }
+
+  try {
+    if (audioInputSource && audioInputSource.value === "system") {
+      const sysStream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: 5 },
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      });
+      const tracks = sysStream.getAudioTracks();
+      if (!tracks.length) {
+        sysStream.getTracks().forEach((t) => t.stop());
+        throw new Error("NoAudioTrack");
+      }
+      micStream = new MediaStream([tracks[0]]);
+    } else {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    }
+    if (!audioCtx) audioCtx = new AudioContext();
+    const source = audioCtx.createMediaStreamSource(micStream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.85;
+    source.connect(analyser);
+    audioData = new Uint8Array(analyser.frequencyBinCount);
+    micActive = true;
+    updateDynamicUiTexts();
+    scheduleRender();
+  } catch (err) {
+    const reason =
+      err && err.message === "NoAudioTrack"
+        ? "NoAudioTrack"
+        : err && err.name
+          ? err.name
+          : "Error desconocido";
+    const modeHint =
+      audioInputSource && audioInputSource.value === "system"
+        ? t("mic_hint_system")
+        : t("mic_hint_regular");
+    alert(`${t("mic_fail")} (${reason}). ${modeHint}`);
+  }
+}
+
+function updateAudioLevel(settings) {
+  updateAudioAnalysis();
+  if (!micActive) {
+    audioLevel = 0;
+    return 0;
+  }
+  const avg = audioFeatures.rms * 0.55 + audioFeatures.bands[1] * 0.3 + audioFeatures.transient * 0.15;
+  const sensitivity = settings.audioSensitivity / 100;
+  const tolerance = settings.audioTolerance / 100;
+  const gate = 0.01 + tolerance * 0.32;
+  const gated = Math.max(0, avg - gate);
+  const normalized = clamp(gated / Math.max(0.08, 1 - gate), 0, 1.8);
+  const boosted = Math.pow(normalized, 0.68) * (0.8 + sensitivity * 5.4);
+  audioLevel = clamp(boosted, 0, 1.5);
+  return audioLevel;
+}
+
+function applyPixelate(imageData, size) {
+  if (size <= 1) return;
+  const { width, height, data } = imageData;
+
+  for (let y = 0; y < height; y += size) {
+    for (let x = 0; x < width; x += size) {
+      const i = (y * width + x) * 4;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const a = data[i + 3];
+      for (let yy = y; yy < y + size && yy < height; yy++) {
+        for (let xx = x; xx < x + size && xx < width; xx++) {
+          const j = (yy * width + xx) * 4;
+          data[j] = r;
+          data[j + 1] = g;
+          data[j + 2] = b;
+          data[j + 3] = a;
+        }
+      }
+    }
+  }
+}
+
+function applyLineJitter(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+
+  for (let y = 0; y < height; y++) {
+    const shift = Math.floor((randHash(0, y, seed) * 2 - 1) * amount);
+    for (let x = 0; x < width; x++) {
+      const srcX = clamp(x + shift, 0, width - 1);
+      const src = (y * width + srcX) * 4;
+      const dst = (y * width + x) * 4;
+      data[dst] = copy[src];
+      data[dst + 1] = copy[src + 1];
+      data[dst + 2] = copy[src + 2];
+      data[dst + 3] = copy[src + 3];
+    }
+  }
+}
+
+function applyWaveDistort(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const amp = amount * 0.6;
+  const freq = 0.03 + amount / 2200;
+
+  for (let y = 0; y < height; y++) {
+    const wave = Math.sin(y * freq + seed * 0.19) * amp;
+    for (let x = 0; x < width; x++) {
+      const srcX = clamp(Math.round(x + wave), 0, width - 1);
+      const src = (y * width + srcX) * 4;
+      const dst = (y * width + x) * 4;
+      data[dst] = copy[src];
+      data[dst + 1] = copy[src + 1];
+      data[dst + 2] = copy[src + 2];
+      data[dst + 3] = copy[src + 3];
+    }
+  }
+}
+
+function applyRgbShift(imageData, shift) {
+  if (shift <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const rx = clamp(x + shift, 0, width - 1);
+      const bx = clamp(x - shift, 0, width - 1);
+      const ri = (y * width + rx) * 4;
+      const bi = (y * width + bx) * 4;
+      data[i] = copy[ri];
+      data[i + 2] = copy[bi + 2];
+    }
+  }
+}
+
+function applyBlockShift(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const blocks = Math.floor((amount / 100) * 70);
+
+  for (let b = 0; b < blocks; b++) {
+    const bw = Math.floor(8 + randHash(b, 1, seed) * (width * 0.2));
+    const bh = Math.floor(3 + randHash(b, 2, seed) * (height * 0.08));
+    const sx = Math.floor(randHash(b, 3, seed) * (width - bw));
+    const sy = Math.floor(randHash(b, 4, seed) * (height - bh));
+    const dx = clamp(sx + Math.floor((randHash(b, 5, seed) * 2 - 1) * amount), 0, width - bw);
+    const dy = clamp(sy + Math.floor((randHash(b, 6, seed) * 2 - 1) * (amount * 0.4)), 0, height - bh);
+
+    for (let y = 0; y < bh; y++) {
+      for (let x = 0; x < bw; x++) {
+        const src = ((sy + y) * width + (sx + x)) * 4;
+        const dst = ((dy + y) * width + (dx + x)) * 4;
+        data[dst] = copy[src];
+        data[dst + 1] = copy[src + 1];
+        data[dst + 2] = copy[src + 2];
+      }
+    }
+  }
+}
+
+function applyNoise(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const n = (randHash(x, y, seed + 91) * 2 - 1) * amount;
+      data[i] = clamp(data[i] + n, 0, 255);
+      data[i + 1] = clamp(data[i + 1] + n, 0, 255);
+      data[i + 2] = clamp(data[i + 2] + n, 0, 255);
+    }
+  }
+}
+
+function applySaltPepper(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const density = amount / 1000;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (randHash(x, y, seed + 211) > density) continue;
+      const i = (y * width + x) * 4;
+      const v = randHash(x + 3, y + 5, seed + 333) > 0.5 ? 255 : 0;
+      data[i] = v;
+      data[i + 1] = v;
+      data[i + 2] = v;
+    }
+  }
+}
+
+function applyDataBands(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const bands = Math.floor((amount / 100) * 26);
+
+  for (let b = 0; b < bands; b++) {
+    const y = Math.floor(randHash(b, 9, seed) * height);
+    const bandH = Math.max(1, Math.floor(1 + randHash(b, 10, seed) * (height * 0.05)));
+    const shift = Math.floor((randHash(b, 11, seed) * 2 - 1) * (amount * 1.2));
+
+    for (let yy = y; yy < y + bandH && yy < height; yy++) {
+      for (let x = 0; x < width; x++) {
+        const sx = clamp(x + shift, 0, width - 1);
+        const src = (yy * width + sx) * 4;
+        const dst = (yy * width + x) * 4;
+        data[dst] = copy[src];
+        data[dst + 1] = copy[src + 1];
+        data[dst + 2] = copy[src + 2];
+      }
+    }
+  }
+}
+
+function applyChromaBleed(imageData, amount) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const radius = Math.max(1, Math.floor(amount / 12));
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const lx = clamp(x - radius, 0, width - 1);
+      const rx = clamp(x + radius, 0, width - 1);
+      const li = (y * width + lx) * 4;
+      const ri = (y * width + rx) * 4;
+      data[i] = copy[ri];
+      data[i + 1] = copy[i + 1];
+      data[i + 2] = copy[li + 2];
+    }
+  }
+}
+
+function applyByteCorrupt(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const levels = clamp(32 - Math.floor(amount / 4), 2, 32);
+  const step = 255 / (levels - 1);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      if (randHash(x, y, seed + 123) < amount / 190) {
+        const r = data[i];
+        data[i] = data[i + 1];
+        data[i + 1] = data[i + 2];
+        data[i + 2] = r;
+      }
+      data[i] = Math.round(data[i] / step) * step;
+      data[i + 1] = Math.round(data[i + 1] / step) * step;
+      data[i + 2] = Math.round(data[i + 2] / step) * step;
+    }
+  }
+}
+
+function buildSubjectMask(imageData) {
+  const { width, height, data } = imageData;
+  const mask = new Uint8Array(width * height);
+  let avgLum = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    avgLum += data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+  }
+  avgLum /= width * height;
+
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+  const maxR = Math.hypot(cx, cy) || 1;
+  const hasFaces = detectedFaces.length > 0;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+      const dx = (x - cx) / maxR;
+      const dy = (y - cy) / maxR;
+      const centerWeight = 1 - clamp(Math.hypot(dx, dy) * 1.35, 0, 1);
+      const sat = Math.max(data[i], data[i + 1], data[i + 2]) - Math.min(data[i], data[i + 1], data[i + 2]);
+      let faceBoost = false;
+      if (hasFaces) {
+        const nx = x / width;
+        const ny = y / height;
+        for (const f of detectedFaces) {
+          const padX = f.width * 0.25;
+          const padY = f.height * 0.35;
+          if (
+            nx >= f.x - padX &&
+            nx <= f.x + f.width + padX &&
+            ny >= f.y - padY &&
+            ny <= f.y + f.height + padY
+          ) {
+            faceBoost = true;
+            break;
+          }
+        }
+      }
+      const likelySubject =
+        faceBoost ||
+        (lum > avgLum * 0.82 && centerWeight > 0.25) ||
+        (sat > 48 && centerWeight > 0.2);
+      mask[y * width + x] = likelySubject ? 255 : 0;
+    }
+  }
+
+  return mask;
+}
+
+function applySubjectGhost(imageData, strength, copies, shift, seed) {
+  if (strength <= 0 || copies <= 0 || shift <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const mask = buildSubjectMask(imageData);
+  const alphaBase = strength / 120;
+
+  for (let c = 1; c <= copies; c++) {
+    const offX = Math.round((shift * c) / copies * (randHash(c, 71, seed) > 0.5 ? 1 : -1));
+    const offY = Math.round((shift * c * 0.45) / copies * (randHash(c, 72, seed) > 0.5 ? 1 : -1));
+    const alpha = clamp(alphaBase / (0.9 + c * 0.55), 0, 1);
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const srcP = y * width + x;
+        if (!mask[srcP]) continue;
+        const tx = x + offX;
+        const ty = y + offY;
+        if (tx < 0 || tx >= width || ty < 0 || ty >= height) continue;
+        const src = srcP * 4;
+        const dst = (ty * width + tx) * 4;
+        data[dst] = clamp(data[dst] * (1 - alpha) + copy[src] * alpha, 0, 255);
+        data[dst + 1] = clamp(data[dst + 1] * (1 - alpha) + copy[src + 1] * alpha, 0, 255);
+        data[dst + 2] = clamp(data[dst + 2] * (1 - alpha) + copy[src + 2] * alpha, 0, 255);
+      }
+    }
+  }
+}
+
+function applyPixelSort(imageData, amount) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const runMax = clamp(4 + Math.floor((amount / 100) * 28), 4, 48);
+  const stepY = clamp(1 + Math.floor((100 - amount) / 18), 1, 8);
+  const threshold = 45 + amount * 1.1;
+
+  for (let y = 0; y < height; y += stepY) {
+    let x = 0;
+    while (x < width - 1) {
+      const i0 = (y * width + x) * 4;
+      const i1 = (y * width + x + 1) * 4;
+      const lum0 = copy[i0] * 0.299 + copy[i0 + 1] * 0.587 + copy[i0 + 2] * 0.114;
+      const lum1 = copy[i1] * 0.299 + copy[i1 + 1] * 0.587 + copy[i1 + 2] * 0.114;
+      if (Math.abs(lum1 - lum0) < threshold * 0.04) {
+        x += 1;
+        continue;
+      }
+      const len = clamp(Math.floor(3 + Math.random() * runMax), 3, width - x);
+      const buf = [];
+      for (let k = 0; k < len; k++) {
+        const ii = (y * width + x + k) * 4;
+        buf.push({
+          lum: copy[ii] * 0.299 + copy[ii + 1] * 0.587 + copy[ii + 2] * 0.114,
+          r: copy[ii],
+          g: copy[ii + 1],
+          b: copy[ii + 2],
+        });
+      }
+      buf.sort((a, b) => a.lum - b.lum);
+      for (let k = 0; k < len; k++) {
+        const ii = (y * width + x + k) * 4;
+        data[ii] = buf[k].r;
+        data[ii + 1] = buf[k].g;
+        data[ii + 2] = buf[k].b;
+      }
+      x += len;
+    }
+  }
+}
+
+function applyOrderedDither(imageData, amount) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const mix = amount / 100;
+  const levels = clamp(7 - Math.floor(amount / 22), 2, 8);
+  const step = 255 / (levels - 1);
+  const m = [
+    [0, 8, 2, 10],
+    [12, 4, 14, 6],
+    [3, 11, 1, 9],
+    [15, 7, 13, 5],
+  ];
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const d = (m[y & 3][x & 3] / 16 - 0.5) * (step * 0.85 * mix);
+      const r = clamp(data[i] + d, 0, 255);
+      const g = clamp(data[i + 1] + d, 0, 255);
+      const b = clamp(data[i + 2] + d, 0, 255);
+      data[i] = Math.round(r / step) * step;
+      data[i + 1] = Math.round(g / step) * step;
+      data[i + 2] = Math.round(b / step) * step;
+    }
+  }
+}
+
+function applyColorBlend(imageData, amount) {
+  if (amount <= 0) return;
+  const { data } = imageData;
+  const mix = amount / 100;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const neonR = clamp(r * (1 - mix * 0.5) + g * mix * 0.28 + b * mix * 0.42, 0, 255);
+    const neonG = clamp(g * (1 - mix * 0.58) + b * mix * 0.52 + r * mix * 0.14, 0, 255);
+    const neonB = clamp(b * (1 - mix * 0.35) + r * mix * 0.55 + g * mix * 0.2, 0, 255);
+    data[i] = neonR;
+    data[i + 1] = neonG;
+    data[i + 2] = neonB;
+  }
+}
+
+function applyPixelMelt(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const maxDrift = Math.max(2, Math.floor((amount / 100) * (height * 0.16)));
+  const colStep = clamp(1 + Math.floor((100 - amount) / 10), 1, 10);
+
+  for (let x = 0; x < width; x += colStep) {
+    const phase = randHash(x, 77, seed + 901) * Math.PI * 2;
+    const bias = randHash(x, 79, seed + 903);
+    for (let y = 0; y < height; y++) {
+      const i = (y * width + x) * 4;
+      const lum = copy[i] * 0.299 + copy[i + 1] * 0.587 + copy[i + 2] * 0.114;
+      const flow = (1 - lum / 255) * 0.7 + bias * 0.3;
+      const offset = Math.round((Math.sin(y * 0.08 + phase) * 0.5 + 0.5) * maxDrift * flow);
+      const sy = clamp(y - offset, 0, height - 1);
+      const src = (sy * width + x) * 4;
+      data[i] = copy[src];
+      data[i + 1] = copy[src + 1];
+      data[i + 2] = copy[src + 2];
+    }
+  }
+}
+
+function drawLineOnImage(data, width, height, x0, y0, x1, y1, color, alpha) {
+  let ax = Math.round(x0);
+  let ay = Math.round(y0);
+  const bx = Math.round(x1);
+  const by = Math.round(y1);
+  const dx = Math.abs(bx - ax);
+  const sx = ax < bx ? 1 : -1;
+  const dy = -Math.abs(by - ay);
+  const sy = ay < by ? 1 : -1;
+  let err = dx + dy;
+
+  while (true) {
+    if (ax >= 0 && ax < width && ay >= 0 && ay < height) {
+      const i = (ay * width + ax) * 4;
+      data[i] = clamp(data[i] * (1 - alpha) + color[0] * alpha, 0, 255);
+      data[i + 1] = clamp(data[i + 1] * (1 - alpha) + color[1] * alpha, 0, 255);
+      data[i + 2] = clamp(data[i + 2] * (1 - alpha) + color[2] * alpha, 0, 255);
+    }
+    if (ax === bx && ay === by) break;
+    const e2 = 2 * err;
+    if (e2 >= dy) {
+      err += dy;
+      ax += sx;
+    }
+    if (e2 <= dx) {
+      err += dx;
+      ay += sy;
+    }
+  }
+}
+
+function applyPolygonTracking(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const { width, height, data } = imageData;
+  const alpha = clamp((amount / 100) * 0.85, 0.1, 0.85);
+  const copies = 1 + Math.floor(amount / 40);
+  const jitter = (amount / 100) * 12;
+  const colA = [50, 255, 215];
+  const colB = [255, 70, 210];
+
+  const shapes = [];
+  if (detectedFaces.length) {
+    for (const f of detectedFaces) {
+      const x = f.x * width;
+      const y = f.y * height;
+      const w = f.width * width;
+      const h = f.height * height;
+      const cx = x + w * 0.5;
+      const cy = y + h * 0.5;
+      shapes.push([
+        [cx, y - h * 0.16],
+        [x + w * 0.9, y + h * 0.1],
+        [x + w * 1.02, cy],
+        [x + w * 0.9, y + h * 0.9],
+        [cx, y + h * 1.08],
+        [x + w * 0.1, y + h * 0.9],
+        [x - w * 0.02, cy],
+        [x + w * 0.1, y + h * 0.1],
+      ]);
+    }
+  } else {
+    const mask = buildSubjectMask(imageData);
+    let minX = width;
+    let minY = height;
+    let maxX = 0;
+    let maxY = 0;
+    let hits = 0;
+    for (let y = 0; y < height; y += 3) {
+      for (let x = 0; x < width; x += 3) {
+        if (!mask[y * width + x]) continue;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+        hits += 1;
+      }
+    }
+    if (hits > 60) {
+      const cx = (minX + maxX) * 0.5;
+      const cy = (minY + maxY) * 0.5;
+      const w = Math.max(8, maxX - minX);
+      const h = Math.max(8, maxY - minY);
+      shapes.push([
+        [cx, cy - h * 0.62],
+        [cx + w * 0.62, cy],
+        [cx, cy + h * 0.62],
+        [cx - w * 0.62, cy],
+      ]);
+    }
+  }
+
+  if (!shapes.length) return;
+
+  for (const poly of shapes) {
+    for (let c = 0; c < copies; c++) {
+      const offX = (randHash(c, 501, seed + 12) * 2 - 1) * jitter * c;
+      const offY = (randHash(c, 502, seed + 31) * 2 - 1) * jitter * c;
+      const col = c % 2 === 0 ? colA : colB;
+      for (let i = 0; i < poly.length; i++) {
+        const p0 = poly[i];
+        const p1 = poly[(i + 1) % poly.length];
+        drawLineOnImage(
+          data,
+          width,
+          height,
+          p0[0] + offX,
+          p0[1] + offY,
+          p1[0] + offX,
+          p1[1] + offY,
+          col,
+          alpha / (1 + c * 0.35)
+        );
+      }
+    }
+  }
+}
+
+function applyErrorComplexity(imageData, amount, seed) {
+  if (amount <= 0) return;
+  const layers = Math.max(1, Math.floor(amount / 22));
+  for (let i = 0; i < layers; i++) {
+    applyLineJitter(imageData, Math.max(2, Math.round(amount * (0.18 + i * 0.09))), seed + i * 13);
+    applyDataBands(imageData, Math.max(5, Math.round(amount * 0.7)), seed + i * 19);
+    applyByteCorrupt(imageData, Math.max(4, Math.round(amount * 0.45)), seed + i * 23);
+  }
+}
+
+function applyPosterize(imageData, levels) {
+  const safe = clamp(levels, 2, 64);
+  const step = 255 / (safe - 1);
+  const { data } = imageData;
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.round(data[i] / step) * step;
+    data[i + 1] = Math.round(data[i + 1] / step) * step;
+    data[i + 2] = Math.round(data[i + 2] / step) * step;
+  }
+}
+
+function applyScanlines(imageData, intensity) {
+  if (intensity <= 0) return;
+  const dark = intensity / 130;
+  const { width, height, data } = imageData;
+
+  for (let y = 0; y < height; y += 2) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      data[i] = clamp(data[i] * (1 - dark), 0, 255);
+      data[i + 1] = clamp(data[i + 1] * (1 - dark), 0, 255);
+      data[i + 2] = clamp(data[i + 2] * (1 - dark), 0, 255);
+    }
+  }
+}
+
+function applyBloom(imageData, amount) {
+  if (amount <= 0) return;
+  const boost = amount / 100;
+  const { data } = imageData;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const factor = 1 + boost * (lum / 255);
+    data[i] = clamp(data[i] * factor, 0, 255);
+    data[i + 1] = clamp(data[i + 1] * factor, 0, 255);
+    data[i + 2] = clamp(data[i + 2] * factor, 0, 255);
+  }
+}
+
+function applyColorControls(imageData, hueShift, saturation, contrast) {
+  const satFactor = saturation / 100;
+  const conFactor = contrast / 100;
+  const conOffset = 128 * (1 - conFactor);
+  const hueOffset = hueShift / 360;
+  const { data } = imageData;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const [h, s, l] = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+    const nh = (h + hueOffset + 1) % 1;
+    const ns = clamp(s * satFactor, 0, 1);
+    const [r, g, b] = hslToRgb(nh, ns, l);
+    data[i] = clamp(r * conFactor + conOffset, 0, 255);
+    data[i + 1] = clamp(g * conFactor + conOffset, 0, 255);
+    data[i + 2] = clamp(b * conFactor + conOffset, 0, 255);
+  }
+}
+
+function applyInvertBlend(imageData, amount) {
+  if (amount <= 0) return;
+  const mix = amount / 100;
+  const { data } = imageData;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = clamp(data[i] * (1 - mix) + (255 - data[i]) * mix, 0, 255);
+    data[i + 1] = clamp(data[i + 1] * (1 - mix) + (255 - data[i + 1]) * mix, 0, 255);
+    data[i + 2] = clamp(data[i + 2] * (1 - mix) + (255 - data[i + 2]) * mix, 0, 255);
+  }
+}
+
+function applySolarize(imageData, amount) {
+  if (amount <= 0) return;
+  const threshold = 255 - (amount / 100) * 170;
+  const { data } = imageData;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] > threshold) data[i] = 255 - data[i];
+    if (data[i + 1] > threshold) data[i + 1] = 255 - data[i + 1];
+    if (data[i + 2] > threshold) data[i + 2] = 255 - data[i + 2];
+  }
+}
+
+function applyAnimatedDistortion(imageData, amount, speed, seed, tSec) {
+  if (amount <= 0) return;
+  const w = imageData.width;
+  const h = imageData.height;
+  const src = new Uint8ClampedArray(imageData.data);
+  const dst = imageData.data;
+  const glitch = amount / 100;
+  const vel = 0.45 + (speed / 100) * 3.4;
+  const maxDx = Math.max(3, Math.round(Math.min(w, h) * (0.008 + glitch * 0.08)));
+  const maxDy = Math.max(1, Math.round(Math.min(w, h) * (0.003 + glitch * 0.03)));
+  const bandH = Math.max(1, Math.round(1 + glitch * 5));
+
+  for (let y = 0; y < h; y += bandH) {
+    const yN = y / Math.max(1, h - 1);
+    const bandNoise =
+      Math.sin(tSec * vel * 1.6 + yN * 18 + seed * 0.0021) * 0.58 +
+      Math.sin(tSec * vel * 0.9 + yN * 37 + seed * 0.0013) * 0.42;
+    const burst = randHash(Math.floor(tSec * vel * 11), y + seed, seed + 911) > 0.88 ? 1 : 0;
+    const dxBand = Math.round((bandNoise + burst * (Math.random() * 1.2 - 0.2)) * maxDx);
+    const dyBand = Math.round(Math.sin(tSec * vel + yN * 9 + seed * 0.003) * maxDy);
+    for (let yy = y; yy < Math.min(h, y + bandH); yy++) {
+      for (let x = 0; x < w; x++) {
+        const sx = clamp(x + dxBand, 0, w - 1);
+        const sy = clamp(yy + dyBand, 0, h - 1);
+        const si = (sy * w + sx) * 4;
+        const di = (yy * w + x) * 4;
+        dst[di] = src[si];
+        dst[di + 1] = src[si + 1];
+        dst[di + 2] = src[si + 2];
+        dst[di + 3] = src[si + 3];
+      }
+    }
+  }
+
+  if (glitch > 0.15) {
+    const blocks = Math.max(1, Math.round(glitch * 8));
+    for (let i = 0; i < blocks; i++) {
+      const bw = Math.max(8, Math.round((0.04 + Math.random() * 0.18) * w));
+      const bh = Math.max(4, Math.round((0.02 + Math.random() * 0.12) * h));
+      const x0 = Math.floor(Math.random() * Math.max(1, w - bw));
+      const y0 = Math.floor(Math.random() * Math.max(1, h - bh));
+      const sx0 = clamp(x0 + Math.round((Math.random() * 2 - 1) * maxDx * 2.4), 0, w - bw);
+      const sy0 = clamp(y0 + Math.round((Math.random() * 2 - 1) * maxDy * 2.6), 0, h - bh);
+      for (let yy = 0; yy < bh; yy++) {
+        for (let xx = 0; xx < bw; xx++) {
+          const si = ((sy0 + yy) * w + (sx0 + xx)) * 4;
+          const di = ((y0 + yy) * w + (x0 + xx)) * 4;
+          dst[di] = src[si];
+          dst[di + 1] = src[si + 1];
+          dst[di + 2] = src[si + 2];
+          dst[di + 3] = src[si + 3];
+        }
+      }
+    }
+  }
+}
+
+function applyMotionTrailGlitch(imageData, amount, decay, threshold, softness, motionOnly) {
+  if (amount <= 0) {
+    if (glitchTrailCanvas.width > 0 && glitchTrailCanvas.height > 0) {
+      glitchTrailCtx.clearRect(0, 0, glitchTrailCanvas.width, glitchTrailCanvas.height);
+    }
+    glitchTrailBuffer = null;
+    glitchPrevFrame = null;
+    glitchTrailW = 0;
+    glitchTrailH = 0;
+    return;
+  }
+  const w = imageData.width;
+  const h = imageData.height;
+  const pix = w * h;
+  if (glitchTrailW !== w || glitchTrailH !== h || !glitchTrailBuffer || glitchTrailBuffer.length !== pix * 3) {
+    glitchTrailW = w;
+    glitchTrailH = h;
+    glitchTrailBuffer = new Float32Array(pix * 3);
+    glitchPrevFrame = new Uint8ClampedArray(pix * 4);
+  }
+
+  const src = new Uint8ClampedArray(imageData.data);
+  const dst = imageData.data;
+  const buf = glitchTrailBuffer;
+  const prev = glitchPrevFrame;
+  const blend = clamp(amount / 100, 0, 1);
+  const keep = clamp(0.84 + (decay / 100) * 0.15, 0.82, 0.995);
+  const gain = clamp(0.5 + blend * 0.8, 0.35, 1.35);
+  const th = 6 + (threshold / 100) * 80;
+  const soft = 1 + (softness / 100) * 70;
+  const mo = clamp(motionOnly / 100, 0, 1);
+  const outMix = clamp(0.14 + blend * 0.78, 0.04, 0.95);
+
+  for (let p = 0; p < pix; p++) {
+    const i4 = p * 4;
+    const i3 = p * 3;
+    const r = src[i4];
+    const g = src[i4 + 1];
+    const b = src[i4 + 2];
+    const dr = Math.abs(r - prev[i4]);
+    const dg = Math.abs(g - prev[i4 + 1]);
+    const db = Math.abs(b - prev[i4 + 2]);
+    const diff = dr * 0.299 + dg * 0.587 + db * 0.114;
+    const x = clamp((diff - th) / soft, 0, 1);
+    const mask = x * x * (3 - 2 * x);
+    const feed = (1 - mo) + mask * mo;
+
+    const tr = clamp(buf[i3] * keep + r * gain * feed, 0, 255);
+    const tg = clamp(buf[i3 + 1] * keep + g * gain * feed, 0, 255);
+    const tb = clamp(buf[i3 + 2] * keep + b * gain * feed, 0, 255);
+    buf[i3] = tr;
+    buf[i3 + 1] = tg;
+    buf[i3 + 2] = tb;
+
+    dst[i4] = clamp(r * (1 - outMix) + tr * outMix, 0, 255);
+    dst[i4 + 1] = clamp(g * (1 - outMix) + tg * outMix, 0, 255);
+    dst[i4 + 2] = clamp(b * (1 - outMix) + tb * outMix, 0, 255);
+    dst[i4 + 3] = 255;
+  }
+
+  glitchPrevFrame.set(src);
+}
+
+function applyGlitchPipeline(imageData, settings, seed, tSec = 0) {
+  applyPixelate(imageData, settings.pixelSize);
+  applyPixelSort(imageData, settings.pixelSort);
+  applyLineJitter(imageData, settings.lineJitter, seed);
+  applyWaveDistort(imageData, settings.waveDistort, seed);
+  applyRgbShift(imageData, settings.rgbShift);
+  applyBlockShift(imageData, settings.blockShift, seed);
+  applyPixelMelt(imageData, settings.pixelMelt, seed);
+  applyNoise(imageData, settings.noiseAmount, seed);
+  applySaltPepper(imageData, settings.saltPepper, seed);
+  applyDataBands(imageData, settings.dataBands, seed);
+  applyByteCorrupt(imageData, settings.byteCorrupt, seed);
+  applyChromaBleed(imageData, settings.chromaBleed);
+  applyOrderedDither(imageData, settings.ditherAmount);
+  applyColorBlend(imageData, settings.colorBlend);
+  applySubjectGhost(imageData, settings.subjectGhost, settings.ghostCopies, settings.ghostShift, seed);
+  applyPolygonTracking(imageData, settings.polygonTrack, seed);
+  applyErrorComplexity(imageData, settings.errorComplexity, seed);
+  applyPosterize(imageData, settings.posterize);
+  applyScanlines(imageData, settings.scanlineIntensity);
+  applyBloom(imageData, settings.bloom);
+  applyColorControls(imageData, settings.hueShift, settings.saturation, settings.contrast);
+  applyInvertBlend(imageData, settings.invertBlend);
+  applySolarize(imageData, settings.solarize);
+  applyAnimatedDistortion(imageData, settings.animDistort, settings.animSpeed, seed, tSec);
+  applyMotionTrailGlitch(
+    imageData,
+    settings.motionTrail,
+    settings.trailDecay,
+    settings.trailThreshold,
+    settings.trailSoftness,
+    settings.trailMotionOnly
+  );
+}
+
+function applyKaleidoFractal(imageData, settings, seed) {
+  const w = imageData.width;
+  const h = imageData.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = Math.hypot(cx, cy);
+  const seg = clamp(Math.round(settings.kaleidoSegments), 1, 36);
+  const layers = clamp(Math.round(settings.kaleidoLayers), 1, 8);
+  const step = (Math.PI * 2) / seg;
+  const twist = (settings.kaleidoTwist / 100) * Math.PI;
+  const zoom = settings.fractalZoom / 100;
+  const pattern = fractalPattern ? fractalPattern.value : "kaleido";
+  const layerEcho = settings.layerEcho / 100;
+  const pulse = settings.fractalPulse / 100;
+
+  fxCtx.putImageData(imageData, 0, 0);
+  fractalCtx.clearRect(0, 0, w, h);
+
+  for (let i = 0; i < seg; i++) {
+    fractalCtx.save();
+    fractalCtx.translate(cx, cy);
+    fractalCtx.rotate(i * step + twist);
+    fractalCtx.scale(i % 2 === 0 ? zoom : -zoom, zoom);
+    fractalCtx.beginPath();
+    fractalCtx.moveTo(0, 0);
+    fractalCtx.arc(0, 0, radius, -step / 2, step / 2);
+    fractalCtx.closePath();
+    fractalCtx.clip();
+    fractalCtx.drawImage(fxCanvas, -cx, -cy);
+    fractalCtx.restore();
+  }
+
+  tileCtx.clearRect(0, 0, w, h);
+  for (let oy = -h; oy <= h; oy += h) {
+    for (let ox = -w; ox <= w; ox += w) {
+      tileCtx.drawImage(fxCanvas, ox, oy, w, h);
+    }
+  }
+
+  const cols = layers;
+  const rows = layers;
+  const cellW = w / cols;
+  const cellH = h / rows;
+
+  for (let gy = 0; gy < rows; gy++) {
+    for (let gx = 0; gx < cols; gx++) {
+      const layerI = gy * cols + gx + 1;
+      const t = layerI / Math.max(1, cols * rows);
+      const localScale = 1 - layerEcho * 0.35 * t;
+      const localRot = layerEcho * t * Math.PI * (0.35 + pulse * 0.8);
+      const alpha = clamp(1 - t * 0.22 * layerEcho, 0.28, 1);
+      tileCtx.save();
+      tileCtx.translate((gx + 0.5) * cellW, (gy + 0.5) * cellH);
+      tileCtx.rotate(localRot);
+      tileCtx.scale((gx % 2 === 0 ? 1 : -1) * localScale, (gy % 2 === 0 ? 1 : -1) * localScale);
+      tileCtx.globalAlpha = alpha;
+      tileCtx.drawImage(fractalCanvas, -cellW / 2, -cellH / 2, cellW, cellH);
+      tileCtx.restore();
+    }
+  }
+
+  const result = tileCtx.getImageData(0, 0, w, h);
+  if (pattern === "spiral" || pattern === "hybrid") {
+    applySpiralWarp(result, settings, seed);
+  }
+  if (pattern === "mandala" || pattern === "hybrid") {
+    applyMandalaWarp(result, settings, seed);
+  }
+
+  if (settings.fractalPulse > 0 || settings.psychedelic > 0 || settings.colorCycle > 0) {
+    applyPsychedelic(result, settings, seed);
+  }
+
+  return result;
+}
+
+function applySpiralWarp(imageData, settings, seed) {
+  const amount = settings.spiralAmount / 100;
+  if (amount <= 0) return;
+  const turns = Math.max(1, settings.spiralTurns);
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+  const maxR = Math.hypot(cx, cy) || 1;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const r = Math.hypot(dx, dy) / maxR;
+      const baseAngle = Math.atan2(dy, dx);
+      const ang = baseAngle + amount * (turns * r * Math.PI * 0.55 + Math.sin(r * 11 + seed * 0.01) * 0.5);
+      const sx = clamp(Math.round(cx + Math.cos(ang) * r * maxR), 0, width - 1);
+      const sy = clamp(Math.round(cy + Math.sin(ang) * r * maxR), 0, height - 1);
+      const src = (sy * width + sx) * 4;
+      const dst = (y * width + x) * 4;
+      data[dst] = copy[src];
+      data[dst + 1] = copy[src + 1];
+      data[dst + 2] = copy[src + 2];
+    }
+  }
+}
+
+function applyMandalaWarp(imageData, settings, seed) {
+  const bloom = settings.mandalaBloom / 100;
+  if (bloom <= 0) return;
+  const petals = Math.max(2, settings.mandalaPetals);
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+  const maxR = Math.hypot(cx, cy) || 1;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const r = Math.hypot(dx, dy);
+      const nr = r / maxR;
+      const a = Math.atan2(dy, dx);
+      const petalWave = Math.sin(a * petals + seed * 0.01) * bloom * (0.6 + (1 - nr) * 0.8);
+      const sampleR = clamp(r * (1 + petalWave * 0.5), 0, maxR);
+      const sampleA = a + petalWave * 0.4;
+      const sx = clamp(Math.round(cx + Math.cos(sampleA) * sampleR), 0, width - 1);
+      const sy = clamp(Math.round(cy + Math.sin(sampleA) * sampleR), 0, height - 1);
+      const src = (sy * width + sx) * 4;
+      const dst = (y * width + x) * 4;
+      data[dst] = copy[src];
+      data[dst + 1] = copy[src + 1];
+      data[dst + 2] = copy[src + 2];
+    }
+  }
+}
+
+function applyPsychedelic(imageData, settings, seed) {
+  const { width, height, data } = imageData;
+  const pulse = settings.fractalPulse / 100;
+  const psycho = settings.psychedelic / 100;
+  const cycle = settings.colorCycle / 360;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const rNorm = x / width - 0.5;
+      const cNorm = y / height - 0.5;
+      const angle = Math.atan2(cNorm, rNorm);
+      const dist = Math.hypot(rNorm, cNorm);
+      const wave = Math.sin(angle * (6 + pulse * 16) + dist * (40 + pulse * 70) + seed * 0.01);
+      const hShift = cycle + wave * 0.18 * psycho;
+      const sat = 1 + psycho * 1.2;
+      const con = 1 + psycho * 0.85;
+
+      const [h, s, l] = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+      const [nr, ng, nb] = hslToRgb((h + hShift + 1) % 1, clamp(s * sat, 0, 1), l);
+      data[i] = clamp((nr - 128) * con + 128, 0, 255);
+      data[i + 1] = clamp((ng - 128) * con + 128, 0, 255);
+      data[i + 2] = clamp((nb - 128) * con + 128, 0, 255);
+    }
+  }
+}
+
+function buildDepthMap(imageData, strength) {
+  const { width, height, data } = imageData;
+  const map = new Float32Array(width * height);
+  const w = strength / 100;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const p = y * width + x;
+      const i = p * 4;
+      const lum = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+
+      const rx = x < width - 1 ? x + 1 : x;
+      const dy = y < height - 1 ? y + 1 : y;
+      const ri = (y * width + rx) * 4;
+      const di = (dy * width + x) * 4;
+      const lr = (data[ri] * 0.299 + data[ri + 1] * 0.587 + data[ri + 2] * 0.114) / 255;
+      const ld = (data[di] * 0.299 + data[di + 1] * 0.587 + data[di + 2] * 0.114) / 255;
+
+      const edge = clamp((Math.abs(lum - lr) + Math.abs(lum - ld)) * 0.75, 0, 1);
+      map[p] = clamp(lum * (0.65 + w * 0.45) + edge * w * 0.8, 0, 1);
+    }
+  }
+
+  return map;
+}
+
+function sampleDepth(depthMap, w, h, x, y) {
+  const sx = clamp(Math.round(x), 0, w - 1);
+  const sy = clamp(Math.round(y), 0, h - 1);
+  return depthMap[sy * w + sx];
+}
+
+function getLightDirection(settings) {
+  const az = (settings.lightAzimuth * Math.PI) / 180;
+  const el = (settings.lightElevation * Math.PI) / 180;
+  const x = Math.cos(el) * Math.cos(az);
+  const y = Math.sin(el);
+  const z = Math.cos(el) * Math.sin(az);
+  return normalize3(x, y, z);
+}
+
+function applyDepthDisplacement(imageData, depthMap, settings) {
+  if (settings.depthShift <= 0) return;
+  const { width, height, data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  const amt = settings.depthShift;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const p = y * width + x;
+      const d = depthMap[p] - 0.5;
+      const dx = Math.round(d * amt * 1.4 + pointerTiltX * amt * 0.65);
+      const dy = Math.round(d * amt * 0.8 + pointerTiltY * amt * 0.55);
+      const sx = clamp(x + dx, 0, width - 1);
+      const sy = clamp(y + dy, 0, height - 1);
+      const src = (sy * width + sx) * 4;
+      const dst = p * 4;
+      data[dst] = copy[src];
+      data[dst + 1] = copy[src + 1];
+      data[dst + 2] = copy[src + 2];
+    }
+  }
+}
+
+function applyDepthView(imageData, depthMap, amount) {
+  if (amount <= 0) return;
+  const mix = amount / 100;
+  const { data } = imageData;
+
+  for (let p = 0; p < depthMap.length; p++) {
+    const i = p * 4;
+    const d = depthMap[p] * 255;
+    data[i] = data[i] * (1 - mix) + d * mix;
+    data[i + 1] = data[i + 1] * (1 - mix) + d * mix;
+    data[i + 2] = data[i + 2] * (1 - mix) + d * mix;
+  }
+}
+
+function rotate3D(x, y, z, rx, ry, rz) {
+  let nx = x;
+  let ny = y;
+  let nz = z;
+
+  const sx = Math.sin(rx);
+  const cx = Math.cos(rx);
+  const sy = Math.sin(ry);
+  const cy = Math.cos(ry);
+  const sz = Math.sin(rz);
+  const cz = Math.cos(rz);
+
+  let ty = ny * cx - nz * sx;
+  let tz = ny * sx + nz * cx;
+  ny = ty;
+  nz = tz;
+
+  let tx = nx * cy + nz * sy;
+  tz = -nx * sy + nz * cy;
+  nx = tx;
+  nz = tz;
+
+  tx = nx * cz - ny * sz;
+  ty = nx * sz + ny * cz;
+  nx = tx;
+  ny = ty;
+
+  return [nx, ny, nz];
+}
+
+function projectPoint3D(x, y, z, w, h, fov, zoom) {
+  const p = fov / (fov + z + 0.001);
+  return [w * 0.5 + x * p * zoom, h * 0.5 + y * p * zoom, p];
+}
+
+function audioEnvelopeGate(level) {
+  const x = clamp((level - 0.045) / 0.24, 0, 1);
+  return x * x * (3 - 2 * x);
+}
+
+function drawSceneBackground(w, h, lightDir, settings, tSec) {
+  const rawMode = bgMode ? bgMode.value : "black";
+  const mode = rawMode === "gradient" ? "gradient-linear" : rawMode === "neon" ? "animated" : rawMode;
+  const palettePresets = {
+    custom: null,
+    cyber: ["#0b1026", "#30103d"],
+    sunset: ["#3a1208", "#ff4f7b"],
+    ocean: ["#04131f", "#0a6aa6"],
+    toxic: ["#121a05", "#7fff00"],
+  };
+  const paletteKey = bgPalette ? bgPalette.value : "custom";
+  const palette = palettePresets[paletteKey] || palettePresets.custom;
+  let cA = hexToRgb(palette ? palette[0] : bgColorA ? bgColorA.value : "#0b1026");
+  let cB = hexToRgb(palette ? palette[1] : bgColorB ? bgColorB.value : "#30103d");
+  // Keep audio influence on background subtle; prioritize geometry response.
+  const bgAudio = Math.max(0, audioLevel - 0.08);
+  const motion = (settings.bgMotion / 100) * (0.45 + bgAudio * 0.22);
+  const flatMode = settings.flatIllustrated > 45;
+
+  if (bgSyncMode && (mode === "depth" || mode === "mix")) {
+    const hueA = ((settings.pointColorShift / 360) + tSec * 0.03) % 1;
+    const hueB = ((settings.meshColorShift / 360) + 0.25 + tSec * 0.025) % 1;
+    const org = (settings.pointOrganic || 0) / 100;
+    const dyn = clamp((settings.pointFloat / 100) * 0.7 + org * 0.7 + (settings.meshMap / 100) * 0.4, 0, 1.6);
+    const sat = clamp(0.55 + dyn * 0.22, 0, 1);
+    const lA = clamp(0.18 + Math.sin(tSec * (1.2 + dyn * 2.2)) * 0.08 + dyn * 0.06, 0.1, 0.5);
+    const lB = clamp(0.2 + Math.cos(tSec * (1.0 + dyn * 1.8) + 1.2) * 0.09 + dyn * 0.05, 0.1, 0.5);
+    const rgbA = hslToRgb(hueA, sat, lA);
+    const rgbB = hslToRgb(hueB, sat, lB);
+    cA = { r: rgbA[0], g: rgbA[1], b: rgbA[2] };
+    cB = { r: rgbB[0], g: rgbB[1], b: rgbB[2] };
+  }
+
+  if (bgColorTween) {
+    const now = performance.now();
+    const p = clamp((now - bgColorTween.startedAt) / Math.max(60, bgColorTween.durationMs), 0, 1);
+    const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    cA = {
+      r: Math.round(bgColorTween.fromA.r + (bgColorTween.toA.r - bgColorTween.fromA.r) * ease),
+      g: Math.round(bgColorTween.fromA.g + (bgColorTween.toA.g - bgColorTween.fromA.g) * ease),
+      b: Math.round(bgColorTween.fromA.b + (bgColorTween.toA.b - bgColorTween.fromA.b) * ease),
+    };
+    cB = {
+      r: Math.round(bgColorTween.fromB.r + (bgColorTween.toB.r - bgColorTween.fromB.r) * ease),
+      g: Math.round(bgColorTween.fromB.g + (bgColorTween.toB.g - bgColorTween.fromB.g) * ease),
+      b: Math.round(bgColorTween.fromB.b + (bgColorTween.toB.b - bgColorTween.fromB.b) * ease),
+    };
+    if (p >= 1) bgColorTween = null;
+  }
+
+  if (mode === "black") {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, w, h);
+  } else if (mode === "solid") {
+    ctx.fillStyle = `rgb(${cA.r},${cA.g},${cA.b})`;
+    ctx.fillRect(0, 0, w, h);
+  } else {
+    const drift = Math.sin(tSec * (0.6 + motion * 1.8)) * 0.35;
+    const lx = w * (0.5 + lightDir[0] * (0.2 + motion * 0.18) + drift * 0.08);
+    const ly = h * (0.45 - lightDir[1] * (0.2 + motion * 0.18));
+    if (mode === "gradient-linear") {
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, `rgb(${cA.r},${cA.g},${cA.b})`);
+      grad.addColorStop(1, `rgb(${cB.r},${cB.g},${cB.b})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+    } else if (mode === "gradient-radial") {
+      const grad = ctx.createRadialGradient(lx, ly, 30, lx, ly, Math.max(w, h) * (0.7 + motion * 0.2));
+      grad.addColorStop(0, `rgba(${cA.r},${cA.g},${cA.b},0.9)`);
+      grad.addColorStop(0.55, `rgba(${cB.r},${cB.g},${cB.b},0.55)`);
+      grad.addColorStop(1, "rgba(0,0,0,0.95)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+    } else if (mode === "animated") {
+      const t = tSec * (0.8 + motion * 2.8);
+      const mix = 0.5 + Math.sin(t) * 0.5;
+      const r1 = Math.round(cA.r * (1 - mix) + cB.r * mix);
+      const g1 = Math.round(cA.g * (1 - mix) + cB.g * mix);
+      const b1 = Math.round(cA.b * (1 - mix) + cB.b * mix);
+      const r2 = Math.round(cB.r * (1 - mix) + cA.r * mix);
+      const g2 = Math.round(cB.g * (1 - mix) + cA.g * mix);
+      const b2 = Math.round(cB.b * (1 - mix) + cA.b * mix);
+      const grad = ctx.createLinearGradient(0, Math.sin(t) * h * 0.18, w, h + Math.cos(t * 0.7) * h * 0.16);
+      grad.addColorStop(0, `rgb(${r1},${g1},${b1})`);
+      grad.addColorStop(1, `rgb(${r2},${g2},${b2})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      const glow = ctx.createRadialGradient(lx, ly, 24, lx, ly, Math.max(w, h) * 0.5);
+      glow.addColorStop(0, `rgba(${cA.r},${cA.g},${cA.b},0.38)`);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+    } else if (mode === "grid") {
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, `rgb(${Math.round(cA.r * 0.7)},${Math.round(cA.g * 0.7)},${Math.round(cA.b * 0.7)})`);
+      grad.addColorStop(1, `rgb(${Math.round(cB.r * 0.55)},${Math.round(cB.g * 0.55)},${Math.round(cB.b * 0.55)})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      const step = Math.max(16, Math.round(50 - motion * 20));
+      const off = (tSec * (18 + motion * 34)) % step;
+      ctx.strokeStyle = `rgba(${cA.r},${cA.g},${cA.b},0.2)`;
+      ctx.lineWidth = 1;
+      for (let x = -step; x < w + step; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x + off, 0);
+        ctx.lineTo(x + off, h);
+        ctx.stroke();
+      }
+      for (let y = -step; y < h + step; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y + off);
+        ctx.lineTo(w, y + off);
+        ctx.stroke();
+      }
+    } else if (mode === "psychedelic-fractal") {
+      const dyn = clamp((settings.bgMotion / 100) * 1.2 + bgAudio * 0.3, 0, 2);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, w, h);
+      const layers = 5;
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      const maxR = Math.max(w, h) * 0.72;
+      for (let i = 0; i < layers; i++) {
+        const p = i / Math.max(1, layers - 1);
+        const rot = tSec * (0.16 + dyn * 0.32) * (i % 2 ? 1 : -1);
+        const petals = 6 + i * 3;
+        const hueA = ((settings.pointColorShift / 360) + p * 0.37 + tSec * 0.03) % 1;
+        const hueB = ((settings.meshColorShift / 360) + 0.18 + p * 0.31 - tSec * 0.025) % 1;
+        const [rA, gA, bA] = hslToRgb(hueA, 0.82, 0.5);
+        const [rB, gB, bB] = hslToRgb(hueB, 0.86, 0.46);
+        const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, maxR * (0.35 + p * 0.62));
+        grad.addColorStop(0, `rgba(${rA},${gA},${bA},${0.18 + p * 0.12})`);
+        grad.addColorStop(1, `rgba(${rB},${gB},${bB},0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rot);
+        ctx.strokeStyle = `rgba(${rA},${gA},${bA},${0.2 + p * 0.2})`;
+        ctx.lineWidth = 1 + p * 1.3;
+        for (let k = 0; k < petals; k++) {
+          const a0 = (k / petals) * Math.PI * 2;
+          const a1 = ((k + 1) / petals) * Math.PI * 2;
+          const r0 = maxR * (0.14 + p * 0.78) * (0.7 + Math.sin(a0 * 3 + tSec * (0.6 + dyn)) * 0.3);
+          const r1 = maxR * (0.14 + p * 0.78) * (0.7 + Math.sin(a1 * 3 + tSec * (0.6 + dyn)) * 0.3);
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a0) * r0, Math.sin(a0) * r0);
+          ctx.lineTo(Math.cos(a1) * r1, Math.sin(a1) * r1);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+  }
+
+  // Keep flat mode cleaner: preserve selected background mode, but skip extra light wash.
+  if (!flatMode) {
+    const lx = w * (0.5 + lightDir[0] * 0.3);
+    const ly = h * (0.42 - lightDir[1] * 0.3);
+    const lightLayer = ctx.createRadialGradient(lx, ly, 40, lx, ly, Math.max(w, h) * 0.7);
+    lightLayer.addColorStop(0, "rgba(55,76,140,0.45)");
+    lightLayer.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = lightLayer;
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+function sampleClampNearest(data, w, h, x, y) {
+  const xx = clamp(Math.round(x), 0, w - 1);
+  const yy = clamp(Math.round(y), 0, h - 1);
+  const i = (yy * w + xx) * 4;
+  return [data[i], data[i + 1], data[i + 2], data[i + 3]];
+}
+
+function updateStageGeometryMotion(preFxData, bgData) {
+  const w = preFxData.width;
+  const h = preFxData.height;
+  const pd = preFxData.data;
+  const bd = bgData.data;
+  const step = Math.max(2, Math.floor(Math.min(w, h) / 180));
+  let sumX = 0;
+  let sumY = 0;
+  let count = 0;
+  for (let y = 0; y < h; y += step) {
+    for (let x = 0; x < w; x += step) {
+      const i = (y * w + x) * 4;
+      const diff =
+        Math.abs(pd[i] - bd[i]) +
+        Math.abs(pd[i + 1] - bd[i + 1]) +
+        Math.abs(pd[i + 2] - bd[i + 2]);
+      if (diff > 16) {
+        sumX += x;
+        sumY += y;
+        count += 1;
+      }
+    }
+  }
+  if (count < 8) {
+    stageGeomMotionX *= 0.88;
+    stageGeomMotionY *= 0.88;
+    return;
+  }
+  const cx = sumX / count;
+  const cy = sumY / count;
+  if (stageGeomPrevCx !== null && stageGeomPrevCy !== null) {
+    const dx = (cx - stageGeomPrevCx) / Math.max(1, w);
+    const dy = (cy - stageGeomPrevCy) / Math.max(1, h);
+    stageGeomMotionX = stageGeomMotionX * 0.72 + dx * 0.28;
+    stageGeomMotionY = stageGeomMotionY * 0.72 + dy * 0.28;
+  }
+  stageGeomPrevCx = cx;
+  stageGeomPrevCy = cy;
+}
+
+function apply3dStageFilter(tSec) {
+  if (mode !== "depth" && mode !== "mix") return;
+  if (!live3dFxMode) return;
+  const fxMode = live3dFxMode.value || "none";
+  const amount = (live3dFxAmount ? Number(live3dFxAmount.value) : 35) / 100;
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 2 || h <= 2) return;
+
+  if (stageFxCanvas.width !== w || stageFxCanvas.height !== h) {
+    stageFxCanvas.width = w;
+    stageFxCanvas.height = h;
+  }
+  if (stagePrevCanvas.width !== w || stagePrevCanvas.height !== h) {
+    stagePrevCanvas.width = w;
+    stagePrevCanvas.height = h;
+    stagePrevCtx.clearRect(0, 0, w, h);
+  }
+
+  stageFxCtx.clearRect(0, 0, w, h);
+  stageFxCtx.drawImage(canvas, 0, 0, w, h);
+
+  const hasPrev = stagePrevCtx && stagePrevCanvas.width === w && stagePrevCanvas.height === h;
+  if (fxMode === "delay" && hasPrev && amount > 0.001) {
+    stageFxCtx.save();
+    stageFxCtx.globalAlpha = clamp(0.16 + amount * 0.62, 0, 0.82);
+    stageFxCtx.drawImage(stagePrevCanvas, 0, 0, w, h);
+    stageFxCtx.restore();
+  } else if (fxMode === "echo" && hasPrev && amount > 0.001) {
+    const mvX = stageGeomMotionX * w;
+    const mvY = stageGeomMotionY * h;
+    const baseX = 4 + amount * 24;
+    const baseY = 3 + amount * 18;
+    const copies = 2 + Math.round(amount * 4);
+    stageFxCtx.save();
+    stageFxCtx.globalCompositeOperation = "screen";
+    for (let i = 1; i <= copies; i++) {
+      const k = i / copies;
+      const dir = i % 2 ? 1 : -1;
+      const offX = mvX * (0.8 + k * 1.6) + dir * baseX * k;
+      const offY = mvY * (0.8 + k * 1.4) + Math.sin(tSec * 1.7 + i) * baseY * k * 0.35;
+      stageFxCtx.globalAlpha = clamp((0.06 + amount * 0.22) * (1 - k * 0.45), 0.04, 0.34);
+      stageFxCtx.drawImage(stagePrevCanvas, offX, offY, w, h);
+    }
+    stageFxCtx.restore();
+  } else if (fxMode === "colortrail" && hasPrev && amount > 0.001) {
+    const cur = stageFxCtx.getImageData(0, 0, w, h);
+    const prev = stagePrevCtx.getImageData(0, 0, w, h);
+    const out = stageFxCtx.createImageData(w, h);
+    const cd = cur.data;
+    const pd = prev.data;
+    const od = out.data;
+    const shift = Math.max(1, Math.round(2 + amount * 28));
+    const blend = clamp(0.22 + amount * 0.58, 0, 0.86);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const iR = (y * w + clamp(x - shift, 0, w - 1)) * 4;
+        const iB = (y * w + clamp(x + shift, 0, w - 1)) * 4;
+        od[i] = clamp(cd[i] * (1 - blend) + pd[iR] * blend, 0, 255);
+        od[i + 1] = clamp(cd[i + 1] * (1 - blend * 0.75) + pd[i + 1] * (blend * 0.75), 0, 255);
+        od[i + 2] = clamp(cd[i + 2] * (1 - blend) + pd[iB + 2] * blend, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    stageFxCtx.putImageData(out, 0, 0);
+  } else if (fxMode === "prism" && amount > 0.001) {
+    const src = stageFxCtx.getImageData(0, 0, w, h);
+    const out = stageFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const amp = 2 + amount * 24;
+    const f1 = 0.012 + amount * 0.02;
+    const f2 = 0.016 + amount * 0.018;
+    for (let y = 0; y < h; y++) {
+      const yy = y - h * 0.5;
+      for (let x = 0; x < w; x++) {
+        const xx = x - w * 0.5;
+        const shiftX = Math.sin(yy * f1 + tSec * 1.7) * amp + Math.sin((xx + yy) * f2 + tSec * 2.2) * amp * 0.35;
+        const shiftY = Math.cos(xx * f1 + tSec * 1.1) * amp * 0.28;
+        const sR = sampleClampNearest(sd, w, h, x - shiftX, y - shiftY);
+        const sG = sampleClampNearest(sd, w, h, x + shiftX * 0.15, y);
+        const sB = sampleClampNearest(sd, w, h, x + shiftX, y + shiftY);
+        const i = (y * w + x) * 4;
+        od[i] = sR[0];
+        od[i + 1] = sG[1];
+        od[i + 2] = sB[2];
+        od[i + 3] = 255;
+      }
+    }
+    stageFxCtx.putImageData(out, 0, 0);
+  }
+
+  ctx.drawImage(stageFxCanvas, 0, 0, w, h);
+  stagePrevCtx.clearRect(0, 0, w, h);
+  stagePrevCtx.drawImage(canvas, 0, 0, w, h);
+}
+
+function apply3dAnaglyphStereo() {
+  if ((mode !== "depth" && mode !== "mix") || !live3dAnaglyph || !live3dAnaglyph.checked) return;
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 2 || h <= 2) return;
+  const amount = live3dAnaglyphStrength ? Number(live3dAnaglyphStrength.value) / 100 : 0.34;
+  const pxShift = Math.max(1, Math.round(1 + amount * (2 + w * 0.008)));
+
+  const src = ctx.getImageData(0, 0, w, h);
+  const sd = src.data;
+  const out = ctx.createImageData(w, h);
+  const od = out.data;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const leftX = clamp(x - pxShift, 0, w - 1);
+      const rightX = clamp(x + pxShift, 0, w - 1);
+      const li = (y * w + leftX) * 4;
+      const ri = (y * w + rightX) * 4;
+      // Classic red/cyan stereo split, slightly blended to keep details readable.
+      od[i] = sd[li];
+      od[i + 1] = clamp(sd[ri + 1] * 0.92 + sd[i + 1] * 0.08, 0, 255);
+      od[i + 2] = clamp(sd[ri + 2] * 0.92 + sd[i + 2] * 0.08, 0, 255);
+      od[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function drawDomeGuideOverlay(w, h, amount) {
+  if (amount <= 0) return;
+  const alpha = clamp(amount / 100, 0, 1) * 0.38;
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const r = Math.min(w, h) * 0.5;
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+  ctx.lineWidth = 1;
+  const rings = 12;
+  for (let i = 1; i <= rings; i++) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, (r * i) / rings, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  const rays = 24;
+  for (let i = 0; i < rays; i++) {
+    const a = (i / rays) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function sampleWrappedBilinear(srcData, w, h, x, y) {
+  const yy = clamp(y, 0, h - 1);
+  const y0 = Math.floor(yy);
+  const y1 = Math.min(h - 1, y0 + 1);
+  const fy = yy - y0;
+
+  const wrap = (vx) => {
+    let n = vx % w;
+    if (n < 0) n += w;
+    return n;
+  };
+
+  const xx = wrap(x);
+  const x0 = Math.floor(xx);
+  const x1 = wrap(x0 + 1);
+  const fx = xx - x0;
+
+  const i00 = (y0 * w + x0) * 4;
+  const i10 = (y0 * w + x1) * 4;
+  const i01 = (y1 * w + x0) * 4;
+  const i11 = (y1 * w + x1) * 4;
+
+  const w00 = (1 - fx) * (1 - fy);
+  const w10 = fx * (1 - fy);
+  const w01 = (1 - fx) * fy;
+  const w11 = fx * fy;
+
+  return [
+    srcData[i00] * w00 + srcData[i10] * w10 + srcData[i01] * w01 + srcData[i11] * w11,
+    srcData[i00 + 1] * w00 + srcData[i10 + 1] * w10 + srcData[i01 + 1] * w01 + srcData[i11 + 1] * w11,
+    srcData[i00 + 2] * w00 + srcData[i10 + 2] * w10 + srcData[i01 + 2] * w01 + srcData[i11 + 2] * w11,
+  ];
+}
+
+function sampleClampBilinear(srcData, w, h, x, y) {
+  const xx = clamp(x, 0, w - 1);
+  const yy = clamp(y, 0, h - 1);
+  const x0 = Math.floor(xx);
+  const y0 = Math.floor(yy);
+  const x1 = Math.min(w - 1, x0 + 1);
+  const y1 = Math.min(h - 1, y0 + 1);
+  const fx = xx - x0;
+  const fy = yy - y0;
+
+  const i00 = (y0 * w + x0) * 4;
+  const i10 = (y0 * w + x1) * 4;
+  const i01 = (y1 * w + x0) * 4;
+  const i11 = (y1 * w + x1) * 4;
+
+  const w00 = (1 - fx) * (1 - fy);
+  const w10 = fx * (1 - fy);
+  const w01 = (1 - fx) * fy;
+  const w11 = fx * fy;
+
+  return [
+    srcData[i00] * w00 + srcData[i10] * w10 + srcData[i01] * w01 + srcData[i11] * w11,
+    srcData[i00 + 1] * w00 + srcData[i10 + 1] * w10 + srcData[i01 + 1] * w01 + srcData[i11 + 1] * w11,
+    srcData[i00 + 2] * w00 + srcData[i10 + 2] * w10 + srcData[i01 + 2] * w01 + srcData[i11 + 2] * w11,
+  ];
+}
+
+function fract01(v) {
+  return v - Math.floor(v);
+}
+
+function updateDomeAutoSeamFromImageData(imageData) {
+  if (!imageData || !imageData.data) return;
+  const w = imageData.width;
+  const h = imageData.height;
+  if (w < 8 || h < 8) return;
+  const key = `${w}x${h}`;
+  if (key === domeSeamCacheKey) return;
+  domeSeamCacheKey = key;
+  const data = imageData.data;
+  let bestCol = 0;
+  let bestCost = Number.POSITIVE_INFINITY;
+  const yEnd = Math.max(2, Math.floor(h * 0.75));
+  const yStep = Math.max(2, Math.floor(h / 180));
+  const xStep = Math.max(1, Math.floor(w / 240));
+
+  for (let c = 0; c < w; c += xStep) {
+    const prev = (c - 1 + w) % w;
+    let cost = 0;
+    for (let y = 0; y < yEnd; y += yStep) {
+      const ia = (y * w + c) * 4;
+      const ib = (y * w + prev) * 4;
+      const dr = data[ia] - data[ib];
+      const dg = data[ia + 1] - data[ib + 1];
+      const db = data[ia + 2] - data[ib + 2];
+      cost += Math.abs(dr) + Math.abs(dg) + Math.abs(db);
+    }
+    if (cost < bestCost) {
+      bestCost = cost;
+      bestCol = c;
+    }
+  }
+
+  domeAutoSeamU = bestCol / w;
+}
+
+function isGlitchDomePanMode() {
+  if (!liveOutputView || liveOutputView.value !== "dome") return false;
+  if (!domeSourceMap || domeSourceMap.value !== "equirect") return false;
+  if (mode !== "glitch") return false;
+  return Boolean(loadedImage || originalImageData);
+}
+
+function isDomeAutoRotateActive() {
+  if (!liveOutputView || liveOutputView.value !== "dome") return false;
+  if (!domeAutoRotate || !domeAutoRotate.checked) return false;
+  const speed = domeAutoRotateSpeed ? Number(domeAutoRotateSpeed.value) : 0;
+  return Math.abs(speed) > 0.01;
+}
+
+function applyOutputViewWarp() {
+  if (!liveOutputView || liveOutputView.value !== "dome") return;
+  if (mode !== "depth" && mode !== "mix" && mode !== "glitch" && mode !== "particles") return;
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 1 || h <= 1) return;
+  const warp = clamp(Number(domeWarp ? domeWarp.value : 70), 0, 100) / 100;
+  const tilt = clamp(Number(domeTilt ? domeTilt.value : 0), -100, 100) / 100;
+  const manualRotate = clamp(Number(domeRotate ? domeRotate.value : 0), -180, 180);
+  const sourceMap = domeSourceMap ? domeSourceMap.value : "standard";
+  const curve = 0.65 + (1 - warp) * 1.2;
+  const seamBlend = sourceMap === "equirect" ? 0.14 : 0.02;
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const rMax = Math.min(w, h) * 0.5;
+  const tiltRad = tilt * 0.58;
+  const domeYawRad = domeViewYaw * (Math.PI / 180);
+  const domePitchRad = domeViewPitch * (Math.PI / 180);
+  const nowMs = performance.now();
+  const dt = clamp((nowMs - lastDomeAnimTs) / 1000, 0, 0.1);
+  lastDomeAnimTs = nowMs;
+  const speedKnob = clamp((domeAutoRotateSpeed ? Number(domeAutoRotateSpeed.value) : 0) / 100, -1, 1);
+  const speedTarget = domeAutoRotate && domeAutoRotate.checked ? Math.sign(speedKnob) * Math.pow(Math.abs(speedKnob), 2.25) * 14 : 0;
+  domeAutoYawVel += (speedTarget - domeAutoYawVel) * 0.06;
+  domeAutoYaw += domeAutoYawVel * dt;
+  const yawU = (domeViewYaw + manualRotate + domeAutoYaw) / 360;
+
+  fxCanvas.width = w;
+  fxCanvas.height = h;
+  fxCtx.clearRect(0, 0, w, h);
+  fxCtx.drawImage(canvas, 0, 0, w, h);
+  const src = fxCtx.getImageData(0, 0, w, h);
+  if (sourceMap === "equirect") updateDomeAutoSeamFromImageData(src);
+  const dst = ctx.createImageData(w, h);
+  const s = src.data;
+  const d = dst.data;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const di = (y * w + x) * 4;
+      const nx = (x - cx) / rMax;
+      const ny = (y - cy) / rMax;
+      const r = Math.hypot(nx, ny);
+      if (r > 1) {
+        d[di] = 0;
+        d[di + 1] = 0;
+        d[di + 2] = 0;
+        d[di + 3] = 255;
+        continue;
+      }
+      // Hemisphere ray from dome disk point.
+      const theta = Math.atan2(nx, -ny);
+      const rAdj = Math.pow(r, curve);
+      const phi = rAdj * (Math.PI * 0.5);
+      let dx = Math.sin(phi) * Math.cos(theta);
+      let dy = Math.sin(phi) * Math.sin(theta);
+      let dz = Math.cos(phi);
+
+      // Tilt the virtual dome camera around X axis.
+      if (Math.abs(tiltRad) > 0.0001) {
+        const ct = Math.cos(tiltRad);
+        const st = Math.sin(tiltRad);
+        const ndy = dy * ct - dz * st;
+        const ndz = dy * st + dz * ct;
+        dy = ndy;
+        dz = ndz;
+      }
+      // Interactive dome view control for glitch+equirect mode.
+      if (Math.abs(domeYawRad) > 0.0001) {
+        const cy = Math.cos(domeYawRad);
+        const sy = Math.sin(domeYawRad);
+        const ndx = dx * cy - dy * sy;
+        const ndy = dx * sy + dy * cy;
+        dx = ndx;
+        dy = ndy;
+      }
+      if (Math.abs(domePitchRad) > 0.0001) {
+        const cp = Math.cos(domePitchRad);
+        const sp = Math.sin(domePitchRad);
+        const ndy = dy * cp - dz * sp;
+        const ndz = dy * sp + dz * cp;
+        dy = ndy;
+        dz = ndz;
+      }
+
+      let rC = 0;
+      let gC = 0;
+      let bC = 0;
+      if (sourceMap === "equirect") {
+        // Equirect -> Dome(180):
+        // Keep seam opposite the view center and sample continuously in latitude.
+        // At neutral orientation this naturally maps to the upper hemisphere (v 0..0.5),
+        // but when pitching/tilting it remains continuous (no hard horizon clamp seam).
+        const lon = Math.atan2(dx, -dy) / (Math.PI * 2);
+        let u = fract01(lon - yawU + domeAutoSeamU);
+        const v = clamp(Math.acos(clamp(dz, -1, 1)) / Math.PI, 0, 1);
+        const sampleMain = sampleWrappedBilinear(s, w, h, u * w, v * (h - 1));
+        rC = sampleMain[0];
+        gC = sampleMain[1];
+        bC = sampleMain[2];
+        const seamDist = Math.min(u, 1 - u);
+        if (seamDist < seamBlend) {
+          const t = clamp(seamDist / seamBlend, 0, 1);
+          const blend = t * t * (3 - 2 * t);
+          const uOther = fract01(u < 0.5 ? u + seamBlend : u - seamBlend);
+          const sampleOther = sampleWrappedBilinear(s, w, h, uOther * w, v * (h - 1));
+          rC = sampleOther[0] * (1 - blend) + rC * blend;
+          gC = sampleOther[1] * (1 - blend) + gC * blend;
+          bC = sampleOther[2] * (1 - blend) + bC * blend;
+        }
+      } else {
+        // Standard mode: stereographic dome camera from forward hemisphere.
+        // This avoids radial seam artifacts and forced vertical stitching.
+        const denom = Math.max(0.0001, 1 + dz);
+        const sxN = clamp(0.5 + 0.5 * (dx / denom), 0, 1);
+        const syN = clamp(0.5 + 0.5 * (dy / denom), 0, 1);
+        const sampleMain = sampleClampBilinear(s, w, h, sxN * (w - 1), syN * (h - 1));
+        rC = sampleMain[0];
+        gC = sampleMain[1];
+        bC = sampleMain[2];
+      }
+
+      d[di] = clamp(Math.round(rC), 0, 255);
+      d[di + 1] = clamp(Math.round(gC), 0, 255);
+      d[di + 2] = clamp(Math.round(bC), 0, 255);
+      d[di + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(dst, 0, 0);
+  drawDomeGuideOverlay(w, h, domeGrid ? Number(domeGrid.value) : 0);
+}
+
+function randomize3dCameraView() {
+  if (mode !== "depth" && mode !== "mix") return;
+  if (!controls.pointRotateX || !controls.pointRotateY || !controls.pointRotateZ) return;
+  const rx = Math.round(-70 + Math.random() * 140);
+  const ry = Math.round(-150 + Math.random() * 300);
+  const rz = Math.round(-120 + Math.random() * 240);
+  controls.pointRotateX.value = String(rx);
+  controls.pointRotateY.value = String(ry);
+  controls.pointRotateZ.value = String(rz);
+  if (controls.cameraZoom) {
+    controls.cameraZoom.value = String(Math.round(64 + Math.random() * 70));
+  }
+  if (controls.cameraFollow) {
+    controls.cameraFollow.value = String(Math.round(15 + Math.random() * 70));
+  }
+  dragRotateX = 0;
+  dragRotateY = 0;
+  updateOutputs();
+  scheduleRender();
+}
+
+function randomize3dCameraViewSmooth() {
+  if (mode !== "depth" && mode !== "mix") return;
+  if (!controls.pointRotateX || !controls.pointRotateY || !controls.pointRotateZ) return;
+  const now = performance.now();
+  if (now - lastCameraShuffleTs < 280) return;
+  lastCameraShuffleTs = now;
+  const curRx = Number(controls.pointRotateX.value) || 0;
+  const curRy = Number(controls.pointRotateY.value) || 0;
+  const curRz = Number(controls.pointRotateZ.value) || 0;
+  const curZoom = controls.cameraZoom ? Number(controls.cameraZoom.value) : 100;
+  const curFollow = controls.cameraFollow ? Number(controls.cameraFollow.value) : 50;
+  const orbiting = cameraMode === "orbit" || cameraMode === "sweep" || cameraMode === "helix";
+  cameraShufflePhase += 0.72 + Math.random() * 0.44;
+  const swingA = Math.sin(cameraShufflePhase);
+  const swingB = Math.cos(cameraShufflePhase * 0.86);
+  const swingC = Math.sin(cameraShufflePhase * 1.21);
+  const sense = swingB >= 0 ? 1 : -1;
+  const rx = clamp(curRx + swingA * (orbiting ? 9 : 14) + (-4 + Math.random() * 8), -85, 85);
+  const ry = clamp(curRy + sense * (orbiting ? 20 : 34) + swingB * (orbiting ? 12 : 24), -180, 180);
+  const rz = clamp(curRz + swingC * (orbiting ? 10 : 18), -180, 180);
+  const zoom = clamp(curZoom + swingA * (orbiting ? 7 : 10) + (-4 + Math.random() * 8), 56, 166);
+  const follow = clamp(curFollow + swingB * (orbiting ? 8 : 12) + (-3 + Math.random() * 6), 8, 95);
+  const panX = clamp((targetPanX ?? cameraPanX) * 0.55 + swingA * 0.18, -0.52, 0.52);
+  const panY = clamp((targetPanY ?? cameraPanY) * 0.55 + swingC * 0.14, -0.42, 0.42);
+  targetRotX = rx;
+  targetRotY = ry;
+  targetRotZ = rz;
+  targetCamZoom = zoom;
+  targetCamFollow = follow;
+  targetPanX = panX;
+  targetPanY = panY;
+  cameraFlowEase = 1.15;
+  if (smoothRotX === null) smoothRotX = Number(controls.pointRotateX.value);
+  if (smoothRotY === null) smoothRotY = Number(controls.pointRotateY.value);
+  if (smoothRotZ === null) smoothRotZ = Number(controls.pointRotateZ.value);
+  if (smoothCamZoom === null && controls.cameraZoom) smoothCamZoom = Number(controls.cameraZoom.value);
+  if (smoothCamFollow === null && controls.cameraFollow) smoothCamFollow = Number(controls.cameraFollow.value);
+  dragRotateX = 0;
+  dragRotateY = 0;
+  scheduleRender();
+}
+
+function toggleBackgroundSyncMode() {
+  bgSyncMode = !bgSyncMode;
+  if (bgSyncMode && bgMode) {
+    if (bgMode.value === "black") bgMode.value = "animated";
+  }
+  scheduleRender();
+}
+
+function renderPointCloud(baseData, depthMap, settings, seed, tSec, lightDir) {
+  const w = baseData.width;
+  const h = baseData.height;
+  const data = baseData.data;
+
+  const spacing = clamp(Math.round((46 - settings.pointDensity) / Math.max(0.45, perfScale)), 4, 44);
+  const pt = settings.pointMap / 100;
+  const pointSize = settings.pointSize;
+  const depthScale = settings.depthExaggeration / 100;
+  const lift = (settings.pointLift / 100) * 240 * depthScale;
+  const pointFloat = settings.pointFloat / 100;
+  const organic = settings.pointOrganic / 100;
+  const spread = (settings.pointSpread / 100) * 0.95;
+  const j3d = (settings.glitch3d / 100) * 24;
+  const exposure = settings.sceneExposure / 100;
+  const ambient = settings.ambientLight / 100;
+  const lightOn = settings.lightEnabled / 100;
+  const flat = settings.flatIllustrated / 100;
+  const lpow = settings.lightIntensity / 100;
+  const motion = getCameraMotion(settings, tSec);
+  const zoom = (settings.cameraZoom / 100) * motion.zoomMul;
+  const panX = motion.panX * w * 0.5;
+  const panY = motion.panY * h * 0.5;
+  const colorShift = settings.pointColorShift / 360;
+  const colorPulse = settings.pointColorPulse / 100;
+  const depthWave = settings.depthColorWave / 100;
+  const pointsAudioIntensity = clamp((settings.audioPointsIntensity || 100) / 100, 0, 2.2);
+  const audioVar = clamp((settings.audioAnimVariation || 100) / 100, 0, 2.2);
+  const audioAnim = audioAnimation ? audioAnimation.value : "lift";
+  const audioTargetMode = audioTarget ? audioTarget.value : "points";
+  const audioToPoints = micActive && (audioTargetMode === "points" || audioTargetMode === "both");
+  const audioBoost = audioToPoints ? audioLevel : 0;
+  const audioDrive = audioToPoints ? audioEnvelopeGate(audioBoost) * pointsAudioIntensity : 0;
+  const reactiveFloat = micActive ? pointFloat * audioDrive : pointFloat;
+  const reactiveOrganic = micActive ? organic * audioDrive : organic;
+  const reactiveJ3d = micActive ? j3d * audioDrive : j3d;
+  const audioLiftBoost = audioToPoints && (audioAnim === "lift" || audioAnim === "all") ? audioDrive * 1.7 : 0;
+  const audioWaveBoost = audioToPoints && (audioAnim === "wave" || audioAnim === "all") ? audioDrive * (1.45 * audioVar) : 0;
+  const audioColorBoost = audioToPoints && (audioAnim === "color" || audioAnim === "all") ? audioDrive * 1.12 : 0;
+  const audioGeoBoost = audioToPoints ? audioDrive * 1.5 : 0;
+
+  const rx = ((settings.pointRotateX + motion.rxDeg) * Math.PI) / 180;
+  const ry = ((settings.pointRotateY + motion.ryDeg) * Math.PI) / 180;
+  const rz = ((settings.pointRotateZ + motion.rzDeg) * Math.PI) / 180;
+  const fov = Math.max(w, h) * 0.95;
+  const liquidEnabled = cameraMode === "liquid";
+  const liquidStrength = liquidEnabled
+    ? clamp(
+        0.28 +
+          organic * 0.65 +
+          pointFloat * 0.32 +
+          (Math.abs(stageGeomMotionX) + Math.abs(stageGeomMotionY)) * 5.2,
+        0,
+        1.9
+      )
+    : 0;
+
+  for (let y = 0; y < h; y += spacing) {
+    for (let x = 0; x < w; x += spacing) {
+      const idx = y * w + x;
+      const i4 = idx * 4;
+      const depth = depthMap[idx];
+      const floatZ =
+        Math.sin((x + y) * 0.045 + tSec * (1.4 + reactiveFloat * 5.6 + audioWaveBoost * (1.4 + audioVar * 0.4)) + seed * 0.01) *
+        (reactiveFloat * 55 + audioGeoBoost * 22);
+      const z = (depth - 0.5) * lift * (1 + audioLiftBoost * 1.08) + floatZ + (randHash(x, y, seed + 401) - 0.5) * (reactiveJ3d + audioGeoBoost * 8);
+      const px0 = x - w * 0.5 + panX;
+      const py0 = y - h * 0.5 + panY;
+      const px = px0 * (1 + spread * depthScale * (depth - 0.25));
+      const py = py0 * (1 + spread * depthScale * (depth - 0.25));
+
+      const left = sampleDepth(depthMap, w, h, x - 1, y);
+      const right = sampleDepth(depthMap, w, h, x + 1, y);
+      const up = sampleDepth(depthMap, w, h, x, y - 1);
+      const down = sampleDepth(depthMap, w, h, x, y + 1);
+      const localInteraction = ((left + right + up + down) * 0.25 - depth);
+      const organicWave =
+        Math.sin((x * 0.018 + y * 0.022) + tSec * (0.9 + reactiveOrganic * 4.2 + audioWaveBoost * (1.1 + audioVar * 0.35)) + localInteraction * 16) *
+        (reactiveOrganic * 28 + audioGeoBoost * 14);
+      const [nx0, ny0, nz0] = normalize3((left - right) * 2.2, (up - down) * 2.2, 1.0);
+      const [nnx, nny, nnz] = rotate3D(nx0, ny0, nz0, rx, ry, rz);
+      const lit = Math.max(0, nnx * lightDir[0] + nny * lightDir[1] + nnz * lightDir[2]) * lpow * lightOn;
+      const shadeRaw = ambient * (0.75 + 0.25 * lightOn) + lit;
+      const shade = clamp(shadeRaw * (1 - flat * 0.85) + 1 * (flat * 0.85), 0, 2.6);
+
+      let liqX = 0;
+      let liqY = 0;
+      let liqZ = 0;
+      if (liquidEnabled) {
+        [liqX, liqY, liqZ] = getLiquidWarp(x, y, depth, tSec, liquidStrength, seed, w, h);
+      }
+      const opx =
+        px +
+        Math.cos(tSec * 1.3 + y * 0.01 + localInteraction * 8) * (reactiveOrganic * 8 + Math.abs(localInteraction) * 5) +
+        liqX;
+      const opy =
+        py +
+        Math.sin(tSec * 1.1 + x * 0.01 + localInteraction * 8) * (reactiveOrganic * 8 + Math.abs(localInteraction) * 5) +
+        liqY;
+      const opz = z + organicWave + liqZ;
+      const [rxp, ryp, rzp] = rotate3D(opx, opy, opz, rx, ry, rz);
+      const [sx, sy, persp] = projectPoint3D(rxp, ryp, rzp, w, h, fov, zoom);
+      if (sx < -14 || sy < -14 || sx > w + 14 || sy > h + 14) continue;
+
+      let r = clamp(data[i4] * shade * exposure, 0, 255);
+      let g = clamp(data[i4 + 1] * shade * exposure, 0, 255);
+      let b = clamp(data[i4 + 2] * shade * exposure, 0, 255);
+      if (colorShift > 0 || colorPulse > 0 || depthWave > 0 || audioColorBoost > 0) {
+        const [h, s, l] = rgbToHsl(r, g, b);
+        const pulse = Math.sin(tSec * (0.8 + colorPulse * 3.5 + audioColorBoost * 4.2) + depth * (3 + depthWave * 18)) * (colorPulse + audioColorBoost * 0.6) * 0.22;
+        const wave = Math.sin((x + y) * 0.01 + tSec * (1.2 + audioWaveBoost * 2.2)) * (depthWave + audioWaveBoost * 0.6) * 0.2;
+        const [nr, ng, nb] = hslToRgb((h + colorShift + pulse + wave + 1) % 1, clamp(s + (colorPulse + audioColorBoost * 0.7) * 0.18, 0, 1), l);
+        r = nr;
+        g = ng;
+        b = nb;
+      }
+      if (flat > 0.02) {
+        const [fh, fs, fl] = rgbToHsl(r, g, b);
+        const bands = 4 + Math.round(flat * 5);
+        const ql = Math.round(fl * bands) / bands;
+        const [fr, fg, fb] = hslToRgb(fh, clamp(fs + flat * 0.18, 0, 1), ql);
+        r = fr;
+        g = fg;
+        b = fb;
+      }
+      const alpha = clamp((0.22 + depth * 0.8 + reactiveOrganic * 0.16 * Math.abs(localInteraction) + audioGeoBoost * 0.18) * pt, 0, 1);
+      const rad = clamp((pointSize + depth * pointSize * 2.3 + reactiveOrganic * 1.6 + audioGeoBoost * 2.2) * persp, 0.2, 18.5);
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${r.toFixed(0)},${g.toFixed(0)},${b.toFixed(0)},${alpha.toFixed(3)})`;
+      ctx.arc(sx, sy, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+function renderMesh(depthMap, settings, seed, tSec, lightDir) {
+  if (settings.meshMap <= 0) return;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const cell = clamp(Math.round(settings.meshDensity / Math.max(0.45, perfScale)), 8, 120);
+  const intensity = settings.meshMap / 100;
+  const depthScale = settings.depthExaggeration / 100;
+  const lift = (settings.meshLift / 100) * 240 * depthScale;
+  const pointFloat = settings.pointFloat / 100;
+  const organic = settings.pointOrganic / 100;
+  const spread = (settings.pointSpread / 100) * 0.65;
+  const j3d = (settings.glitch3d / 100) * 16;
+  const exposure = settings.sceneExposure / 100;
+  const ambient = settings.ambientLight / 100;
+  const lightOn = settings.lightEnabled / 100;
+  const flat = settings.flatIllustrated / 100;
+  const lpow = settings.lightIntensity / 100;
+  const motion = getCameraMotion(settings, tSec);
+  const zoom = (settings.cameraZoom / 100) * motion.zoomMul;
+  const panX = motion.panX * w * 0.5;
+  const panY = motion.panY * h * 0.5;
+  const colorShift = settings.pointColorShift / 360;
+  const meshShift = settings.meshColorShift / 360;
+  const meshGlow = settings.meshGlow / 100;
+  const colorPulse = settings.pointColorPulse / 100;
+  const depthWave = settings.depthColorWave / 100;
+  const meshAudioIntensity = clamp((settings.audioMeshIntensity || 100) / 100, 0, 2.2);
+  const audioVar = clamp((settings.audioAnimVariation || 100) / 100, 0, 2.2);
+  const audioAnim = audioAnimation ? audioAnimation.value : "lift";
+  const audioTargetMode = audioTarget ? audioTarget.value : "mesh";
+  const audioToMesh = micActive && (audioTargetMode === "mesh" || audioTargetMode === "both");
+  const audioBoost = audioToMesh ? audioLevel : 0;
+  const audioDrive = audioToMesh ? audioEnvelopeGate(audioBoost) * meshAudioIntensity : 0;
+  const reactiveFloat = micActive ? pointFloat * audioDrive : pointFloat;
+  const reactiveOrganic = micActive ? organic * audioDrive : organic;
+  const reactiveJ3d = micActive ? j3d * audioDrive : j3d;
+  const audioLiftBoost = audioToMesh && (audioAnim === "lift" || audioAnim === "all") ? audioDrive * 1.65 : 0;
+  const audioWaveBoost = audioToMesh && (audioAnim === "wave" || audioAnim === "all") ? audioDrive * (1.38 * audioVar) : 0;
+  const audioColorBoost = audioToMesh && (audioAnim === "color" || audioAnim === "all") ? audioDrive * 1.1 : 0;
+  const audioGeoBoost = audioToMesh ? audioDrive * 1.42 : 0;
+
+  const rx = ((settings.pointRotateX + motion.rxDeg) * Math.PI) / 180;
+  const ry = ((settings.pointRotateY + motion.ryDeg) * Math.PI) / 180;
+  const rz = ((settings.pointRotateZ + motion.rzDeg) * Math.PI) / 180;
+  const fov = Math.max(w, h) * 0.95;
+  const liquidEnabled = cameraMode === "liquid";
+  const liquidStrength = liquidEnabled
+    ? clamp(
+        0.26 +
+          organic * 0.58 +
+          pointFloat * 0.34 +
+          (Math.abs(stageGeomMotionX) + Math.abs(stageGeomMotionY)) * 4.7,
+        0,
+        1.8
+      )
+    : 0;
+
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.lineWidth = 1;
+
+  for (let y = 0; y <= h - cell; y += cell) {
+    for (let x = 0; x <= w - cell; x += cell) {
+      const p0 = y * w + x;
+      const p1 = y * w + Math.min(w - 1, x + cell);
+      const p2 = Math.min(h - 1, y + cell) * w + x;
+
+      const fAmp = reactiveFloat * (34 + reactiveOrganic * 24) + audioGeoBoost * 17;
+      const f0 = Math.sin((x + y) * 0.03 + tSec * (1.2 + reactiveFloat * 4.4 + reactiveOrganic * 2.2 + audioWaveBoost * (1.3 + audioVar * 0.42)) + seed * 0.01) * fAmp;
+      const f1 = Math.sin((x + cell + y) * 0.03 + tSec * (1.2 + reactiveFloat * 4.4 + reactiveOrganic * 2.2 + audioWaveBoost * (1.3 + audioVar * 0.42)) + seed * 0.01) * fAmp;
+      const f2 = Math.sin((x + y + cell) * 0.03 + tSec * (1.2 + reactiveFloat * 4.4 + reactiveOrganic * 2.2 + audioWaveBoost * (1.3 + audioVar * 0.42)) + seed * 0.01) * fAmp;
+      const d0 = (depthMap[p0] - 0.5) * lift * (1 + audioLiftBoost * 1.06) + f0 + (randHash(x, y, seed + 700) - 0.5) * (reactiveJ3d + audioGeoBoost * 7);
+      const d1 = (depthMap[p1] - 0.5) * lift * (1 + audioLiftBoost * 1.06) + f1 + (randHash(x + 2, y + 1, seed + 700) - 0.5) * (reactiveJ3d + audioGeoBoost * 7);
+      const d2 = (depthMap[p2] - 0.5) * lift * (1 + audioLiftBoost * 1.06) + f2 + (randHash(x + 1, y + 2, seed + 700) - 0.5) * (reactiveJ3d + audioGeoBoost * 7);
+
+      const x0 = x - w * 0.5 + panX;
+      const y0 = y - h * 0.5 + panY;
+      const x1n = Math.min(w - 1, x + cell) - w * 0.5 + panX;
+      const y2n = Math.min(h - 1, y + cell) - h * 0.5 + panY;
+      let liq0x = 0;
+      let liq0y = 0;
+      let liq0z = 0;
+      let liq1x = 0;
+      let liq1y = 0;
+      let liq1z = 0;
+      let liq2x = 0;
+      let liq2y = 0;
+      let liq2z = 0;
+      if (liquidEnabled) {
+        [liq0x, liq0y, liq0z] = getLiquidWarp(x, y, depthMap[p0], tSec, liquidStrength, seed + 13, w, h);
+        [liq1x, liq1y, liq1z] = getLiquidWarp(Math.min(w - 1, x + cell), y, depthMap[p1], tSec, liquidStrength, seed + 31, w, h);
+        [liq2x, liq2y, liq2z] = getLiquidWarp(x, Math.min(h - 1, y + cell), depthMap[p2], tSec, liquidStrength, seed + 59, w, h);
+      }
+      const [a1, b1, c1] = rotate3D(
+        x0 * (1 + spread * (depthMap[p0] - 0.25)) + liq0x,
+        y0 * (1 + spread * (depthMap[p0] - 0.25)) + liq0y,
+        d0 + liq0z,
+        rx,
+        ry,
+        rz
+      );
+      const [a2, b2, c2] = rotate3D(
+        x1n * (1 + spread * (depthMap[p1] - 0.25)) + liq1x,
+        y0 * (1 + spread * (depthMap[p1] - 0.25)) + liq1y,
+        d1 + liq1z,
+        rx,
+        ry,
+        rz
+      );
+      const [a3, b3, c3] = rotate3D(
+        x0 * (1 + spread * (depthMap[p2] - 0.25)) + liq2x,
+        y2n * (1 + spread * (depthMap[p2] - 0.25)) + liq2y,
+        d2 + liq2z,
+        rx,
+        ry,
+        rz
+      );
+
+      const [x1, y1] = projectPoint3D(a1, b1, c1, w, h, fov, zoom);
+      const [x2, y2] = projectPoint3D(a2, b2, c2, w, h, fov, zoom);
+      const [x3, y3] = projectPoint3D(a3, b3, c3, w, h, fov, zoom);
+
+      const left = sampleDepth(depthMap, w, h, x - 1, y);
+      const right = sampleDepth(depthMap, w, h, x + 1, y);
+      const up = sampleDepth(depthMap, w, h, x, y - 1);
+      const down = sampleDepth(depthMap, w, h, x, y + 1);
+      const [nx0, ny0, nz0] = normalize3((left - right) * 2.2, (up - down) * 2.2, 1.0);
+      const [nnx, nny, nnz] = rotate3D(nx0, ny0, nz0, rx, ry, rz);
+      const lit = Math.max(0, nnx * lightDir[0] + nny * lightDir[1] + nnz * lightDir[2]) * lpow * lightOn;
+      const shadeRaw = ambient * (0.75 + 0.25 * lightOn) + lit;
+      const shade = clamp(shadeRaw * (1 - flat * 0.88) + 1 * (flat * 0.88), 0, 2.6);
+
+      const alpha = clamp((0.14 + intensity * 0.65 + audioGeoBoost * 0.14) * shade * 0.8, 0, 1);
+      let r = clamp(110 * shade * exposure * (1 + meshGlow * 0.5), 0, 255);
+      let g = clamp(210 * shade * exposure * (1 + meshGlow * 0.5), 0, 255);
+      let b = clamp(255 * shade * exposure * (1 + meshGlow * 0.5), 0, 255);
+      if (colorShift > 0 || meshShift > 0 || colorPulse > 0 || depthWave > 0 || audioColorBoost > 0) {
+        const depthHere = sampleDepth(depthMap, w, h, x, y);
+        const [h0, s0, l0] = rgbToHsl(r, g, b);
+        const pulse = Math.sin(tSec * (0.8 + colorPulse * 3.5 + audioColorBoost * 4.2) + depthHere * (3 + depthWave * 18)) * (colorPulse + audioColorBoost * 0.6) * 0.2;
+        const wave = Math.sin((x + y) * 0.015 + tSec * (1.1 + audioWaveBoost * 2.2)) * (depthWave + audioWaveBoost * 0.6) * 0.2;
+        [r, g, b] = hslToRgb((h0 + colorShift + meshShift + pulse + wave + 1) % 1, clamp(s0 + (colorPulse + audioColorBoost * 0.7 + meshGlow * 0.45) * 0.14, 0, 1), l0);
+      }
+      if (flat > 0.02) {
+        const [fh, fs, fl] = rgbToHsl(r, g, b);
+        const bands = 4 + Math.round(flat * 6);
+        const ql = Math.round(fl * bands) / bands;
+        [r, g, b] = hslToRgb(fh, clamp(fs + flat * 0.2, 0, 1), ql);
+      }
+
+      ctx.strokeStyle = `rgba(${r.toFixed(0)},${g.toFixed(0)},${b.toFixed(0)},${alpha.toFixed(3)})`;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x3, y3);
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore();
+}
+
+function compositeFxGeometryOverBackground(bgData, preFxData, fxData) {
+  const w = preFxData.width;
+  const h = preFxData.height;
+  const out = ctx.createImageData(w, h);
+  const bd = bgData.data;
+  const pd = preFxData.data;
+  const fd = fxData.data;
+  const od = out.data;
+  for (let i = 0; i < pd.length; i += 4) {
+    const diff =
+      Math.abs(pd[i] - bd[i]) +
+      Math.abs(pd[i + 1] - bd[i + 1]) +
+      Math.abs(pd[i + 2] - bd[i + 2]);
+    const hasGeometry = diff > 10;
+    if (hasGeometry) {
+      od[i] = fd[i];
+      od[i + 1] = fd[i + 1];
+      od[i + 2] = fd[i + 2];
+      od[i + 3] = 255;
+    } else {
+      od[i] = bd[i];
+      od[i + 1] = bd[i + 1];
+      od[i + 2] = bd[i + 2];
+      od[i + 3] = 255;
+    }
+  }
+  return out;
+}
+
+function renderDepthMode(baseImageData, settings, seed, tSec) {
+  const working = copyImageData(baseImageData);
+  const depthMap = buildDepthMap(working, settings.depthStrength);
+  applyDepthDisplacement(working, depthMap, settings);
+  applyDepthView(working, depthMap, settings.depthView);
+
+  const lightDir = getLightDirection(settings);
+  drawSceneBackground(working.width, working.height, lightDir, settings, tSec);
+  const bgData = ctx.getImageData(0, 0, working.width, working.height);
+  renderPointCloud(working, depthMap, settings, seed, tSec, lightDir);
+  renderMesh(depthMap, settings, seed, tSec, lightDir);
+  if (live3dFxMode && live3dFxMode.value !== "none") {
+    const preFxData = ctx.getImageData(0, 0, working.width, working.height);
+    updateStageGeometryMotion(preFxData, bgData);
+    apply3dStageFilter(tSec);
+    const fxData = ctx.getImageData(0, 0, working.width, working.height);
+    const composed = compositeFxGeometryOverBackground(bgData, preFxData, fxData);
+    ctx.putImageData(composed, 0, 0);
+  } else {
+    stageGeomMotionX *= 0.88;
+    stageGeomMotionY *= 0.88;
+  }
+  apply3dAnaglyphStereo();
+}
+
+function getParticlesTargetCount(level) {
+  const map = {
+    low: 12000,
+    med: 28000,
+    high: 55000,
+    ultra: 90000,
+  };
+  return map[level] || map.med;
+}
+
+function ensureParticlesBuffers(baseImageData, ps) {
+  const targetN = getParticlesTargetCount(ps.count);
+  if (particlesBufferN === targetN && particlesX && particlesY && particlesU && particlesV) return;
+  particlesBufferN = targetN;
+  particlesBufferW = Math.max(1, Math.floor(Math.sqrt(targetN)));
+  particlesBufferH = Math.max(1, Math.ceil(targetN / particlesBufferW));
+  particlesX = new Float32Array(targetN);
+  particlesY = new Float32Array(targetN);
+  particlesZ = new Float32Array(targetN);
+  particlesVX = new Float32Array(targetN);
+  particlesVY = new Float32Array(targetN);
+  particlesVZ = new Float32Array(targetN);
+  particlesLife = new Float32Array(targetN);
+  particlesU = new Float32Array(targetN);
+  particlesV = new Float32Array(targetN);
+  particlesSeed = new Float32Array(targetN);
+  particlesDrawStride = 1;
+  particlesPerfStreak = 0;
+  initParticlesState(baseImageData, ps, true);
+}
+
+function initParticlesState(baseImageData, ps, fullReset = false) {
+  if (!particlesX || !particlesY || !particlesU || !particlesV || !particlesSeed) return;
+  const n = particlesBufferN;
+  const w = baseImageData.width || 1;
+  const h = baseImageData.height || 1;
+  const data = baseImageData.data;
+  const motGate = clamp(ps.motionThreshold / 100, 0, 1);
+  for (let i = 0; i < n; i++) {
+    const gx = (i % particlesBufferW) / Math.max(1, particlesBufferW - 1);
+    const gy = Math.floor(i / particlesBufferW) / Math.max(1, particlesBufferH - 1);
+    const u0 = clamp(gx, 0, 1);
+    const v0 = clamp(gy, 0, 1);
+    const ri = ((Math.floor(v0 * (h - 1)) * w + Math.floor(u0 * (w - 1))) * 4) | 0;
+    const lum = data ? (data[ri] * 0.299 + data[ri + 1] * 0.587 + data[ri + 2] * 0.114) / 255 : 0.5;
+    const seed = randHash(i, n, randomSeed + 777);
+    particlesSeed[i] = seed;
+    particlesU[i] = u0;
+    particlesV[i] = v0;
+    if (ps.emitter === "volume") {
+      particlesX[i] = seed * 2 - 1;
+      particlesY[i] = randHash(i, 11, randomSeed + 701) * 2 - 1;
+      particlesZ[i] = randHash(i, 19, randomSeed + 703) * 2 - 1;
+    } else if (ps.emitter === "motion") {
+      const boost = visualFeatures.motion > motGate ? 1 : 0;
+      const jx = (randHash(i, 31, randomSeed + 705) * 2 - 1) * (0.22 + boost * 0.38);
+      const jy = (randHash(i, 41, randomSeed + 707) * 2 - 1) * (0.22 + boost * 0.38);
+      particlesX[i] = (u0 * 2 - 1) * 0.85 + jx;
+      particlesY[i] = (v0 * 2 - 1) * 0.85 + jy;
+      particlesZ[i] = (lum - 0.5) * 1.8 + (randHash(i, 47, randomSeed + 709) * 2 - 1) * 0.2;
+    } else {
+      particlesX[i] = (u0 * 2 - 1) * 0.92;
+      particlesY[i] = (v0 * 2 - 1) * 0.92;
+      particlesZ[i] = (lum - 0.5) * 1.6;
+    }
+    if (fullReset) {
+      particlesVX[i] = (randHash(i, 59, randomSeed + 711) * 2 - 1) * 0.02;
+      particlesVY[i] = (randHash(i, 61, randomSeed + 713) * 2 - 1) * 0.02;
+      particlesVZ[i] = (randHash(i, 67, randomSeed + 719) * 2 - 1) * 0.02;
+    }
+    particlesLife[i] = 0.55 + randHash(i, 73, randomSeed + 727) * 0.45;
+  }
+}
+
+function sampleSourceColor(baseImageData, u, v) {
+  const w = baseImageData.width || 1;
+  const h = baseImageData.height || 1;
+  const x = clamp(Math.floor(u * (w - 1)), 0, w - 1);
+  const y = clamp(Math.floor(v * (h - 1)), 0, h - 1);
+  const i = (y * w + x) * 4;
+  const d = baseImageData.data;
+  return [d[i], d[i + 1], d[i + 2]];
+}
+
+function createParticlesGpuProgram(gl, vsSrc, fsSrc) {
+  const mk = (type, src) => {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      const msg = gl.getShaderInfoLog(sh) || "shader compile error";
+      gl.deleteShader(sh);
+      throw new Error(msg);
+    }
+    return sh;
+  };
+  const vs = mk(gl.VERTEX_SHADER, vsSrc);
+  const fs = mk(gl.FRAGMENT_SHADER, fsSrc);
+  const prg = gl.createProgram();
+  gl.attachShader(prg, vs);
+  gl.attachShader(prg, fs);
+  gl.linkProgram(prg);
+  gl.deleteShader(vs);
+  gl.deleteShader(fs);
+  if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
+    const msg = gl.getProgramInfoLog(prg) || "program link error";
+    gl.deleteProgram(prg);
+    throw new Error(msg);
+  }
+  return prg;
+}
+
+function disableParticlesGpu(reason) {
+  if (reason) console.warn("Particles GPU disabled:", reason);
+  particlesGpuForcedOff = true;
+  particlesGpuReady = false;
+  particlesGpuTriedInit = true;
+  particlesGpu = null;
+}
+
+function ensureParticlesGpu() {
+  if (particlesGpuForcedOff) return false;
+  if (particlesGpuReady && particlesGpu) return true;
+  if (particlesGpuTriedInit) return false;
+  particlesGpuTriedInit = true;
+  try {
+    const glCanvas = document.createElement("canvas");
+    const gl = glCanvas.getContext("webgl2", {
+      alpha: true,
+      premultipliedAlpha: false,
+      antialias: false,
+      preserveDrawingBuffer: false,
+    });
+    if (!gl) return false;
+    gl.getExtension("EXT_color_buffer_float");
+
+    const quadVs = `#version 300 es
+      precision highp float;
+      out vec2 vUv;
+      void main() {
+        vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
+        vUv = p * 0.5;
+        gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+      }`;
+    const initFs = `#version 300 es
+      precision highp float;
+      in vec2 vUv;
+      layout(location=0) out vec4 oPos;
+      layout(location=1) out vec4 oVel;
+      layout(location=2) out vec4 oAttr;
+      uniform sampler2D uSource;
+      uniform vec2 uRes;
+      uniform int uEmitter;
+      uniform float uSeed;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)) + uSeed * 17.23) * 43758.5453); }
+      void main() {
+        vec2 uv = (floor(vUv * uRes) + 0.5) / uRes;
+        float lum = dot(texture(uSource, uv).rgb, vec3(0.299,0.587,0.114));
+        float s0 = hash(uv * 1.31);
+        float s1 = hash(uv * 2.17 + 0.37);
+        float s2 = hash(uv * 3.11 + 0.71);
+        vec3 p;
+        if (uEmitter == 1) {
+          p = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
+        } else {
+          p = vec3(uv * 2.0 - 1.0, (lum - 0.5) * 1.6);
+          if (uEmitter == 2) {
+            p.xy += vec2(s0 - 0.5, s1 - 0.5) * 0.3;
+          }
+        }
+        vec3 v = vec3((s1 - 0.5) * 0.02, (s2 - 0.5) * 0.02, (s0 - 0.5) * 0.02);
+        oPos = vec4(p, 0.55 + s0 * 0.45);
+        oVel = vec4(v, 0.0);
+        oAttr = vec4(uv, s2, 1.0);
+      }`;
+    const updateFs = `#version 300 es
+      precision highp float;
+      in vec2 vUv;
+      layout(location=0) out vec4 oPos;
+      layout(location=1) out vec4 oVel;
+      layout(location=2) out vec4 oAttr;
+      uniform sampler2D uPos;
+      uniform sampler2D uVel;
+      uniform sampler2D uAttr;
+      uniform sampler2D uSource;
+      uniform float uTime;
+      uniform float uNoise;
+      uniform float uAttract;
+      uniform float uFlow;
+      uniform float uDamp;
+      uniform float uVortex;
+      uniform float uDepth;
+      uniform float uSpawn;
+      uniform float uMotion;
+      uniform float uAudio;
+      uniform int uEmitter;
+      float n3(vec3 p) { return fract(sin(dot(p, vec3(12.9898,78.233,35.425))) * 43758.5453) * 2.0 - 1.0; }
+      void main() {
+        vec4 p4 = texture(uPos, vUv);
+        vec4 v4 = texture(uVel, vUv);
+        vec4 a4 = texture(uAttr, vUv);
+        vec3 p = p4.xyz;
+        vec3 v = v4.xyz;
+        float life = p4.w;
+        vec3 fNoise = vec3(
+          n3(vec3(p.xy * 2.7, uTime * 0.81 + a4.z)),
+          n3(vec3(p.yz * 2.3, uTime * 0.74 + a4.z)),
+          n3(vec3(p.zx * 2.1, uTime * 0.67 + a4.z))
+        ) * (0.002 + uNoise * 0.011 + uMotion * 0.003);
+        vec3 fAttr = -p * (0.001 + uAttract * 0.008);
+        vec3 fVort = vec3(-p.y, p.x, 0.0) * ((0.001 + uVortex * 0.008) * (1.0 + uAudio * 0.42));
+        vec3 fFlow = vec3(0.0, 0.0, uAudio * 0.0035) * (0.4 + uFlow * 0.8);
+        v += fNoise + fAttr + fVort + fFlow;
+        v *= uDamp;
+        p += vec3(v.xy, v.z * (0.24 + uDepth * 1.85));
+        life -= 0.0018 + (1.0 - uSpawn) * 0.0034;
+        bool oob = abs(p.x) > 1.6 || abs(p.y) > 1.6 || abs(p.z) > 1.9;
+        if (life <= 0.0 || oob) {
+          vec2 uv = a4.xy;
+          float lum = dot(texture(uSource, uv).rgb, vec3(0.299,0.587,0.114));
+          float s0 = fract(sin(dot(uv * 1.31, vec2(127.1,311.7)) + uTime * 0.37) * 43758.5453);
+          float s1 = fract(sin(dot(uv * 2.17, vec2(127.1,311.7)) + uTime * 0.53) * 43758.5453);
+          float s2 = fract(sin(dot(uv * 3.11, vec2(127.1,311.7)) + uTime * 0.71) * 43758.5453);
+          if (uEmitter == 1) p = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
+          else p = vec3(uv * 2.0 - 1.0, (lum - 0.5) * 1.6);
+          if (uEmitter == 2) p.xy += vec2(s0 - 0.5, s1 - 0.5) * (uMotion * 0.7);
+          v = vec3((s1 - 0.5) * 0.01, (s2 - 0.5) * 0.01, (s0 - 0.5) * 0.01);
+          life = 0.45 + s0 * 0.55;
+        }
+        oPos = vec4(p, life);
+        oVel = vec4(v, 0.0);
+        oAttr = a4;
+      }`;
+    const drawVs = `#version 300 es
+      precision highp float;
+      uniform sampler2D uPos;
+      uniform sampler2D uAttr;
+      uniform sampler2D uSource;
+      uniform vec2 uRes;
+      uniform vec2 uCanvas;
+      uniform vec3 uCamDeg;
+      uniform float uZoom;
+      uniform vec2 uPan;
+      uniform float uPointSize;
+      uniform float uHue;
+      uniform int uColorMode;
+      uniform float uAudio;
+      out vec4 vColor;
+      vec3 h2r(float h, float s, float l){
+        vec3 c = vec3(h, s, l);
+        vec3 rgb = clamp(abs(mod(c.x*6.0 + vec3(0.0,4.0,2.0), 6.0)-3.0)-1.0,0.0,1.0);
+        rgb = rgb*rgb*(3.0-2.0*rgb);
+        return c.z + c.y*(rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
+      }
+      mat3 rotXYZ(vec3 r){
+        vec3 c = cos(r), s = sin(r);
+        mat3 rx = mat3(1,0,0, 0,c.x,-s.x, 0,s.x,c.x);
+        mat3 ry = mat3(c.y,0,s.y, 0,1,0, -s.y,0,c.y);
+        mat3 rz = mat3(c.z,-s.z,0, s.z,c.z,0, 0,0,1);
+        return rz * ry * rx;
+      }
+      void main() {
+        float id = float(gl_VertexID);
+        float x = mod(id, uRes.x);
+        float y = floor(id / uRes.x);
+        vec2 uv = (vec2(x,y) + 0.5) / uRes;
+        vec4 p4 = texture(uPos, uv);
+        vec4 a4 = texture(uAttr, uv);
+        vec3 p = p4.xyz;
+        vec3 pr = rotXYZ(radians(uCamDeg)) * vec3(p.xy * 170.0 + uPan, p.z * 132.0);
+        float fov = min(uCanvas.x, uCanvas.y) * 0.46;
+        float pScale = fov / (fov + pr.z + 0.001);
+        vec2 sp = vec2(uCanvas.x*0.5 + pr.x * pScale * uZoom, uCanvas.y*0.5 + pr.y * pScale * uZoom);
+        vec2 ndc = vec2(sp.x / uCanvas.x * 2.0 - 1.0, 1.0 - sp.y / uCanvas.y * 2.0);
+        gl_Position = vec4(ndc, 0.0, 1.0);
+        gl_PointSize = max(1.0, uPointSize * (0.65 + pScale * 1.1));
+        vec3 col;
+        if (uColorMode == 0) col = texture(uSource, a4.xy).rgb;
+        else if (uColorMode == 1) col = h2r(fract(a4.z * 0.9 + uHue / 360.0), 0.78, 0.52 + uAudio * 0.08);
+        else col = h2r(fract(0.67 - uAudio*0.62 + uHue/360.0), 0.85, clamp(0.4 + uAudio*0.35, 0.0, 1.0));
+        vColor = vec4(col, clamp(0.45 + p4.w * 0.55 + uAudio * 0.2, 0.0, 1.0));
+      }`;
+    const drawFs = `#version 300 es
+      precision highp float;
+      in vec4 vColor;
+      out vec4 oColor;
+      void main() {
+        vec2 p = gl_PointCoord * 2.0 - 1.0;
+        float r2 = dot(p,p);
+        if (r2 > 1.0) discard;
+        float a = (1.0 - r2) * vColor.a;
+        oColor = vec4(vColor.rgb, a);
+      }`;
+
+    const initProg = createParticlesGpuProgram(gl, quadVs, initFs);
+    const updateProg = createParticlesGpuProgram(gl, quadVs, updateFs);
+    const drawProg = createParticlesGpuProgram(gl, drawVs, drawFs);
+
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    gl.bindVertexArray(null);
+
+    particlesGpu = {
+      glCanvas,
+      gl,
+      initProg,
+      updateProg,
+      drawProg,
+      vao,
+      sourceTex: null,
+      simW: 0,
+      simH: 0,
+      drawN: 0,
+      ping: 0,
+      srcPair: null,
+      dstPair: null,
+      lastEmitter: -1,
+    };
+    particlesGpuReady = true;
+    return true;
+  } catch (err) {
+    console.error("Particles GPU init failed", err);
+    disableParticlesGpu(err);
+    return false;
+  }
+}
+
+function particlesGpuCreateTexture(gl, w, h, internalFmt = gl.RGBA32F, fmt = gl.RGBA, type = gl.FLOAT) {
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, internalFmt, w, h, 0, fmt, type, null);
+  return tex;
+}
+
+function particlesGpuCreatePair(gl, w, h) {
+  const pos = particlesGpuCreateTexture(gl, w, h);
+  const vel = particlesGpuCreateTexture(gl, w, h);
+  const attr = particlesGpuCreateTexture(gl, w, h);
+  const fbo = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pos, 0);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, vel, 0);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT2, gl.TEXTURE_2D, attr, 0);
+  gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1, gl.COLOR_ATTACHMENT2]);
+  const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  if (!ok) throw new Error("particles framebuffer incomplete");
+  return { pos, vel, attr, fbo };
+}
+
+function ensureParticlesGpuBuffers(baseImageData, ps) {
+  try {
+    if (!ensureParticlesGpu()) return false;
+    const g = particlesGpu;
+    const gl = g.gl;
+    const targetN = getParticlesTargetCount(ps.count);
+    const simW = Math.max(1, Math.floor(Math.sqrt(targetN)));
+    const simH = Math.max(1, Math.ceil(targetN / simW));
+    const needsRebuild = !g.srcPair || g.simW !== simW || g.simH !== simH;
+    const emitter = ps.emitter === "volume" ? 1 : ps.emitter === "motion" ? 2 : 0;
+    if (needsRebuild || g.lastEmitter !== emitter) {
+      g.simW = simW;
+      g.simH = simH;
+      g.drawN = simW * simH;
+      g.srcPair = particlesGpuCreatePair(gl, simW, simH);
+      g.dstPair = particlesGpuCreatePair(gl, simW, simH);
+      g.ping = 0;
+    }
+    if (!g.sourceTex) {
+      g.sourceTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, g.sourceTex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    }
+    gl.bindTexture(gl.TEXTURE_2D, g.sourceTex);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      baseImageData.width,
+      baseImageData.height,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      baseImageData.data
+    );
+    if (needsRebuild) {
+      gl.useProgram(g.initProg);
+      gl.bindVertexArray(g.vao);
+      gl.viewport(0, 0, g.simW, g.simH);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, g.srcPair.fbo);
+      gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1, gl.COLOR_ATTACHMENT2]);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, g.sourceTex);
+      gl.uniform1i(gl.getUniformLocation(g.initProg, "uSource"), 0);
+      gl.uniform2f(gl.getUniformLocation(g.initProg, "uRes"), g.simW, g.simH);
+      gl.uniform1i(gl.getUniformLocation(g.initProg, "uEmitter"), emitter);
+      gl.uniform1f(gl.getUniformLocation(g.initProg, "uSeed"), randomSeed);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.bindVertexArray(null);
+      g.lastEmitter = emitter;
+    }
+    return true;
+  } catch (err) {
+    disableParticlesGpu(err);
+    return false;
+  }
+}
+
+function renderParticlesModeGpu(baseImageData, tSec, settings) {
+  try {
+    const ps = getParticlesSettings();
+    if (!ensureParticlesGpuBuffers(baseImageData, ps)) return false;
+    const g = particlesGpu;
+    const gl = g.gl;
+
+  const src = g.ping === 0 ? g.srcPair : g.dstPair;
+  const dst = g.ping === 0 ? g.dstPair : g.srcPair;
+  const emitter = ps.emitter === "volume" ? 1 : ps.emitter === "motion" ? 2 : 0;
+  const colorMode = ps.colorMode === "palette" ? 1 : ps.colorMode === "audio" ? 2 : 0;
+
+  const flowMotion = clamp(visualFeatures.motion * 1.2, 0, 1.2);
+  const audioAmt = (ps.audioOn ? ps.audioAmount : 0) / 100;
+  const audioDrive = clamp((audioFeatures.rms * 0.8 + audioFeatures.transient * 0.4) * audioAmt, 0, 1.6);
+  particlesCamXSmooth += (ps.camX - particlesCamXSmooth) * 0.08;
+  particlesCamYSmooth += (ps.camY - particlesCamYSmooth) * 0.08;
+  particlesCamZSmooth += (ps.camZ - particlesCamZSmooth) * 0.08;
+  const motion = getCameraMotion(settings || getSettings(), tSec);
+  const camX = particlesCamXSmooth + motion.rxDeg;
+  const camY = particlesCamYSmooth + motion.ryDeg;
+  const camZ = particlesCamZSmooth + motion.rzDeg;
+  const zoom = ((settings && settings.cameraZoom ? settings.cameraZoom : 86) / 100) * motion.zoomMul;
+  const panX = motion.panX * 120;
+  const panY = motion.panY * 120;
+  const damp = clamp(1 - ps.damping / 100 * 0.11, 0.82, 0.999);
+
+  gl.disable(gl.DEPTH_TEST);
+  gl.bindVertexArray(g.vao);
+
+  gl.useProgram(g.updateProg);
+  gl.viewport(0, 0, g.simW, g.simH);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fbo);
+  gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1, gl.COLOR_ATTACHMENT2]);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, src.pos);
+  gl.uniform1i(gl.getUniformLocation(g.updateProg, "uPos"), 0);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, src.vel);
+  gl.uniform1i(gl.getUniformLocation(g.updateProg, "uVel"), 1);
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, src.attr);
+  gl.uniform1i(gl.getUniformLocation(g.updateProg, "uAttr"), 2);
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_2D, g.sourceTex);
+  gl.uniform1i(gl.getUniformLocation(g.updateProg, "uSource"), 3);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uTime"), tSec);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uNoise"), ps.noise / 100);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uAttract"), ps.attractor / 100);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uFlow"), ps.flow / 100);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uDamp"), damp);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uVortex"), ps.vortex / 100);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uDepth"), ps.depth / 100);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uSpawn"), ps.spawn / 100);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uMotion"), flowMotion);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uAudio"), audioDrive);
+  gl.uniform1i(gl.getUniformLocation(g.updateProg, "uEmitter"), emitter);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  g.ping = 1 - g.ping;
+  const drawSrc = g.ping === 0 ? g.srcPair : g.dstPair;
+
+  g.glCanvas.width = canvas.width;
+  g.glCanvas.height = canvas.height;
+  gl.viewport(0, 0, g.glCanvas.width, g.glCanvas.height);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.useProgram(g.drawProg);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, drawSrc.pos);
+  gl.uniform1i(gl.getUniformLocation(g.drawProg, "uPos"), 0);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, drawSrc.attr);
+  gl.uniform1i(gl.getUniformLocation(g.drawProg, "uAttr"), 1);
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, g.sourceTex);
+  gl.uniform1i(gl.getUniformLocation(g.drawProg, "uSource"), 2);
+  gl.uniform2f(gl.getUniformLocation(g.drawProg, "uRes"), g.simW, g.simH);
+  gl.uniform2f(gl.getUniformLocation(g.drawProg, "uCanvas"), g.glCanvas.width, g.glCanvas.height);
+  gl.uniform3f(gl.getUniformLocation(g.drawProg, "uCamDeg"), camX, camY, camZ);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uZoom"), zoom);
+  gl.uniform2f(gl.getUniformLocation(g.drawProg, "uPan"), panX, panY);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uPointSize"), 0.8 + (ps.size / 100) * 2.2);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uHue"), ps.hue);
+  gl.uniform1i(gl.getUniformLocation(g.drawProg, "uColorMode"), colorMode);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uAudio"), audioDrive);
+  gl.drawArrays(gl.POINTS, 0, g.drawN);
+  gl.disable(gl.BLEND);
+  gl.bindVertexArray(null);
+
+    const glErr = gl.getError();
+    if (glErr !== gl.NO_ERROR) {
+      disableParticlesGpu(`GL error ${glErr}`);
+      return false;
+    }
+    ctx.drawImage(g.glCanvas, 0, 0, canvas.width, canvas.height);
+    return true;
+  } catch (err) {
+    disableParticlesGpu(err);
+    return false;
+  }
+}
+
+function renderParticlesModeCpu(baseImageData, tSec, settings) {
+  const ps = getParticlesSettings();
+  ensureParticlesBuffers(baseImageData, ps);
+  if (!particlesX || particlesBufferN <= 0) return;
+
+  if (fps < 30) {
+    particlesPerfStreak += 1;
+    if (particlesPerfStreak > 10) {
+      particlesDrawStride = Math.min(8, particlesDrawStride + 1);
+      particlesPerfStreak = 0;
+    }
+  } else if (fps > 52 && particlesDrawStride > 1) {
+    particlesDrawStride = Math.max(1, particlesDrawStride - 1);
+  } else {
+    particlesPerfStreak = Math.max(0, particlesPerfStreak - 1);
+  }
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const out = ctx.createImageData(w, h);
+  const od = out.data;
+  const n = particlesBufferN;
+  const dt = 0.016;
+  const noiseA = ps.noise / 100;
+  const attractA = ps.attractor / 100;
+  const flowA = ps.flow / 100;
+  const damp = clamp(1 - ps.damping / 100 * 0.11, 0.82, 0.999);
+  const vort = ps.vortex / 100;
+  const zScale = 0.22 + (ps.depth / 100) * 1.9;
+  const audioAmt = (ps.audioOn ? ps.audioAmount : 0) / 100;
+  const bands = audioFeatures.bands;
+  const audioDrive = clamp((audioFeatures.rms * 0.8 + audioFeatures.transient * 0.4) * audioAmt, 0, 1.6);
+  const flowMotion = clamp(visualFeatures.motion * 1.2, 0, 1.2);
+  const webcamBoost = webcamActive ? clamp(visualFeatures.motion * 2.2, 0, 2.2) : 0;
+  particlesCamXSmooth += (ps.camX - particlesCamXSmooth) * 0.08;
+  particlesCamYSmooth += (ps.camY - particlesCamYSmooth) * 0.08;
+  particlesCamZSmooth += (ps.camZ - particlesCamZSmooth) * 0.08;
+  const motion = getCameraMotion(settings || getSettings(), tSec);
+  const rx = (particlesCamXSmooth + motion.rxDeg) * (Math.PI / 180);
+  const ry = (particlesCamYSmooth + motion.ryDeg) * (Math.PI / 180);
+  const rz = (particlesCamZSmooth + motion.rzDeg) * (Math.PI / 180);
+  const fov = Math.min(w, h) * 0.46;
+  const zoom = ((settings && settings.cameraZoom ? settings.cameraZoom : 86) / 100) * motion.zoomMul;
+  const panX = motion.panX * 120;
+  const panY = motion.panY * 120;
+  const worldScale = 170;
+  const sizePx = 0.8 + (ps.size / 100) * 2.2;
+  const thr = ps.motionThreshold / 100;
+
+  for (let i = 0; i < n; i += particlesDrawStride) {
+    const seed = particlesSeed[i];
+    let x = particlesX[i];
+    let y = particlesY[i];
+    let z = particlesZ[i];
+    let vx = particlesVX[i];
+    let vy = particlesVY[i];
+    let vz = particlesVZ[i];
+    let life = particlesLife[i];
+
+    const nx = Math.sin(tSec * (0.8 + seed * 0.6) + y * 2.7 + seed * 9.2);
+    const ny = Math.cos(tSec * (0.74 + seed * 0.5) + x * 2.1 + seed * 7.4);
+    const nz = Math.sin(tSec * (0.63 + seed * 0.4) + (x + y) * 1.9 + seed * 6.1);
+    vx += nx * (0.0022 + noiseA * 0.011 + webcamBoost * 0.0025);
+    vy += ny * (0.0022 + noiseA * 0.011 + webcamBoost * 0.0025);
+    vz += nz * (0.0018 + noiseA * 0.009 + webcamBoost * 0.002);
+
+    vx += -x * (0.001 + attractA * 0.008);
+    vy += -y * (0.001 + attractA * 0.008);
+    vz += -z * (0.0008 + attractA * 0.006);
+
+    const vortK = (0.001 + vort * 0.008) * (1 + audioDrive * 0.45);
+    const tx = -y * vortK;
+    const ty = x * vortK;
+    vx += tx;
+    vy += ty;
+
+    const flowK = (0.0008 + flowA * 0.01) * (0.45 + flowMotion * 1.4 + audioDrive * 0.5 + webcamBoost * 0.65);
+    vx += (pointerTiltX * 0.8 + stageGeomMotionX * 2.2) * flowK;
+    vy += (pointerTiltY * 0.8 + stageGeomMotionY * 2.2) * flowK;
+    vz += (audioFeatures.transient * 0.3 + bands[1] * 0.25) * flowK;
+
+    vx *= damp;
+    vy *= damp;
+    vz *= damp;
+
+    x += vx;
+    y += vy;
+    z += vz * zScale;
+    life -= 0.0018 + (1 - ps.spawn / 100) * 0.0034;
+
+    const outOfBounds = Math.abs(x) > 1.5 || Math.abs(y) > 1.5 || Math.abs(z) > 1.8;
+    if (life <= 0 || outOfBounds) {
+      const u = particlesU[i];
+      const v = particlesV[i];
+      if (ps.emitter === "volume") {
+        x = randHash(i, 101, randomSeed + 801) * 2 - 1;
+        y = randHash(i, 103, randomSeed + 803) * 2 - 1;
+        z = randHash(i, 107, randomSeed + 809) * 2 - 1;
+      } else {
+        const mBoost = ps.emitter === "motion" && visualFeatures.motion > thr ? 0.35 : 0.14;
+        x = (u * 2 - 1) * 0.9 + (randHash(i, 109, randomSeed + 811) * 2 - 1) * mBoost;
+        y = (v * 2 - 1) * 0.9 + (randHash(i, 113, randomSeed + 813) * 2 - 1) * mBoost;
+        z = (randHash(i, 127, randomSeed + 815) * 2 - 1) * 0.6;
+      }
+      vx = (randHash(i, 131, randomSeed + 817) * 2 - 1) * 0.01;
+      vy = (randHash(i, 137, randomSeed + 819) * 2 - 1) * 0.01;
+      vz = (randHash(i, 139, randomSeed + 821) * 2 - 1) * 0.01;
+      life = 0.45 + randHash(i, 149, randomSeed + 823) * 0.55;
+    }
+
+    particlesX[i] = x;
+    particlesY[i] = y;
+    particlesZ[i] = z;
+    particlesVX[i] = vx;
+    particlesVY[i] = vy;
+    particlesVZ[i] = vz;
+    particlesLife[i] = life;
+
+    const [rx3, ry3, rz3] = rotate3D(x * worldScale + panX, y * worldScale + panY, z * worldScale * 0.78, rx, ry, rz);
+    const [sxp, syp] = projectPoint3D(rx3, ry3, rz3, w, h, fov, zoom);
+    const zz = 1.6 + rz3 * 0.006;
+    const persp = 1 / Math.max(0.24, zz);
+    const sx = Math.round(sxp);
+    const sy = Math.round(syp);
+    if (sx < 1 || sx >= w - 1 || sy < 1 || sy >= h - 1) continue;
+
+    let r = 255;
+    let g = 255;
+    let b = 255;
+    if (ps.colorMode === "source") {
+      [r, g, b] = sampleSourceColor(baseImageData, particlesU[i], particlesV[i]);
+    } else if (ps.colorMode === "audio") {
+      const heat = clamp(bands[0] * 0.7 + bands[1] * 0.6 + bands[3] * 0.35 + audioDrive * 0.4, 0, 1);
+      const hue = ((0.67 - heat * 0.62 + ps.hue / 360) + 1) % 1;
+      [r, g, b] = hslToRgb(hue, 0.85, clamp(0.4 + heat * 0.35, 0, 1));
+    } else {
+      const hue = ((particlesSeed[i] * 0.9 + tSec * 0.03 + ps.hue / 360) + 1) % 1;
+      [r, g, b] = hslToRgb(hue, 0.78, 0.52 + audioDrive * 0.08);
+    }
+
+    const alpha = clamp((0.45 + life * 0.55 + audioDrive * 0.2) * 255, 0, 255);
+    const radius = Math.max(1, Math.round(sizePx * (0.6 + persp * 0.95)));
+    const drawPx = (px, py, blend = 1) => {
+      if (px < 0 || py < 0 || px >= w || py >= h) return;
+      const pi = (py * w + px) * 4;
+      const k = clamp((alpha / 255) * blend, 0.08, 1);
+      od[pi] = clamp(od[pi] * (1 - k) + r * k, 0, 255);
+      od[pi + 1] = clamp(od[pi + 1] * (1 - k) + g * k, 0, 255);
+      od[pi + 2] = clamp(od[pi + 2] * (1 - k) + b * k, 0, 255);
+      od[pi + 3] = 255;
+    };
+    drawPx(sx, sy, 1);
+    if (radius > 1) {
+      drawPx(sx - 1, sy, 0.46);
+      drawPx(sx + 1, sy, 0.46);
+      drawPx(sx, sy - 1, 0.46);
+      drawPx(sx, sy + 1, 0.46);
+    }
+    if (radius > 2) {
+      drawPx(sx - 2, sy, 0.26);
+      drawPx(sx + 2, sy, 0.26);
+      drawPx(sx, sy - 2, 0.26);
+      drawPx(sx, sy + 2, 0.26);
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function renderParticlesMode(baseImageData, tSec, settings) {
+  if (!particlesGpuForcedOff && renderParticlesModeGpu(baseImageData, tSec, settings)) return;
+  renderParticlesModeCpu(baseImageData, tSec, settings);
+}
+
+function renderFrame() {
+  const keyPanMoved = applyCameraKeyPanning();
+  const smoothCameraMoved = applySmoothCameraTargets();
+  const sourceImage = getSourceImageData();
+  if (!sourceImage) return;
+  updateVisualAnalysis(sourceImage);
+  const tSec = performance.now() / 1000;
+  const s = getSettings();
+  if (shouldRunTracking(s)) updateTrackingFromFrame();
+
+  if (mode === "none") {
+    ctx.putImageData(sourceImage, 0, 0);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    if (webcamActive || isDomeAutoRotateActive()) scheduleRender();
+    return;
+  }
+
+  updateAudioLevel(s);
+  applyModulation(s, tSec);
+  const base = copyImageData(sourceImage);
+  const fractalFromGlitch = fractalSource && fractalSource.value === "glitch";
+
+  if (mode === "glitch") {
+    applyGlitchPipeline(base, s, randomSeed, tSec);
+    ctx.putImageData(base, 0, 0);
+    drawTrackingOverlay(s);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    if (webcamActive || micActive || recordingActive || s.animDistort > 0 || s.motionTrail > 0 || isDomeAutoRotateActive()) scheduleRender();
+    return;
+  }
+
+  if (mode === "particles") {
+    renderParticlesMode(base, tSec, s);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    if (webcamActive || micActive || recordingActive || isDomeAutoRotateActive() || mode === "particles") scheduleRender();
+    return;
+  }
+
+  if (mode === "fractal") {
+    const fractalBase = copyImageData(sourceImage);
+    if (fractalFromGlitch) applyGlitchPipeline(fractalBase, s, randomSeed, tSec);
+    const result = applyKaleidoFractal(fractalBase, s, randomSeed);
+    ctx.putImageData(result, 0, 0);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    if (webcamActive || isDomeAutoRotateActive()) scheduleRender();
+    return;
+  }
+
+  if (mode === "depth") {
+    renderDepthMode(base, s, randomSeed, tSec);
+  }
+
+  if (mode === "mix") {
+    applyGlitchPipeline(base, s, randomSeed, tSec);
+    const fractalInput = fractalFromGlitch ? base : copyImageData(sourceImage);
+    const fractal = applyKaleidoFractal(fractalInput, s, randomSeed);
+    renderDepthMode(fractal, s, randomSeed, tSec);
+    drawTrackingOverlay(s);
+  }
+
+  applyOutputViewWarp();
+
+  if (shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved)) {
+    scheduleRender();
+  }
+
+  fpsFrames += 1;
+  const now = performance.now();
+  if (now - lastFpsTs > 600) {
+    fps = (fpsFrames * 1000) / (now - lastFpsTs);
+    fpsFrames = 0;
+    lastFpsTs = now;
+    updatePerfScale();
+    updatePerformanceUI();
+  }
+
+  syncCleanOutput();
+}
+
+function modeRelevantIds(targetMode) {
+  if (targetMode === "glitch") return glitchIds;
+  if (targetMode === "fractal") return fractalIds;
+  if (targetMode === "depth") return depthIds;
+  if (targetMode === "mix") return [...glitchIds, ...fractalIds, ...depthIds];
+  return [];
+}
+
+function updatePresetOptions() {
+  presetSelect.innerHTML = "";
+  const empty = document.createElement("option");
+  empty.value = "";
+  empty.textContent = t("no_preset");
+  presetSelect.appendChild(empty);
+  const list = presets[mode] || presets.none;
+  list.forEach((preset, idx) => {
+    const opt = document.createElement("option");
+    opt.value = String(idx);
+    opt.textContent = preset.label;
+    presetSelect.appendChild(opt);
+  });
+  presetSelect.value = "";
+}
+
+function applyPreset() {
+  if (!presetSelect.value) return;
+  const list = presets[mode] || presets.none;
+  const idx = Number(presetSelect.value) || 0;
+  const preset = list[idx];
+  if (!preset) return;
+  setValues({ ...defaults, ...preset.values });
+  if (fractalPattern && preset.pattern) fractalPattern.value = preset.pattern;
+  if (fractalSource && preset.source) fractalSource.value = preset.source;
+}
+
+function apply3DStarter() {
+  const depthRadio = modeInputs.find((m) => m.value === "depth");
+  if (depthRadio) depthRadio.checked = true;
+  setMode("depth");
+  setValues({ ...defaults, ...presets.depth[0].values });
+  setCameraMode("cursor");
+  cleanFront3dActive = false;
+  cleanFront3dSnapshot = null;
+  scheduleRender();
+}
+
+function toggle3DCleanFrontMode() {
+  if (mode !== "depth" && mode !== "mix") return;
+  const keys = [
+    "pointMap",
+    "meshMap",
+    "pointDensity",
+    "meshDensity",
+    "pointSize",
+    "pointLift",
+    "meshLift",
+    "depthStrength",
+    "depthExaggeration",
+    "pointSpread",
+    "pointRotateX",
+    "pointRotateY",
+    "pointRotateZ",
+    "cameraZoom",
+    "cameraFollow",
+    "autoRotate",
+    "lightEnabled",
+    "flatIllustrated",
+    "sceneExposure",
+    "ambientLight",
+    "lightIntensity",
+    "pointColorPulse",
+    "depthColorWave",
+    "glitch3d",
+    "bgMotion",
+  ];
+
+  if (!cleanFront3dActive) {
+    cleanFront3dSnapshot = {
+      mode,
+      cameraMode,
+      bgMode: bgMode ? bgMode.value : "solid",
+      bgPalette: bgPalette ? bgPalette.value : "custom",
+      bgColorA: bgColorA ? bgColorA.value : "#000000",
+      bgColorB: bgColorB ? bgColorB.value : "#000000",
+      fxMode: live3dFxMode ? live3dFxMode.value : "none",
+      fxAmount: live3dFxAmount ? Number(live3dFxAmount.value) : 35,
+      values: Object.fromEntries(keys.map((k) => [k, Number(controls[k].value)])),
+    };
+
+    if (mode !== "depth") {
+      const depthRadio = modeInputs.find((m) => m.value === "depth");
+      if (depthRadio) depthRadio.checked = true;
+      setMode("depth");
+    }
+    setCameraMode("static");
+    dragRotateX = 0;
+    dragRotateY = 0;
+    cameraPanX = 0;
+    cameraPanY = 0;
+    setValues({
+      pointMap: 92,
+      meshMap: 72,
+      pointDensity: 39,
+      meshDensity: 18,
+      pointSize: 3,
+      pointLift: 46,
+      meshLift: 40,
+      depthStrength: 76,
+      depthExaggeration: 102,
+      pointSpread: 8,
+      pointRotateX: 0,
+      pointRotateY: 0,
+      pointRotateZ: 0,
+      cameraZoom: 98,
+      cameraFollow: 0,
+      autoRotate: 0,
+      lightEnabled: 88,
+      flatIllustrated: 0,
+      sceneExposure: 118,
+      ambientLight: 42,
+      lightIntensity: 96,
+      pointColorPulse: 0,
+      depthColorWave: 0,
+      glitch3d: 0,
+      bgMotion: 6,
+    });
+    if (bgMode) bgMode.value = "solid";
+    if (bgPalette) bgPalette.value = "custom";
+    if (bgColorA) bgColorA.value = "#000000";
+    if (bgColorB) bgColorB.value = "#000000";
+    if (live3dFxMode) live3dFxMode.value = "none";
+    if (live3dFxAmount) live3dFxAmount.value = "35";
+    cleanFront3dActive = true;
+  } else if (cleanFront3dSnapshot) {
+    if (cleanFront3dSnapshot.mode && mode !== cleanFront3dSnapshot.mode) {
+      const modeRadio = modeInputs.find((m) => m.value === cleanFront3dSnapshot.mode);
+      if (modeRadio) modeRadio.checked = true;
+      setMode(cleanFront3dSnapshot.mode);
+    }
+    setValues(cleanFront3dSnapshot.values || {});
+    setCameraMode(cleanFront3dSnapshot.cameraMode || "cursor");
+    if (bgMode) bgMode.value = cleanFront3dSnapshot.bgMode || "solid";
+    if (bgPalette) bgPalette.value = cleanFront3dSnapshot.bgPalette || "custom";
+    if (bgColorA) bgColorA.value = cleanFront3dSnapshot.bgColorA || "#000000";
+    if (bgColorB) bgColorB.value = cleanFront3dSnapshot.bgColorB || "#000000";
+    if (live3dFxMode) live3dFxMode.value = cleanFront3dSnapshot.fxMode || "none";
+    if (live3dFxAmount) live3dFxAmount.value = String(Math.round(cleanFront3dSnapshot.fxAmount ?? 35));
+    cleanFront3dActive = false;
+    cleanFront3dSnapshot = null;
+  }
+  updateOutputs();
+  scheduleRender();
+}
+
+function randomizeActiveMode() {
+  if (mode === "particles") {
+    if (liveParticlesCount) {
+      const opts = ["low", "med", "high", "ultra"];
+      liveParticlesCount.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesEmitter) {
+      const opts = ["grid", "volume", "motion"];
+      liveParticlesEmitter.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesColorMode) {
+      const opts = ["source", "palette", "audio"];
+      liveParticlesColorMode.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesSize) liveParticlesSize.value = String(Math.round(18 + Math.random() * 72));
+    if (liveParticlesDepth) liveParticlesDepth.value = String(Math.round(22 + Math.random() * 70));
+    if (liveParticlesNoise) liveParticlesNoise.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesAttractor) liveParticlesAttractor.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesFlow) liveParticlesFlow.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesCamX) liveParticlesCamX.value = String(Math.round(-60 + Math.random() * 120));
+    if (liveParticlesCamY) liveParticlesCamY.value = String(Math.round(-150 + Math.random() * 300));
+    if (liveParticlesCamZ) liveParticlesCamZ.value = String(Math.round(-90 + Math.random() * 180));
+    if (liveParticlesHue) liveParticlesHue.value = String(Math.round(Math.random() * 360));
+    if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesAudio) liveParticlesAudio.checked = Math.random() > 0.2;
+    if (liveParticlesDamping) liveParticlesDamping.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesVortex) liveParticlesVortex.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesSpawn) liveParticlesSpawn.value = String(Math.round(20 + Math.random() * 80));
+    if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = String(Math.round(Math.random() * 100));
+    particlesBufferN = 0;
+    updateOutputs();
+    scheduleRender();
+    return;
+  }
+  const ids = modeRelevantIds(mode);
+  const keepError = mode === "glitch" ? Number(controls.errorComplexity.value) : null;
+  const keepFlatIllustrated =
+    mode === "depth" || mode === "mix" ? Number(controls.flatIllustrated.value) : null;
+  const keepLightEnabled =
+    mode === "depth" || mode === "mix" ? Number(controls.lightEnabled.value) : null;
+  ids.forEach((id) => {
+    const [min, max] = ranges[id];
+    const v = min + Math.random() * (max - min);
+    controls[id].value = Number.isInteger(min) && Number.isInteger(max) ? Math.round(v) : v;
+  });
+  if (keepError !== null) controls.errorComplexity.value = keepError;
+  if (keepFlatIllustrated !== null) controls.flatIllustrated.value = keepFlatIllustrated;
+  if (keepLightEnabled !== null) controls.lightEnabled.value = keepLightEnabled;
+
+  if (mode === "fractal" || mode === "mix") {
+    controls.kaleidoSegments.value = clamp(Number(controls.kaleidoSegments.value), 4, 20);
+    controls.kaleidoLayers.value = clamp(Number(controls.kaleidoLayers.value), 2, 8);
+    controls.psychedelic.value = clamp(Number(controls.psychedelic.value), 20, 100);
+    if (fractalPattern) {
+      const options = ["kaleido", "spiral", "mandala", "hybrid"];
+      fractalPattern.value = options[Math.floor(Math.random() * options.length)];
+    }
+    if (fractalSource) {
+      fractalSource.value = Math.random() > 0.45 ? "glitch" : "original";
+    }
+  }
+
+  if (mode === "depth" || mode === "mix") {
+    controls.pointMap.value = clamp(Number(controls.pointMap.value), 28, 100);
+    controls.meshMap.value = clamp(Number(controls.meshMap.value), 18, 100);
+    controls.sceneExposure.value = clamp(Number(controls.sceneExposure.value), 95, 200);
+    controls.lightIntensity.value = clamp(Number(controls.lightIntensity.value), 55, 180);
+  }
+
+  updateOutputs();
+}
+
+function randomizeBackground() {
+  if (!bgMode || !bgColorA || !bgColorB) return;
+  // Keep psychedelic and grid backgrounds as separate manual choices (not in F random).
+  const modes = ["solid", "gradient-linear", "gradient-radial", "animated"];
+  bgMode.value = modes[Math.floor(Math.random() * modes.length)];
+  if (bgPalette) {
+    const palettes = ["custom", "cyber", "sunset", "ocean", "toxic"];
+    bgPalette.value = palettes[Math.floor(Math.random() * palettes.length)];
+  }
+  const randColor = () =>
+    `#${Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padStart(6, "0")}`;
+  bgColorA.value = randColor();
+  bgColorB.value = randColor();
+  if (controls.bgMotion) {
+    controls.bgMotion.value = Math.round(20 + Math.random() * 80);
+  }
+  updateOutputs();
+}
+
+function cycle3dBackgroundMode() {
+  if (mode !== "depth" && mode !== "mix") return;
+  if (!bgMode) return;
+  const cycle = ["solid", "animated", "psychedelic-fractal"];
+  const idx = cycle.indexOf(bgMode.value);
+  bgMode.value = cycle[(idx + 1 + cycle.length) % cycle.length];
+  scheduleRender();
+}
+
+function cycleCurrentBackgroundColors() {
+  if (!bgMode || !bgColorA || !bgColorB) return;
+  // Keep the current mode selected with C; only rotate color styling.
+  const colorPairs = [
+    ["#0b1026", "#30103d"],
+    ["#00f7ff", "#1742ff"],
+    ["#ff4fd8", "#7a1fff"],
+    ["#19ff88", "#0a5b2d"],
+    ["#ffd54a", "#ff5f1f"],
+    ["#ffffff", "#9fd8ff"],
+    ["#ff0033", "#1d0010"],
+    ["#4affff", "#101a33"],
+  ];
+  const currentA = (bgColorA.value || "").toLowerCase();
+  const currentB = (bgColorB.value || "").toLowerCase();
+  let pair = colorPairs[Math.floor(Math.random() * colorPairs.length)];
+  for (let i = 0; i < 8 && pair[0].toLowerCase() === currentA && pair[1].toLowerCase() === currentB; i += 1) {
+    pair = colorPairs[Math.floor(Math.random() * colorPairs.length)];
+  }
+  if (bgPalette) bgPalette.value = "custom";
+  if (bgMode.value === "solid") {
+    bgColorA.value = pair[0];
+    bgColorB.value = pair[0];
+  } else {
+    bgColorA.value = pair[0];
+    bgColorB.value = pair[1];
+  }
+  updateOutputs();
+  scheduleRender();
+}
+
+function randomizeCurrentBackgroundColorsSmooth() {
+  if (!bgMode || !bgColorA || !bgColorB) return;
+  const rgbToHex = (r, g, b) =>
+    `#${[r, g, b]
+      .map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0"))
+      .join("")}`;
+  const randColor = () =>
+    `#${Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padStart(6, "0")}`;
+  const fromAHex = bgColorA.value || "#0b1026";
+  const fromBHex = bgColorB.value || "#30103d";
+
+  let toAHex;
+  let toBHex;
+  // In 3D, keep Z color changes inside the same palette as points/mesh.
+  if ((mode === "depth" || mode === "mix") && controls.pointColorShift && controls.meshColorShift) {
+    const pointHue = clamp(Number(controls.pointColorShift.value) / 360, 0, 1);
+    const meshHue = clamp(Number(controls.meshColorShift.value) / 360, 0, 1);
+    const jA = Math.random() * 0.08 - 0.04;
+    const jB = Math.random() * 0.08 - 0.04;
+    const hA = (pointHue + jA + 1) % 1;
+    const hB = (meshHue + jB + 1) % 1;
+    const sA = clamp(0.48 + Math.random() * 0.24, 0, 1);
+    const sB = clamp(0.46 + Math.random() * 0.26, 0, 1);
+    const lA = clamp(0.16 + Math.random() * 0.18, 0.1, 0.58);
+    const lB = clamp(0.2 + Math.random() * 0.2, 0.12, 0.62);
+    const [rA, gA, bA] = hslToRgb(hA, sA, lA);
+    const [rB, gB, bB] = hslToRgb(hB, sB, lB);
+    toAHex = rgbToHex(rA, gA, bA);
+    toBHex = rgbToHex(rB, gB, bB);
+  } else {
+    toAHex = randColor();
+    toBHex = randColor();
+  }
+
+  if (bgMode.value === "solid") toBHex = toAHex;
+  for (let i = 0; i < 8 && toAHex.toLowerCase() === fromAHex.toLowerCase(); i += 1) {
+    toAHex = randColor();
+    if (bgMode.value === "solid") toBHex = toAHex;
+  }
+  if (bgPalette) bgPalette.value = "custom";
+  bgColorA.value = toAHex;
+  bgColorB.value = toBHex;
+  bgColorTween = {
+    fromA: hexToRgb(fromAHex),
+    fromB: hexToRgb(fromBHex),
+    toA: hexToRgb(toAHex),
+    toB: hexToRgb(toBHex),
+    startedAt: performance.now(),
+    durationMs: 760,
+  };
+  updateOutputs();
+  scheduleRender();
+}
+
+function cycle3dFxMode() {
+  if (mode !== "depth" && mode !== "mix") return;
+  if (!live3dFxMode) return;
+  const cycle = ["none", "delay", "echo", "colortrail", "prism"];
+  const idx = cycle.indexOf(live3dFxMode.value);
+  live3dFxMode.value = cycle[(idx + 1 + cycle.length) % cycle.length];
+  scheduleRender();
+}
+
+function randomize3dGeometryColors() {
+  if (mode !== "depth" && mode !== "mix") return;
+  if (!controls.pointColorShift || !controls.meshColorShift) return;
+  const pointHue = Math.round(Math.random() * 360);
+  const meshHue = Math.round(Math.random() * 360);
+  controls.pointColorShift.value = String(pointHue);
+  controls.meshColorShift.value = String(meshHue);
+  targetPointHue = null;
+  targetMeshHue = null;
+  smoothPointHue = pointHue;
+  smoothMeshHue = meshHue;
+  updateOutputs();
+  scheduleRender();
+}
+
+function toggle3dBackgroundBlackWhite() {
+  if (mode !== "depth" && mode !== "mix" && mode !== "glitch") return;
+  if (!bgMode || !bgColorA || !bgColorB) return;
+  if (bgPalette) bgPalette.value = "custom";
+  bgMode.value = "solid";
+  const a = (bgColorA.value || "").toLowerCase();
+  const b = (bgColorB.value || "").toLowerCase();
+  const whiteSet = new Set(["#fff", "#ffffff"]);
+  const isWhite = whiteSet.has(a) && whiteSet.has(b);
+  if (isWhite) {
+    bgColorA.value = "#000000";
+    bgColorB.value = "#000000";
+  } else {
+    bgColorA.value = "#ffffff";
+    bgColorB.value = "#ffffff";
+  }
+  updateOutputs();
+  scheduleRender();
+}
+
+function syncModeUi() {
+  modeGroups.forEach((group) => {
+    if (currentWorkspacePanel === "studio") {
+      const studioGroup = group.dataset.studioGroup || "";
+      if (studioGroup === "depth") {
+        group.hidden = studioActiveTab !== "depth";
+      } else if (studioGroup === "glitch") {
+        group.hidden = studioActiveTab !== "glitch";
+      } else {
+        group.hidden = true;
+      }
+      return;
+    }
+    const activeModes = group.dataset.modes.split(",");
+    group.hidden = !activeModes.includes(mode);
+  });
+  updatePresetOptions();
+}
+
+function setMode(newMode) {
+  mode = newMode;
+  populateModTargets();
+  if (newMode !== "glitch" && newMode !== "mix" && glitchTrailCanvas.width > 0 && glitchTrailCanvas.height > 0) {
+    glitchTrailCtx.clearRect(0, 0, glitchTrailCanvas.width, glitchTrailCanvas.height);
+    glitchTrailBuffer = null;
+    glitchPrevFrame = null;
+    glitchTrailW = 0;
+    glitchTrailH = 0;
+  }
+  syncLiveModeTabsFromMode();
+  syncModeUi();
+  if (newMode !== "depth" && newMode !== "mix" && newMode !== "particles") {
+    isDragging3D = false;
+    canvas.classList.remove("dragging");
+    cameraPanX = 0;
+    cameraPanY = 0;
+    cameraKeyState.up = false;
+    cameraKeyState.down = false;
+    cameraKeyState.left = false;
+    cameraKeyState.right = false;
+  }
+
+  if (newMode === "depth") {
+    const pointsOff = Number(controls.pointMap.value) === 0;
+    const meshOff = Number(controls.meshMap.value) === 0;
+    if (pointsOff && meshOff) setValues({ ...defaults, ...presets.depth[0].values });
+  }
+  if (newMode === "particles") {
+    // Rebuild particle buffers and recenter camera on each entry for predictable startup.
+    particlesBufferN = 0;
+    cameraPanX = 0;
+    cameraPanY = 0;
+    targetPanX = null;
+    targetPanY = null;
+    particlesCamXSmooth = 0;
+    particlesCamYSmooth = 0;
+    particlesCamZSmooth = 0;
+    if (liveParticlesCamX) liveParticlesCamX.value = "0";
+    if (liveParticlesCamY) liveParticlesCamY.value = "0";
+    if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
+  }
+
+  applyAspectRatioChange();
+  updateCameraDeckVisibility();
+  scheduleRender();
+}
+
+function updateCameraDeckVisibility() {
+  if (!cameraDeckControls) return;
+  const hideCamAnim = mode === "glitch";
+  const title = cameraDeckControls.querySelector(".subgroup-title");
+  const modeBox = cameraDeckControls.querySelector(".camera-mode-box");
+  const speedWrap = cameraDeckControls.querySelector("label.slider input#cameraMoveSpeed")?.closest("label.slider");
+  if (title) title.hidden = hideCamAnim;
+  if (modeBox) modeBox.hidden = hideCamAnim;
+  if (speedWrap) speedWrap.hidden = hideCamAnim;
+}
+
+function updateDomeControlsVisibility() {
+  const domeDetails = document.getElementById("liveDomeSummary")?.closest("details");
+  if (!domeDetails) return;
+  domeDetails.open = true;
+}
+
+function ensureDomeRotationControls() {
+  if (document.getElementById("domeRotate") && document.getElementById("domeAutoRotateSpeed")) return;
+  const domeDetails = document.getElementById("liveDomeSummary")?.closest("details");
+  if (!domeDetails) return;
+  const domeGridWrap = domeGrid ? domeGrid.closest("label.slider") : null;
+  const labels = locale === "en"
+    ? {
+        rot: "Dome Rotation",
+        auto: "Dome Auto Rotate",
+        speed: "Dome Auto Speed",
+      }
+    : {
+        rot: "Rotación Domo",
+        auto: "Auto rotación Domo",
+        speed: "Velocidad auto Domo",
+      };
+  const html = `
+    <label class="slider"><span>${labels.rot}</span><input type="range" id="domeRotate" min="-180" max="180" value="0" /><output for="domeRotate">0</output></label>
+    <label class="toggle"><input type="checkbox" id="domeAutoRotate" /><span>${labels.auto}</span></label>
+    <label class="slider"><span>${labels.speed}</span><input type="range" id="domeAutoRotateSpeed" min="-100" max="100" value="18" /><output for="domeAutoRotateSpeed">18</output></label>
+  `;
+  if (domeGridWrap) domeGridWrap.insertAdjacentHTML("beforebegin", html);
+  else domeDetails.insertAdjacentHTML("beforeend", html);
+  domeRotate = document.getElementById("domeRotate");
+  domeAutoRotate = document.getElementById("domeAutoRotate");
+  domeAutoRotateSpeed = document.getElementById("domeAutoRotateSpeed");
+}
+
+function resetAll() {
+  setValues(defaults);
+  cleanFront3dActive = false;
+  cleanFront3dSnapshot = null;
+  if (cameraMoveSpeed) {
+    cameraMoveSpeed.value = "28";
+    updateQuickOutputById("cameraMoveSpeed", cameraMoveSpeed.value);
+  }
+  {
+    const k = clamp((cameraMoveSpeed ? Number(cameraMoveSpeed.value) : 28) / 100, 0, 1);
+    smoothCameraModeSpeed = 0.08 + Math.pow(k, 2.6) * 0.82;
+  }
+  cameraAnimTime = 0;
+  lastCameraAnimTs = performance.now();
+  stageGeomPrevCx = null;
+  stageGeomPrevCy = null;
+  stageGeomMotionX = 0;
+  stageGeomMotionY = 0;
+  if (glitchTrailCanvas.width > 0 && glitchTrailCanvas.height > 0) {
+    glitchTrailCtx.clearRect(0, 0, glitchTrailCanvas.width, glitchTrailCanvas.height);
+  }
+  glitchTrailBuffer = null;
+  glitchPrevFrame = null;
+  glitchTrailW = 0;
+  glitchTrailH = 0;
+  randomSeed = 1;
+  pointerTiltX = 0;
+  pointerTiltY = 0;
+  dragRotateX = 0;
+  dragRotateY = 0;
+  cameraPanX = 0;
+  cameraPanY = 0;
+  domeViewYaw = 0;
+  domeViewPitch = 0;
+  isDraggingDome = false;
+  domeAutoYaw = 0;
+  domeAutoYawVel = 0;
+  lastDomeAnimTs = performance.now();
+  if (domeRotate) domeRotate.value = "0";
+  if (domeAutoRotate) domeAutoRotate.checked = false;
+  if (domeAutoRotateSpeed) domeAutoRotateSpeed.value = "18";
+  if (liveParticlesCount) liveParticlesCount.value = "med";
+  if (liveParticlesEmitter) liveParticlesEmitter.value = "grid";
+  if (liveParticlesSize) liveParticlesSize.value = "42";
+  if (liveParticlesDepth) liveParticlesDepth.value = "58";
+  if (liveParticlesNoise) liveParticlesNoise.value = "34";
+  if (liveParticlesAttractor) liveParticlesAttractor.value = "26";
+  if (liveParticlesFlow) liveParticlesFlow.value = "30";
+  if (liveParticlesCamX) liveParticlesCamX.value = "0";
+  if (liveParticlesCamY) liveParticlesCamY.value = "0";
+  if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
+  if (liveParticlesColorMode) liveParticlesColorMode.value = "source";
+  if (liveParticlesHue) liveParticlesHue.value = "0";
+  if (liveParticlesAudio) liveParticlesAudio.checked = true;
+  if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = "54";
+  if (liveParticlesDamping) liveParticlesDamping.value = "18";
+  if (liveParticlesVortex) liveParticlesVortex.value = "22";
+  if (liveParticlesSpawn) liveParticlesSpawn.value = "68";
+  if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = "32";
+  particlesBufferN = 0;
+  particlesX = null;
+  particlesY = null;
+  particlesZ = null;
+  particlesVX = null;
+  particlesVY = null;
+  particlesVZ = null;
+  particlesLife = null;
+  particlesU = null;
+  particlesV = null;
+  particlesSeed = null;
+  particlesCamXSmooth = 0;
+  particlesCamYSmooth = 0;
+  particlesCamZSmooth = 0;
+  cameraKeyState.up = false;
+  cameraKeyState.down = false;
+  cameraKeyState.left = false;
+  cameraKeyState.right = false;
+  if (live3dAnaglyph) live3dAnaglyph.checked = false;
+  if (live3dAnaglyphStrength) live3dAnaglyphStrength.value = "34";
+  const none = modeInputs.find((m) => m.value === "none");
+  if (none) none.checked = true;
+  setCameraMode("cursor");
+  setMode("none");
+  updateCanvasEntryOverlay();
+  scheduleRender();
+}
+
+function downloadCurrentImage() {
+  const a = document.createElement("a");
+  a.download = `pixel-error-${Date.now()}.png`;
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+}
+
+function exportPhotoHQ() {
+  if (!canvas || canvas.width <= 0 || canvas.height <= 0) return;
+  const prevW = canvas.width;
+  const prevH = canvas.height;
+  const prevOrig = originalImageData;
+
+  const src = getCurrentSourceDimensions();
+  const target = computeCanvasSizeForSource(src.width, src.height, {
+    maxW: EXPORT_CANVAS_MAX_W,
+    maxH: EXPORT_CANVAS_MAX_H,
+  });
+
+  resizeWorkingCanvases(target.width, target.height);
+
+  if (webcamActive || loadedImage) {
+    const freshSource = getSourceImageData();
+    if (freshSource) {
+      originalImageData = copyImageData(freshSource);
+    }
+  }
+
+  renderFrame();
+  canvas.toBlob(
+    (blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.download = `pixel-error-photo-hq-${Date.now()}.png`;
+        a.href = url;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      }
+      resizeWorkingCanvases(prevW, prevH);
+      originalImageData = prevOrig;
+      scheduleRender();
+    },
+    "image/png",
+    1
+  );
+}
+
+async function exportAnimation(kind) {
+  if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
+    alert(t("export_unsupported"));
+    return;
+  }
+
+  const durationMs = 5000;
+  const stream = canvas.captureStream(24);
+  const mimeCandidates =
+    kind === "video"
+      ? ["video/mp4;codecs=h264", "video/mp4", "video/webm;codecs=vp9", "video/webm"]
+      : ["image/gif", "video/webm;codecs=vp9", "video/webm"];
+  const mimeType = mimeCandidates.find((m) => MediaRecorder.isTypeSupported(m)) || "";
+  const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+  const chunks = [];
+  const prevAuto = Number(controls.autoRotate.value);
+
+  recorder.ondataavailable = (e) => {
+    if (e.data.size > 0) chunks.push(e.data);
+  };
+
+  recorder.start();
+  recordingActive = true;
+  if (prevAuto < 10) controls.autoRotate.value = 14;
+  updateOutputs();
+  scheduleRender();
+
+  setTimeout(() => {
+    recorder.stop();
+  }, durationMs);
+
+  recorder.onstop = () => {
+    recordingActive = false;
+    controls.autoRotate.value = prevAuto;
+    updateOutputs();
+    const blob = new Blob(chunks, { type: mimeType || "video/webm" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const ext =
+      kind === "gif" && mimeType === "image/gif"
+        ? "gif"
+        : mimeType.includes("mp4")
+          ? "mp4"
+          : "webm";
+    a.download = `pixel-error-${kind}-5s-${Date.now()}.${ext}`;
+    a.href = url;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    if (kind === "gif" && ext !== "gif") {
+      alert(t("export_gif_fallback"));
+    } else if (kind === "video" && ext !== "mp4") {
+      alert(t("export_mp4_fallback"));
+    }
+  };
+}
+
+function updateRecordingButtons() {
+  if (!recordStartBtn || !recordSaveBtn) return;
+  recordStartBtn.disabled = false;
+  recordSaveBtn.disabled = liveRecordingState === "idle";
+  if (liveRecordingState === "idle" || liveRecordingState === "stopped") {
+    recordStartBtn.textContent = t("record_start");
+  } else if (liveRecordingState === "recording") {
+    recordStartBtn.textContent = t("record_pause");
+  } else {
+    recordStartBtn.textContent = t("record_resume");
+  }
+  if (recordingIndicator && recordingStatusText) {
+    recordingIndicator.classList.remove("recording", "paused");
+    if (liveRecordingState === "recording") {
+      recordingIndicator.classList.add("recording");
+      recordingStatusText.textContent = t("record_status_recording");
+    } else if (liveRecordingState === "paused") {
+      recordingIndicator.classList.add("paused");
+      recordingStatusText.textContent = t("record_status_paused");
+    } else {
+      recordingStatusText.textContent = t("record_status_idle");
+    }
+  }
+}
+
+function createLiveRecorder() {
+  if (!liveRecordingStream || !liveRecordingMimeType) return null;
+  try {
+    return new MediaRecorder(liveRecordingStream, { mimeType: liveRecordingMimeType });
+  } catch {
+    return null;
+  }
+}
+
+function startRecorderSegment() {
+  const recorder = createLiveRecorder();
+  if (!recorder) {
+    alert(t("recording_mp4_required"));
+    return false;
+  }
+
+  liveRecorder = recorder;
+  liveRecorder.ondataavailable = (e) => {
+    if (e.data && e.data.size > 0) liveRecordingChunks.push(e.data);
+  };
+  liveRecorder.onstop = () => {
+    if (liveFinalizePending) {
+      finalizeLiveRecording();
+      return;
+    }
+    if (livePausePending) {
+      livePausePending = false;
+      liveRecordingState = "paused";
+      updateRecordingButtons();
+      return;
+    }
+    if (liveRecordingState !== "idle") {
+      liveRecordingState = "paused";
+      updateRecordingButtons();
+    }
+  };
+  liveRecorder.start(220);
+  liveRecordingState = "recording";
+  updateRecordingButtons();
+  return true;
+}
+
+function finalizeLiveRecording() {
+  const type = liveRecordingMimeType || "video/mp4";
+  const blob = new Blob(liveRecordingChunks, { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.download = `pixel-error-live-${Date.now()}.${liveRecordingExt}`;
+  a.href = url;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  if (liveRecordingStream) liveRecordingStream.getTracks().forEach((t) => t.stop());
+  if (liveDisplayStream) liveDisplayStream.getTracks().forEach((t) => t.stop());
+  liveRecorder = null;
+  liveRecordingStream = null;
+  liveDisplayStream = null;
+  liveRecordingChunks = [];
+  liveRecordingMimeType = "";
+  livePausePending = false;
+  liveFinalizePending = false;
+  liveRecordingState = "idle";
+  updateRecordingButtons();
+}
+
+function startLiveRecording() {
+  if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
+    alert(t("recording_unsupported"));
+    return;
+  }
+  if (liveRecordingState !== "idle" && liveRecordingState !== "stopped") return;
+
+  const start = async () => {
+    const useScreen = recordSource && recordSource.value === "screen";
+    let sourceStream = null;
+
+    try {
+      if (useScreen) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          alert(t("recording_screen_fail"));
+          return;
+        }
+        liveDisplayStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { frameRate: { ideal: 24, max: 24 } },
+          audio: true,
+        });
+        sourceStream = liveDisplayStream;
+      } else {
+        sourceStream = canvas.captureStream(24);
+      }
+    } catch {
+      alert(t("recording_screen_fail"));
+      return;
+    }
+
+    const merged = new MediaStream([...(sourceStream ? sourceStream.getVideoTracks() : [])]);
+    const hasScreenAudio = sourceStream && sourceStream.getAudioTracks().length > 0;
+    if (sourceStream) {
+      sourceStream.getAudioTracks().forEach((t) => merged.addTrack(t));
+    }
+    if (micActive && micStream && (!hasScreenAudio || !useScreen)) {
+      micStream.getAudioTracks().forEach((t) => merged.addTrack(t));
+    }
+
+    const mp4Type =
+      ["video/mp4;codecs=h264,aac", "video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/mp4"].find((m) =>
+        MediaRecorder.isTypeSupported(m)
+      ) || "";
+
+    if (!mp4Type) {
+      if (liveDisplayStream) {
+        liveDisplayStream.getTracks().forEach((t) => t.stop());
+        liveDisplayStream = null;
+      }
+      merged.getTracks().forEach((t) => t.stop());
+      alert(t("recording_mp4_required"));
+      return;
+    }
+
+    liveRecordingChunks = [];
+    liveRecordingStream = merged;
+    liveRecordingMimeType = mp4Type;
+    livePausePending = false;
+    liveFinalizePending = false;
+    if (!createLiveRecorder()) {
+      merged.getTracks().forEach((t) => t.stop());
+      if (liveDisplayStream) {
+        liveDisplayStream.getTracks().forEach((t) => t.stop());
+        liveDisplayStream = null;
+      }
+      alert(t("recording_mp4_required"));
+      return;
+    }
+    liveRecordingExt = "mp4";
+    startRecorderSegment();
+  };
+
+  start();
+}
+
+function toggleLiveRecording() {
+  if (liveRecordingState === "idle" || liveRecordingState === "stopped") {
+    startLiveRecording();
+    return;
+  }
+  if (liveRecordingState === "recording" || liveRecordingState === "paused") {
+    pauseOrResumeLiveRecording();
+  }
+}
+
+function pauseOrResumeLiveRecording() {
+  if (liveRecordingState === "recording") {
+    if (!liveRecorder || liveRecorder.state === "inactive") return;
+    livePausePending = true;
+    liveRecorder.stop();
+  } else if (liveRecordingState === "paused") {
+    livePausePending = false;
+    liveFinalizePending = false;
+    startRecorderSegment();
+  }
+}
+
+function saveLiveRecording() {
+  if (liveRecordingState !== "recording" && liveRecordingState !== "paused" && liveRecordingState !== "stopped") {
+    return;
+  }
+  if (liveRecordingState === "paused" || !liveRecorder || liveRecorder.state === "inactive") {
+    finalizeLiveRecording();
+    return;
+  }
+  liveFinalizePending = true;
+  liveRecorder.stop();
+}
+
+imageInput.addEventListener("change", (e) => {
+  const file = e.target.files?.[0];
+  if (file) loadImageToCanvas(file);
+  updateCanvasEntryOverlay();
+});
+
+if (canvasOverlayImageBtn) {
+  canvasOverlayImageBtn.addEventListener("click", () => {
+    if (imageInput) imageInput.click();
+  });
+}
+if (canvasOverlayWebcamBtn) {
+  canvasOverlayWebcamBtn.addEventListener("click", () => {
+    toggleWebcam();
+  });
+}
+
+modeInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    if (input.checked) setMode(input.value);
+  });
+});
+
+allIds.forEach((id) => {
+  controls[id].addEventListener("input", () => {
+    updateOutputs();
+    scheduleRender();
+  });
+});
+
+metaControls.forEach((control) => {
+  control.addEventListener("input", () => {
+    updateOutputs();
+    scheduleRender();
+  });
+});
+
+presetSelect.addEventListener("change", () => {
+  applyPreset();
+  scheduleRender();
+});
+
+if (fractalPattern) {
+  fractalPattern.addEventListener("change", scheduleRender);
+}
+
+if (fractalSource) {
+  fractalSource.addEventListener("change", scheduleRender);
+}
+if (bgMode) {
+  bgMode.addEventListener("change", scheduleRender);
+}
+if (bgPalette) {
+  bgPalette.addEventListener("change", scheduleRender);
+}
+if (bgColorA) {
+  bgColorA.addEventListener("input", scheduleRender);
+}
+if (bgColorB) {
+  bgColorB.addEventListener("input", scheduleRender);
+}
+if (aspectRatioSelect) {
+  aspectRatioSelect.addEventListener("change", () => {
+    applyAspectRatioChange();
+  });
+}
+
+if (depthPad) {
+  let padActive = false;
+  depthPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyDepthPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyDepthPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  depthPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyDepthPadFromPointer(t.clientX, t.clientY);
+  });
+  depthPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyDepthPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (liveModPad) {
+  let padActive = false;
+  liveModPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLiveModPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLiveModPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  liveModPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLiveModPadFromPointer(t.clientX, t.clientY);
+  });
+  liveModPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLiveModPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (liveGlitchPad) {
+  liveGlitchPad.addEventListener("mousedown", (e) => {
+    liveGlitchPadDragging = true;
+    applyLiveGlitchPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!liveGlitchPadDragging) return;
+    applyLiveGlitchPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    liveGlitchPadDragging = false;
+  });
+  liveGlitchPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    liveGlitchPadDragging = true;
+    applyLiveGlitchPadFromPointer(t.clientX, t.clientY);
+  });
+  liveGlitchPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLiveGlitchPadFromPointer(t.clientX, t.clientY);
+  });
+  liveGlitchPad.addEventListener("touchend", () => {
+    liveGlitchPadDragging = false;
+  });
+  liveGlitchPad.addEventListener("touchcancel", () => {
+    liveGlitchPadDragging = false;
+  });
+}
+
+if (liveGlitchPadB) {
+  liveGlitchPadB.addEventListener("mousedown", (e) => {
+    liveGlitchPadBDragging = true;
+    applyLiveGlitchPadBFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!liveGlitchPadBDragging) return;
+    applyLiveGlitchPadBFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    liveGlitchPadBDragging = false;
+  });
+  liveGlitchPadB.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    liveGlitchPadBDragging = true;
+    applyLiveGlitchPadBFromPointer(t.clientX, t.clientY);
+  });
+  liveGlitchPadB.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLiveGlitchPadBFromPointer(t.clientX, t.clientY);
+  });
+  liveGlitchPadB.addEventListener("touchend", () => {
+    liveGlitchPadBDragging = false;
+  });
+  liveGlitchPadB.addEventListener("touchcancel", () => {
+    liveGlitchPadBDragging = false;
+  });
+}
+
+if (liveGlitchPadC) {
+  liveGlitchPadC.addEventListener("mousedown", (e) => {
+    liveGlitchPadCDragging = true;
+    applyLiveGlitchPadCFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!liveGlitchPadCDragging) return;
+    applyLiveGlitchPadCFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    liveGlitchPadCDragging = false;
+  });
+  liveGlitchPadC.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    liveGlitchPadCDragging = true;
+    applyLiveGlitchPadCFromPointer(t.clientX, t.clientY);
+  });
+  liveGlitchPadC.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLiveGlitchPadCFromPointer(t.clientX, t.clientY);
+  });
+  liveGlitchPadC.addEventListener("touchend", () => {
+    liveGlitchPadCDragging = false;
+  });
+  liveGlitchPadC.addEventListener("touchcancel", () => {
+    liveGlitchPadCDragging = false;
+  });
+}
+
+if (live3dPointsPad) {
+  let padActive = false;
+  live3dPointsPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLive3dPointsPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLive3dPointsPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  live3dPointsPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dPointsPadFromPointer(t.clientX, t.clientY);
+  });
+  live3dPointsPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dPointsPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (live3dMeshPad) {
+  let padActive = false;
+  live3dMeshPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLive3dMeshPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLive3dMeshPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  live3dMeshPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dMeshPadFromPointer(t.clientX, t.clientY);
+  });
+  live3dMeshPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dMeshPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (live3dPadB) {
+  let padActive = false;
+  live3dPadB.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLive3dPadBFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLive3dPadBFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  live3dPadB.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dPadBFromPointer(t.clientX, t.clientY);
+  });
+  live3dPadB.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dPadBFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (live3dCamPad) {
+  let padActive = false;
+  live3dCamPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLive3dCamPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLive3dCamPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  live3dCamPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dCamPadFromPointer(t.clientX, t.clientY);
+  });
+  live3dCamPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dCamPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (live3dRotPad) {
+  let padActive = false;
+  live3dRotPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLive3dRotPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLive3dRotPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  live3dRotPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dRotPadFromPointer(t.clientX, t.clientY);
+  });
+  live3dRotPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dRotPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (live3dColorPad) {
+  let padActive = false;
+  live3dColorPad.addEventListener("mousedown", (e) => {
+    padActive = true;
+    applyLive3dColorPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!padActive) return;
+    applyLive3dColorPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    padActive = false;
+  });
+  live3dColorPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dColorPadFromPointer(t.clientX, t.clientY);
+  });
+  live3dColorPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyLive3dColorPadFromPointer(t.clientX, t.clientY);
+  });
+}
+
+if (liveModeGlitchBtn) liveModeGlitchBtn.addEventListener("click", () => setLiveModeTab("glitch"));
+if (liveMode3dBtn) liveMode3dBtn.addEventListener("click", () => setLiveModeTab("depth"));
+if (liveModeParticlesBtn) liveModeParticlesBtn.addEventListener("click", () => setLiveModeTab("particles"));
+if (liveGlitchIntensity) {
+  liveGlitchIntensity.addEventListener("input", () => {
+    applyLiveGlitchMacros();
+    scheduleRender();
+  });
+}
+if (liveGlitchColor) {
+  liveGlitchColor.addEventListener("input", () => {
+    applyLiveGlitchMacros();
+    scheduleRender();
+  });
+}
+if (liveGlitchError) {
+  liveGlitchError.addEventListener("input", () => {
+    applyLiveGlitchMacros();
+    scheduleRender();
+  });
+}
+if (liveGlitchTracking) {
+  liveGlitchTracking.addEventListener("input", () => {
+    applyLiveGlitchMacros();
+    scheduleRender();
+  });
+}
+if (liveGlitchTrail) {
+  liveGlitchTrail.addEventListener("input", () => {
+    applyLiveGlitchMacros();
+    scheduleRender();
+  });
+}
+if (liveGlitchAnim) {
+  liveGlitchAnim.addEventListener("input", () => {
+    applyLiveGlitchMacros();
+    scheduleRender();
+  });
+}
+if (live3dPoints) {
+  live3dPoints.addEventListener("input", () => {
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dMesh) {
+  live3dMesh.addEventListener("input", () => {
+    targetMeshAmount = null;
+    smoothMeshAmount = Number(live3dMesh.value);
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dSeparation) {
+  live3dSeparation.addEventListener("input", () => {
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dBackground) {
+  live3dBackground.addEventListener("input", () => {
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dOrganic) {
+  live3dOrganic.addEventListener("input", () => {
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dLight) {
+  live3dLight.addEventListener("input", () => {
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dLightingMode) {
+  live3dLightingMode.addEventListener("change", () => {
+    applyLive3dMacros();
+    scheduleRender();
+  });
+}
+if (live3dFxMode) {
+  live3dFxMode.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (live3dFxAmount) {
+  live3dFxAmount.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (live3dAnaglyph) {
+  live3dAnaglyph.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (live3dAnaglyphStrength) {
+  live3dAnaglyphStrength.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (liveParticlesCount) {
+  liveParticlesCount.addEventListener("change", () => {
+    particlesBufferN = 0;
+    scheduleRender();
+  });
+}
+if (liveParticlesEmitter) {
+  liveParticlesEmitter.addEventListener("change", () => {
+    particlesBufferN = 0;
+    scheduleRender();
+  });
+}
+if (liveParticlesColorMode) {
+  liveParticlesColorMode.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (liveParticlesAudio) {
+  liveParticlesAudio.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+[
+  liveParticlesSize,
+  liveParticlesDepth,
+  liveParticlesNoise,
+  liveParticlesAttractor,
+  liveParticlesFlow,
+  liveParticlesCamX,
+  liveParticlesCamY,
+  liveParticlesCamZ,
+  liveParticlesHue,
+  liveParticlesAudioAmount,
+  liveParticlesDamping,
+  liveParticlesVortex,
+  liveParticlesSpawn,
+  liveParticlesMotionThreshold,
+].forEach((control) => {
+  if (!control) return;
+  control.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+});
+if (liveOutputView) {
+  liveOutputView.addEventListener("change", () => {
+    if (loadedImage) renderLoadedImageToCanvas();
+    scheduleRender();
+  });
+}
+if (domeSourceMap) {
+  domeSourceMap.addEventListener("change", () => {
+    if (loadedImage) renderLoadedImageToCanvas();
+    scheduleRender();
+  });
+}
+if (domeWarp) {
+  domeWarp.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (domeTilt) {
+  domeTilt.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+ensureDomeRotationControls();
+if (domeRotate) {
+  domeRotate.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (domeAutoRotate) {
+  domeAutoRotate.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (domeAutoRotateSpeed) {
+  domeAutoRotateSpeed.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (domeGrid) {
+  domeGrid.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (liveCameraMode) {
+  liveCameraMode.addEventListener("change", () => {
+    setCameraMode(liveCameraMode.value);
+  });
+}
+if (modCurve) modCurve.addEventListener("change", scheduleRender);
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!originalImageData && !webcamActive) return;
+  if (isDraggingDome && isGlitchDomePanMode()) {
+    const dx = e.clientX - lastDomeDragX;
+    const dy = e.clientY - lastDomeDragY;
+    lastDomeDragX = e.clientX;
+    lastDomeDragY = e.clientY;
+    domeViewYaw = ((domeViewYaw + dx * 0.22 + 540) % 360) - 180;
+    domeViewPitch = clamp(domeViewPitch + dy * 0.18, -82, 82);
+    scheduleRender();
+    return;
+  }
+  if (mode !== "depth" && mode !== "particles") return;
+  if (isDragging3D) {
+    const dx = e.clientX - lastDragX;
+    const dy = e.clientY - lastDragY;
+    lastDragX = e.clientX;
+    lastDragY = e.clientY;
+    dragRotateY += dx * 0.18;
+    dragRotateX += dy * 0.18;
+    dragRotateX = clamp(dragRotateX, -179, 179);
+    scheduleRender();
+    return;
+  }
+});
+
+canvas.addEventListener(
+  "wheel",
+  (e) => {
+    if (mode !== "depth" && mode !== "mix" && mode !== "particles") return;
+    e.preventDefault();
+    const speed = e.ctrlKey ? 0.06 : 0.025;
+    adjustCanvasZoom(-e.deltaY, speed);
+  },
+  { passive: false }
+);
+
+canvas.addEventListener("gesturestart", (e) => {
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles") return;
+  e.preventDefault();
+  gestureBaseZoom = Number(controls.cameraZoom ? controls.cameraZoom.value : 86);
+});
+
+canvas.addEventListener("gesturechange", (e) => {
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles") return;
+  e.preventDefault();
+  if (!controls.cameraZoom) return;
+  if (gestureBaseZoom === null) gestureBaseZoom = Number(controls.cameraZoom.value);
+  const scale = clamp(Number(e.scale || 1), 0.3, 4);
+  const next = clamp(gestureBaseZoom * scale, 40, 180);
+  controls.cameraZoom.value = String(Math.round(next));
+  smoothCamZoom = next;
+  targetCamZoom = null;
+  updateOutputs();
+  scheduleRender();
+});
+
+canvas.addEventListener("gestureend", () => {
+  gestureBaseZoom = null;
+});
+
+canvas.addEventListener(
+  "touchstart",
+  (e) => {
+    if (!isGlitchDomePanMode()) return;
+    const t0 = e.touches && e.touches[0];
+    if (!t0) return;
+    isDraggingDome = true;
+    lastDomeDragX = t0.clientX;
+    lastDomeDragY = t0.clientY;
+    canvas.classList.add("dragging");
+    e.preventDefault();
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchmove",
+  (e) => {
+    if (!isDraggingDome || !isGlitchDomePanMode()) return;
+    const t0 = e.touches && e.touches[0];
+    if (!t0) return;
+    const dx = t0.clientX - lastDomeDragX;
+    const dy = t0.clientY - lastDomeDragY;
+    lastDomeDragX = t0.clientX;
+    lastDomeDragY = t0.clientY;
+    domeViewYaw = ((domeViewYaw + dx * 0.22 + 540) % 360) - 180;
+    domeViewPitch = clamp(domeViewPitch + dy * 0.18, -82, 82);
+    scheduleRender();
+    e.preventDefault();
+  },
+  { passive: false }
+);
+
+canvas.addEventListener("touchend", () => {
+  if (!isDraggingDome) return;
+  isDraggingDome = false;
+  if (!isDragging3D) canvas.classList.remove("dragging");
+});
+
+canvas.addEventListener("mousedown", (e) => {
+  if (isGlitchDomePanMode()) {
+    isDraggingDome = true;
+    lastDomeDragX = e.clientX;
+    lastDomeDragY = e.clientY;
+    canvas.classList.add("dragging");
+    return;
+  }
+  if ((mode !== "depth" && mode !== "particles") || (!originalImageData && !webcamActive)) return;
+  isDragging3D = true;
+  lastDragX = e.clientX;
+  lastDragY = e.clientY;
+  canvas.classList.add("dragging");
+});
+
+window.addEventListener("mouseup", () => {
+  if (!isDragging3D && !isDraggingDome) return;
+  isDragging3D = false;
+  isDraggingDome = false;
+  canvas.classList.remove("dragging");
+});
+
+canvas.addEventListener("mouseleave", () => {
+  if (!originalImageData && !webcamActive) return;
+  if (isDragging3D) return;
+});
+
+quick3dBtn.addEventListener("click", apply3DStarter);
+if (quick3dCleanBtn) quick3dCleanBtn.addEventListener("click", toggle3DCleanFrontMode);
+webcamBtn.addEventListener("click", toggleWebcam);
+if (refreshCamsBtn) {
+  refreshCamsBtn.addEventListener("click", () => {
+    refreshCameraDeviceList(true);
+  });
+}
+if (cameraDeviceSelect) {
+  cameraDeviceSelect.addEventListener("change", async () => {
+    selectedCameraDeviceId = cameraDeviceSelect.value || "";
+    if (!webcamActive) return;
+    stopWebcamInput();
+    updateDynamicUiTexts();
+    updateInputSpecs();
+    await toggleWebcam();
+  });
+}
+micBtn.addEventListener("click", toggleMic);
+exportVideoBtn.addEventListener("click", () => exportAnimation("video"));
+exportGifBtn.addEventListener("click", () => exportAnimation("gif"));
+if (exportPhotoBtn) exportPhotoBtn.addEventListener("click", exportPhotoHQ);
+recordStartBtn.addEventListener("click", toggleLiveRecording);
+if (recordPauseBtn) recordPauseBtn.addEventListener("click", pauseOrResumeLiveRecording);
+recordSaveBtn.addEventListener("click", saveLiveRecording);
+openCleanOutputBtn.addEventListener("click", openCleanOutput);
+closeCleanOutputBtn.addEventListener("click", closeCleanOutput);
+camStaticBtn.addEventListener("click", () => setCameraMode("static"));
+camCursorBtn.addEventListener("click", () => setCameraMode("cursor"));
+camOrbitBtn.addEventListener("click", () => setCameraMode("orbit"));
+camSweepBtn.addEventListener("click", () => setCameraMode("sweep"));
+camPulseBtn.addEventListener("click", () => setCameraMode("pulse"));
+if (camHelixBtn) camHelixBtn.addEventListener("click", () => setCameraMode("helix"));
+if (camDriftBtn) camDriftBtn.addEventListener("click", () => setCameraMode("drift"));
+if (camLiquidBtn) camLiquidBtn.addEventListener("click", () => setCameraMode("liquid"));
+if (cameraMoveSpeed) {
+  cameraMoveSpeed.addEventListener("input", () => {
+    updateQuickOutputById("cameraMoveSpeed", cameraMoveSpeed.value);
+    scheduleRender();
+  });
+}
+
+audioInputSource.addEventListener("change", () => {
+  updateAudioRoutingUi();
+  if (micActive) {
+    toggleMic().then(() => toggleMic());
+  }
+});
+audioTarget.addEventListener("change", scheduleRender);
+audioAnimation.addEventListener("change", scheduleRender);
+if (modSource) modSource.addEventListener("change", scheduleRender);
+if (modTarget) modTarget.addEventListener("change", scheduleRender);
+
+workflowTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    setWorkspacePanel(tab.dataset.panel || "setup");
+  });
+});
+
+if (studioModeGlitchBtn) studioModeGlitchBtn.addEventListener("click", () => setStudioTab("glitch"));
+if (studioMode3dBtn) studioMode3dBtn.addEventListener("click", () => setStudioTab("depth"));
+
+if (languageSelect) {
+  languageSelect.addEventListener("change", () => {
+    locale = languageSelect.value === "en" ? "en" : "es";
+    applyLocaleTexts();
+    drawPlaceholder();
+    scheduleRender();
+  });
+}
+
+if (uiLiveBtn) {
+  uiLiveBtn.addEventListener("click", () => setUiMode("live"));
+}
+if (uiEditBtn) {
+  uiEditBtn.addEventListener("click", () => setUiMode("edit"));
+}
+
+if (freezeBtn) freezeBtn.addEventListener("click", toggleFreeze);
+if (panicBtn) panicBtn.addEventListener("click", panicReset);
+if (snapshotSaveBtn) {
+  snapshotSaveBtn.addEventListener("click", () => captureSnapshot(currentSnapshotSlot));
+}
+snapshotSlots.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const slot = Number(btn.dataset.slot);
+    currentSnapshotSlot = slot;
+    refreshSnapshotUi();
+    if (snapshots[slot - 1]) applySnapshot(slot);
+  });
+});
+
+randomBtn.addEventListener("click", () => {
+  randomizeActiveMode();
+  scheduleRender();
+});
+
+reseedBtn.addEventListener("click", () => {
+  randomSeed = Math.floor(Math.random() * 100000);
+  scheduleRender();
+});
+
+resetBtn.addEventListener("click", resetAll);
+downloadBtn.addEventListener("click", downloadCurrentImage);
+
+window.addEventListener("beforeunload", () => {
+  closeCleanOutput();
+  if (webcamStream) webcamStream.getTracks().forEach((t) => t.stop());
+  if (micStream) micStream.getTracks().forEach((t) => t.stop());
+  if (liveDisplayStream) liveDisplayStream.getTracks().forEach((t) => t.stop());
+});
+
+window.addEventListener("resize", () => {
+  updateCanvasDisplaySize();
+});
+
+window.addEventListener("keydown", (e) => {
+  const active = document.activeElement;
+  const tag = (active && active.tagName) || "";
+  const inputType = active && active.tagName === "INPUT" ? (active.type || "").toLowerCase() : "";
+  const isTextInput =
+    tag === "TEXTAREA" ||
+    (tag === "INPUT" &&
+      !["range", "checkbox", "radio", "button", "color", "file", "submit", "reset"].includes(inputType)) ||
+    (active && active.isContentEditable);
+  if (isTextInput) return;
+  if (e.code === "Space") {
+    e.preventDefault();
+    toggleFreeze();
+    return;
+  }
+  if (e.code === "ArrowUp" || e.code === "KeyW") {
+    e.preventDefault();
+    cameraKeyState.up = true;
+    scheduleRender();
+    return;
+  }
+  if (e.code === "ArrowDown" || e.code === "KeyS") {
+    e.preventDefault();
+    cameraKeyState.down = true;
+    scheduleRender();
+    return;
+  }
+  if (e.code === "ArrowLeft" || e.code === "KeyA") {
+    e.preventDefault();
+    cameraKeyState.left = true;
+    scheduleRender();
+    return;
+  }
+  if (e.code === "ArrowRight" || e.code === "KeyD") {
+    e.preventDefault();
+    cameraKeyState.right = true;
+    scheduleRender();
+    return;
+  }
+  if (e.key === "r" || e.key === "R") {
+    e.preventDefault();
+    randomizeActiveMode();
+    scheduleRender();
+    return;
+  }
+  if (e.code === "KeyF") {
+    e.preventDefault();
+    randomizeBackground();
+    scheduleRender();
+    return;
+  }
+  if (e.code === "KeyC") {
+    e.preventDefault();
+    cycle3dBackgroundMode();
+    return;
+  }
+  if (e.code === "KeyX") {
+    e.preventDefault();
+    cycleCurrentBackgroundColors();
+    return;
+  }
+  if (e.code === "KeyZ") {
+    e.preventDefault();
+    randomizeCurrentBackgroundColorsSmooth();
+    return;
+  }
+  if (e.code === "KeyQ") {
+    e.preventDefault();
+    cycle3dFxMode();
+    return;
+  }
+  if (e.code === "KeyU") {
+    e.preventDefault();
+    randomize3dGeometryColors();
+    return;
+  }
+  if (e.code === "KeyM") {
+    e.preventDefault();
+    toggle3DCleanFrontMode();
+    return;
+  }
+  if (e.code === "KeyY") {
+    e.preventDefault();
+    if (e.repeat) return;
+    randomize3dCameraViewSmooth();
+    return;
+  }
+  if (e.key === "t" || e.key === "T") {
+    e.preventDefault();
+    randomize3dCameraView();
+    return;
+  }
+  if (e.key === "g" || e.key === "G") {
+    e.preventDefault();
+    toggleBackgroundSyncMode();
+    return;
+  }
+  if (e.code === "KeyV" && e.shiftKey) {
+    e.preventDefault();
+    toggleLiveRecording();
+    return;
+  }
+  if (e.code === "KeyV") {
+    e.preventDefault();
+    toggle3dBackgroundBlackWhite();
+    return;
+  }
+  if (e.key === "p" || e.key === "P") {
+    e.preventDefault();
+    panicReset();
+    return;
+  }
+  if (/^[1-8]$/.test(e.key)) {
+    e.preventDefault();
+    applySnapshot(Number(e.key));
+  }
+});
+
+window.addEventListener("keyup", (e) => {
+  if (e.code === "ArrowUp" || e.code === "KeyW") cameraKeyState.up = false;
+  if (e.code === "ArrowDown" || e.code === "KeyS") cameraKeyState.down = false;
+  if (e.code === "ArrowLeft" || e.code === "KeyA") cameraKeyState.left = false;
+  if (e.code === "ArrowRight" || e.code === "KeyD") cameraKeyState.right = false;
+});
+
+locale = languageSelect && languageSelect.value === "en" ? "en" : "es";
+populateModTargets();
+setValues(defaults);
+syncModeUi();
+setWorkspacePanel("setup");
+setUiMode("live");
+setCameraMode("cursor");
+updateCameraDeckVisibility();
+updateDomeControlsVisibility();
+{
+  const k = clamp((cameraMoveSpeed ? Number(cameraMoveSpeed.value) : 28) / 100, 0, 1);
+  smoothCameraModeSpeed = 0.08 + Math.pow(k, 2.6) * 0.82;
+}
+cameraAnimTime = 0;
+lastCameraAnimTs = performance.now();
+stageGeomPrevCx = null;
+stageGeomPrevCy = null;
+stageGeomMotionX = 0;
+stageGeomMotionY = 0;
+applyLocaleTexts();
+ensureDomeRotationControls();
+captureSnapshot(1);
+updatePerformanceUI();
+drawPlaceholder();
+updateCanvasDisplaySize();
+updateInputSpecs();
+updateCanvasEntryOverlay();
+refreshCameraDeviceList(true);
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+  navigator.mediaDevices.addEventListener("devicechange", () => {
+    refreshCameraDeviceList(true);
+  });
+}

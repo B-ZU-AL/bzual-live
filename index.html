@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pixel Error Lab 2000</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="winamp-frame">
+        <header class="topbar">
+          <span data-i18n="brand_left">PIXEL ERROR LAB 2000</span>
+          <div class="topbar-right">
+            <div class="ui-mode-toggle">
+              <button id="uiLiveBtn" class="btn mini active" data-i18n="ui_live">Live</button>
+              <button id="uiEditBtn" class="btn mini" data-i18n="ui_edit">Edit</button>
+            </div>
+            <span data-i18n="brand_right">B.ZU.AL Studios</span>
+            <label class="lang-picker">
+              <span data-i18n="language">Language</span>
+              <select id="languageSelect">
+                <option value="es">ES</option>
+                <option value="en">EN</option>
+              </select>
+            </label>
+          </div>
+        </header>
+
+        <div class="main-layout">
+          <aside class="left-panel">
+            <nav class="workflow-tabs" aria-label="Workspace">
+              <button class="btn workflow-tab active" data-panel="setup" id="tabSetup" data-i18n="tab_setup">Setup</button>
+              <button class="btn workflow-tab" data-panel="live" id="tabLive" data-i18n="tab_live">Live</button>
+              <button class="btn workflow-tab" data-panel="studio" id="tabStudio" data-i18n="tab_studio">Studio</button>
+            </nav>
+
+            <section class="workspace-panel active" id="panelSetup">
+              <h2 class="panel-title" data-i18n="setup_title">Input + Routing</h2>
+              <div class="control input-entry-row">
+                <label class="input-entry" for="imageInput">
+                  <span class="input-entry-icon">IMG</span>
+                  <span class="input-entry-label" data-i18n="load_image">Load Image</span>
+                  <input type="file" id="imageInput" accept="image/*" />
+                </label>
+                <button id="webcamBtn" class="input-entry input-entry-btn" data-i18n="enable_webcam">
+                  Enable Webcam
+                  <span class="input-entry-icon">CAM</span>
+                </button>
+              </div>
+              <p class="status-line" id="inputSpecs">Input: none</p>
+              <div class="control">
+                <label class="inline-select">
+                  <span data-i18n="camera_device">Camera Device</span>
+                  <select id="cameraDeviceSelect"></select>
+                </label>
+                <button id="refreshCamsBtn" class="btn mini" data-i18n="refresh_cameras">Refresh Cameras</button>
+              </div>
+
+              <div class="mode-box" role="radiogroup" aria-label="Mode">
+                <label><input type="radio" name="mode" value="none" checked /> <span data-i18n="mode_clean">Clean</span></label>
+                <label><input type="radio" name="mode" value="glitch" /> <span data-i18n="mode_glitch">Glitch</span></label>
+                <label><input type="radio" name="mode" value="depth" /> <span data-i18n="mode_depth">3D Stage</span></label>
+                <label><input type="radio" name="mode" value="particles" /> <span data-i18n="mode_particles">Particles</span></label>
+              </div>
+
+              <div class="control preset-control">
+                <label for="presetSelect" data-i18n="preset">Preset</label>
+                <select id="presetSelect"></select>
+              </div>
+
+              <div class="group setup-audio">
+                <h2 data-i18n="audio_reactive">Audio Reactive</h2>
+                <button id="micBtn" class="btn" data-i18n="enable_mic">Enable Mic</button>
+                <label class="inline-select">
+                  <span data-i18n="audio_input">Audio Input</span>
+                  <select id="audioInputSource">
+                    <option value="mic" data-i18n="audio_input_mic">Microphone</option>
+                    <option value="system" data-i18n="audio_input_system">System / Device Audio</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span data-i18n="audio_target">Target</span>
+                  <select id="audioTarget">
+                    <option value="points" data-i18n="audio_target_points">Points</option>
+                    <option value="mesh" data-i18n="audio_target_mesh">Mesh</option>
+                    <option value="both" data-i18n="audio_target_both" selected>Both</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span data-i18n="audio_animation">Animation</span>
+                  <select id="audioAnimation">
+                    <option value="lift" data-i18n="audio_anim_lift">Lift</option>
+                    <option value="wave" data-i18n="audio_anim_wave">Wave</option>
+                    <option value="color" data-i18n="audio_anim_color">Color</option>
+                    <option value="all" data-i18n="audio_anim_all">All</option>
+                  </select>
+                </label>
+                <label class="slider">
+                  <span data-i18n="audio_sensitivity">Audio Sensitivity</span>
+                  <input type="range" id="audioSensitivity" min="0" max="200" value="75" />
+                  <output for="audioSensitivity">75</output>
+                </label>
+                <label class="slider">
+                  <span data-i18n="audio_tolerance">Audio Tolerance</span>
+                  <input type="range" id="audioTolerance" min="0" max="100" value="18" />
+                  <output for="audioTolerance">18</output>
+                </label>
+                <label class="slider">
+                  <span data-i18n="audio_points_intensity">Points Audio Intensity</span>
+                  <input type="range" id="audioPointsIntensity" min="0" max="200" value="120" />
+                  <output for="audioPointsIntensity">120</output>
+                </label>
+                <label class="slider">
+                  <span data-i18n="audio_mesh_intensity">Mesh Audio Intensity</span>
+                  <input type="range" id="audioMeshIntensity" min="0" max="200" value="120" />
+                  <output for="audioMeshIntensity">120</output>
+                </label>
+                <label class="slider">
+                  <span data-i18n="audio_anim_variation">Audio Animation Variation</span>
+                  <input type="range" id="audioAnimVariation" min="0" max="200" value="100" />
+                  <output for="audioAnimVariation">100</output>
+                </label>
+                <p class="info-tip" id="audioHelpText" data-i18n="audio_help">
+                  System audio uses screen/tab sharing on browsers. Enable "Share audio" in the picker.
+                </p>
+                <p class="status-line" id="audioRouteStatus" data-i18n="audio_status_idle">Audio: idle</p>
+              </div>
+            </section>
+
+            <section class="workspace-panel" id="panelLive" hidden>
+              <h2 class="panel-title" data-i18n="live_title">Performance Rack</h2>
+              <div class="actions">
+                <button id="randomBtn" class="btn" data-i18n="random">Random</button>
+                <button id="reseedBtn" class="btn" data-i18n="reseed">Re-seed</button>
+                <button id="resetBtn" class="btn" data-i18n="reset">Reset</button>
+                <button id="downloadBtn" class="btn" data-i18n="save_png">Save PNG</button>
+              </div>
+              <div class="live-mode-tabs">
+                <button id="liveModeGlitchBtn" class="btn live-mode-btn active">
+                  <span class="live-mode-icon">GL</span>
+                  <span>Glitch Live</span>
+                </button>
+                <button id="liveMode3dBtn" class="btn live-mode-btn">
+                  <span class="live-mode-icon">3D</span>
+                  <span>3D Live</span>
+                </button>
+                <button id="liveModeParticlesBtn" class="btn live-mode-btn">
+                  <span class="live-mode-icon">PT</span>
+                  <span>Particles Live</span>
+                </button>
+              </div>
+              <div id="livePaneGlitch" class="group live-pane">
+                <h2>Glitch Essentials</h2>
+                <label class="slider"><span>Intensity</span><input type="range" id="liveGlitchIntensity" min="0" max="100" value="0" /><output for="liveGlitchIntensity">0</output></label>
+                <label class="slider"><span>Color Mix</span><input type="range" id="liveGlitchColor" min="0" max="100" value="50" /><output for="liveGlitchColor">50</output></label>
+                <label class="slider"><span>Error Complexity</span><input type="range" id="liveGlitchError" min="0" max="100" value="0" /><output for="liveGlitchError">0</output></label>
+                <label class="slider"><span>Tracking FX</span><input type="range" id="liveGlitchTracking" min="0" max="100" value="0" /><output for="liveGlitchTracking">0</output></label>
+                <label class="slider"><span>Motion Trail</span><input type="range" id="liveGlitchTrail" min="0" max="100" value="0" /><output for="liveGlitchTrail">0</output></label>
+                <label class="slider"><span>Anim Distort</span><input type="range" id="liveGlitchAnim" min="0" max="100" value="0" /><output for="liveGlitchAnim">0</output></label>
+                <div id="liveGlitchPadLabel" class="pad-label"><span class="pad-icon">GL</span><span>Glitch Pad (X=Intensity / Y=Color)</span></div>
+                <div id="liveGlitchPad" class="depth-pad live-fx-pad">
+                  <div id="liveGlitchPadDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="liveGlitchPadBLabel" class="pad-label"><span class="pad-icon">FX2</span><span>Glitch Pad B (X=Error / Y=Tracking)</span></div>
+                <div id="liveGlitchPadB" class="depth-pad live-fx-pad">
+                  <div id="liveGlitchPadBDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="liveGlitchPadCLabel" class="pad-label"><span class="pad-icon">FX3</span><span>Glitch Pad C (X=Trail / Y=Anim Distort)</span></div>
+                <div id="liveGlitchPadC" class="depth-pad live-fx-pad">
+                  <div id="liveGlitchPadCDot" class="depth-pad-dot"></div>
+                </div>
+                <p class="micro-tip">Tip: webcam + tracking FX da glitch facial/manos en tiempo real.</p>
+              </div>
+              <div id="livePane3d" class="group live-pane" hidden>
+                <h2>3D Essentials</h2>
+                <label class="inline-select">
+                  <span>Camera Move</span>
+                  <select id="liveCameraMode">
+                    <option value="static">Static</option>
+                    <option value="cursor">Cursor</option>
+                    <option value="orbit">Orbit</option>
+                    <option value="sweep">Sweep</option>
+                    <option value="pulse">Dolly Pulse</option>
+                    <option value="helix">Helix</option>
+                    <option value="drift">Drift</option>
+                    <option value="liquid">Liquid</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Points</span><input type="range" id="live3dPoints" min="0" max="100" value="55" /><output for="live3dPoints">55</output></label>
+                <label class="slider"><span>Mesh</span><input type="range" id="live3dMesh" min="0" max="100" value="45" /><output for="live3dMesh">45</output></label>
+                <label class="slider"><span>Point/Mesh Separation</span><input type="range" id="live3dSeparation" min="0" max="100" value="30" /><output for="live3dSeparation">30</output></label>
+                <label class="slider"><span>Background Energy</span><input type="range" id="live3dBackground" min="0" max="100" value="35" /><output for="live3dBackground">35</output></label>
+                <label class="slider"><span>Organic Interaction</span><input type="range" id="live3dOrganic" min="0" max="100" value="20" /><output for="live3dOrganic">20</output></label>
+                <label class="inline-select">
+                  <span>Lighting Mode</span>
+                  <select id="live3dLightingMode">
+                    <option value="lit">Lit</option>
+                    <option value="flat">Flat / Illustrated</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Lighting Power</span><input type="range" id="live3dLight" min="0" max="100" value="70" /><output for="live3dLight">70</output></label>
+                <label class="inline-select">
+                  <span>3D FX Filter</span>
+                  <select id="live3dFxMode">
+                    <option value="none">None</option>
+                    <option value="delay">Delay</option>
+                    <option value="echo">Visual Echo</option>
+                    <option value="colortrail">Color Trail</option>
+                    <option value="prism">Prism Drift</option>
+                  </select>
+                </label>
+                <label class="slider"><span>3D FX Amount</span><input type="range" id="live3dFxAmount" min="0" max="100" value="35" /><output for="live3dFxAmount">35</output></label>
+                <label class="toggle"><input type="checkbox" id="live3dAnaglyph" /><span>Anaglyph 3D</span></label>
+                <label class="slider"><span>Anaglyph Depth</span><input type="range" id="live3dAnaglyphStrength" min="0" max="100" value="34" /><output for="live3dAnaglyphStrength">34</output></label>
+                <div id="live3dPointsPadLabel" class="pad-label"><span class="pad-icon">PTS</span><span>Points Pad (X=Amount / Y=Size)</span></div>
+                <div id="live3dPointsPad" class="depth-pad live-fx-pad">
+                  <div id="live3dPointsPadDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="live3dMeshPadLabel" class="pad-label"><span class="pad-icon">MSH</span><span>Mesh Pad (X=Amount / Y=Lift)</span></div>
+                <div id="live3dMeshPad" class="depth-pad live-fx-pad">
+                  <div id="live3dMeshPadDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="live3dPadBLabel" class="pad-label"><span class="pad-icon">SEP</span><span>Pad B (X=Separation / Y=Background)</span></div>
+                <div id="live3dPadB" class="depth-pad live-fx-pad">
+                  <div id="live3dPadBDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="live3dCamPadLabel" class="pad-label"><span class="pad-icon">CAM</span><span>Camera Pad (X=Follow / Y=Zoom)</span></div>
+                <div id="live3dCamPad" class="depth-pad live-fx-pad">
+                  <div id="live3dCamPadDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="live3dRotPadLabel" class="pad-label"><span class="pad-icon">ROT</span><span>Rotation Pad (X=Rotate Y / Y=Rotate X)</span></div>
+                <div id="live3dRotPad" class="depth-pad live-fx-pad">
+                  <div id="live3dRotPadDot" class="depth-pad-dot"></div>
+                </div>
+                <div id="live3dColorPadLabel" class="pad-label"><span class="pad-icon">CLR</span><span>Color Mix Pad (X=Point Hue / Y=Mesh Hue)</span></div>
+                <div id="live3dColorPad" class="depth-pad live-fx-pad">
+                  <div id="live3dColorPadDot" class="depth-pad-dot"></div>
+                </div>
+                <button id="quick3dBtn" class="btn" data-i18n="quick3d">3D Starter</button>
+                <button id="quick3dCleanBtn" class="btn" data-i18n="quick3d_clean">3D Clean Front (M)</button>
+                <p class="micro-tip">Tip: usa WASD/flechas para paneo 3D y arrastra para orbitar.</p>
+              </div>
+              <div id="livePaneParticles" class="group live-pane" hidden>
+                <h2>Particles Essentials</h2>
+                <label class="inline-select">
+                  <span>Particle Count</span>
+                  <select id="liveParticlesCount">
+                    <option value="low">Low</option>
+                    <option value="med" selected>Med</option>
+                    <option value="high">High</option>
+                    <option value="ultra">Ultra</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Emitter</span>
+                  <select id="liveParticlesEmitter">
+                    <option value="grid" selected>Grid</option>
+                    <option value="volume">Volume</option>
+                    <option value="motion">Motion</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Size</span><input type="range" id="liveParticlesSize" min="0" max="100" value="42" /><output for="liveParticlesSize">42</output></label>
+                <label class="slider"><span>Depth / Z</span><input type="range" id="liveParticlesDepth" min="0" max="100" value="58" /><output for="liveParticlesDepth">58</output></label>
+                <label class="slider"><span>Noise</span><input type="range" id="liveParticlesNoise" min="0" max="100" value="34" /><output for="liveParticlesNoise">34</output></label>
+                <label class="slider"><span>Attractor</span><input type="range" id="liveParticlesAttractor" min="0" max="100" value="26" /><output for="liveParticlesAttractor">26</output></label>
+                <label class="slider"><span>Flow</span><input type="range" id="liveParticlesFlow" min="0" max="100" value="30" /><output for="liveParticlesFlow">30</output></label>
+                <label class="slider"><span>Camera X</span><input type="range" id="liveParticlesCamX" min="-90" max="90" value="0" /><output for="liveParticlesCamX">0</output></label>
+                <label class="slider"><span>Camera Y</span><input type="range" id="liveParticlesCamY" min="-180" max="180" value="0" /><output for="liveParticlesCamY">0</output></label>
+                <label class="slider"><span>Camera Z</span><input type="range" id="liveParticlesCamZ" min="-180" max="180" value="0" /><output for="liveParticlesCamZ">0</output></label>
+                <label class="inline-select">
+                  <span>Color Mode</span>
+                  <select id="liveParticlesColorMode">
+                    <option value="source" selected>From Source</option>
+                    <option value="palette">Palette</option>
+                    <option value="audio">Audio Heatmap</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Hue Shift</span><input type="range" id="liveParticlesHue" min="0" max="360" value="0" /><output for="liveParticlesHue">0</output></label>
+                <label class="toggle"><input type="checkbox" id="liveParticlesAudio" checked /><span>Audio React</span></label>
+                <label class="slider"><span>Audio Amount</span><input type="range" id="liveParticlesAudioAmount" min="0" max="100" value="54" /><output for="liveParticlesAudioAmount">54</output></label>
+                <details class="advanced-only">
+                  <summary>Advanced Particles</summary>
+                  <label class="slider"><span>Damping</span><input type="range" id="liveParticlesDamping" min="0" max="100" value="18" /><output for="liveParticlesDamping">18</output></label>
+                  <label class="slider"><span>Vortex</span><input type="range" id="liveParticlesVortex" min="0" max="100" value="22" /><output for="liveParticlesVortex">22</output></label>
+                  <label class="slider"><span>Spawn Rate</span><input type="range" id="liveParticlesSpawn" min="0" max="100" value="68" /><output for="liveParticlesSpawn">68</output></label>
+                  <label class="slider"><span>Motion Threshold</span><input type="range" id="liveParticlesMotionThreshold" min="0" max="100" value="32" /><output for="liveParticlesMotionThreshold">32</output></label>
+                </details>
+                <p class="micro-tip">Tip: módulo independiente con partículas XYZ audio-reactivas y auto performance.</p>
+              </div>
+              <div id="liveOutputGroup" class="group">
+                <h2>Output View</h2>
+                <label class="inline-select">
+                  <span>Output View</span>
+                  <select id="liveOutputView">
+                    <option value="normal">Normal</option>
+                    <option value="dome">Dome</option>
+                  </select>
+                </label>
+                <details class="advanced-only" open>
+                  <summary id="liveDomeSummary">Dome View Module</summary>
+                  <label class="inline-select">
+                    <span>Dome Source Map</span>
+                    <select id="domeSourceMap">
+                      <option value="standard">Standard Warp</option>
+                      <option value="equirect">360 Equirect -> 180 Dome</option>
+                    </select>
+                  </label>
+                  <label class="slider"><span>Dome Warp</span><input type="range" id="domeWarp" min="0" max="100" value="70" /><output for="domeWarp">70</output></label>
+                  <label class="slider"><span>Dome Tilt</span><input type="range" id="domeTilt" min="-100" max="100" value="0" /><output for="domeTilt">0</output></label>
+                  <label class="slider"><span>Dome Rotation</span><input type="range" id="domeRotate" min="-180" max="180" value="0" /><output for="domeRotate">0</output></label>
+                  <label class="toggle"><input type="checkbox" id="domeAutoRotate" /><span>Dome Auto Rotate</span></label>
+                  <label class="slider"><span>Dome Auto Speed</span><input type="range" id="domeAutoRotateSpeed" min="-100" max="100" value="18" /><output for="domeAutoRotateSpeed">18</output></label>
+                  <label class="slider"><span>Dome Grid Guide</span><input type="range" id="domeGrid" min="0" max="100" value="0" /><output for="domeGrid">0</output></label>
+                </details>
+              </div>
+              <div class="group">
+                <h2 data-i18n="modulation">Modulation</h2>
+                <label class="inline-select">
+                  <span data-i18n="mod_source">Source</span>
+                  <select id="modSource">
+                    <option value="none">None</option>
+                    <option value="rms">RMS</option>
+                    <option value="band1">Band 1 (Sub)</option>
+                    <option value="band2">Band 2 (Bass)</option>
+                    <option value="band3">Band 3 (Mid)</option>
+                    <option value="band4">Band 4 (High)</option>
+                    <option value="transient">Transient</option>
+                    <option value="lfo">LFO</option>
+                    <option value="manual">Manual</option>
+                    <option value="visual_luma">Visual Luma</option>
+                    <option value="visual_motion">Visual Motion</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span data-i18n="mod_target">Target</span>
+                  <select id="modTarget"></select>
+                </label>
+                <label class="slider"><span data-i18n="mod_amount">Amount</span><input type="range" id="modAmount" min="-100" max="100" value="0" /><output for="modAmount">0</output></label>
+                <label class="inline-select">
+                  <span>Curve</span>
+                  <select id="modCurve">
+                    <option value="smooth">Smooth</option>
+                    <option value="linear">Linear</option>
+                    <option value="punch">Punch</option>
+                    <option value="step">Step</option>
+                  </select>
+                </label>
+                <div id="liveModPadLabel" class="pad-label">Mod Pad (X=Amount / Y=Smoothing)</div>
+                <div id="liveModPad" class="depth-pad live-mod-pad">
+                  <div id="liveModPadDot" class="depth-pad-dot"></div>
+                </div>
+                <details class="advanced-only">
+                  <summary>Advanced Modulation</summary>
+                  <label class="slider"><span data-i18n="mod_smoothing">Smoothing</span><input type="range" id="modSmoothing" min="0" max="100" value="60" /><output for="modSmoothing">60</output></label>
+                  <label class="slider"><span data-i18n="mod_clamp">Clamp</span><input type="range" id="modClamp" min="0" max="100" value="100" /><output for="modClamp">100</output></label>
+                </details>
+                <p class="status-line" id="performanceStatus">FPS: --</p>
+                <p class="status-line" id="performanceHint">Auto performance: OFF</p>
+              </div>
+              <p class="status" data-i18n="status_realtime">Realtime ON. Clean mode = original image.</p>
+            </section>
+
+            <section class="workspace-panel" id="panelStudio" hidden>
+              <h2 class="panel-title" data-i18n="studio_title">Advanced Studio</h2>
+              <div class="studio-mode-tabs">
+                <button id="studioModeGlitchBtn" class="btn studio-mode-btn active" data-i18n="studio_glitch">Glitch Studio</button>
+                <button id="studioMode3dBtn" class="btn studio-mode-btn" data-i18n="studio_3d">3D Studio</button>
+              </div>
+              <div class="group mode-group" data-modes="glitch" data-studio-group="glitch" hidden>
+                <h2>Glitch Rack</h2>
+                <label class="slider"><span>RGB Shift</span><input type="range" id="rgbShift" min="0" max="60" value="0" /><output for="rgbShift">0</output></label>
+                <label class="slider"><span>Line Jitter</span><input type="range" id="lineJitter" min="0" max="70" value="0" /><output for="lineJitter">0</output></label>
+                <label class="slider"><span>Noise</span><input type="range" id="noiseAmount" min="0" max="140" value="0" /><output for="noiseAmount">0</output></label>
+                <label class="slider"><span>Salt & Pepper</span><input type="range" id="saltPepper" min="0" max="100" value="0" /><output for="saltPepper">0</output></label>
+                <label class="slider"><span>Pixelate</span><input type="range" id="pixelSize" min="1" max="30" value="1" /><output for="pixelSize">1</output></label>
+                <label class="slider"><span>Wave Distort</span><input type="range" id="waveDistort" min="0" max="80" value="0" /><output for="waveDistort">0</output></label>
+                <label class="slider"><span>Block Shift</span><input type="range" id="blockShift" min="0" max="100" value="0" /><output for="blockShift">0</output></label>
+                <label class="slider"><span>Data Bands</span><input type="range" id="dataBands" min="0" max="100" value="0" /><output for="dataBands">0</output></label>
+                <label class="slider"><span>Byte Corrupt</span><input type="range" id="byteCorrupt" min="0" max="100" value="0" /><output for="byteCorrupt">0</output></label>
+                <label class="slider"><span>Chroma Bleed</span><input type="range" id="chromaBleed" min="0" max="100" value="0" /><output for="chromaBleed">0</output></label>
+                <p class="subgroup-title">Pixel Art / Color Blend</p>
+                <label class="slider"><span>Pixel Sort</span><input type="range" id="pixelSort" min="0" max="100" value="0" /><output for="pixelSort">0</output></label>
+                <label class="slider"><span>Dither Matrix</span><input type="range" id="ditherAmount" min="0" max="100" value="0" /><output for="ditherAmount">0</output></label>
+                <label class="slider"><span>Neon Blend</span><input type="range" id="colorBlend" min="0" max="100" value="0" /><output for="colorBlend">0</output></label>
+                <label class="slider"><span>Pixel Melt</span><input type="range" id="pixelMelt" min="0" max="100" value="0" /><output for="pixelMelt">0</output></label>
+                <p class="subgroup-title">Subject Mask Glitch</p>
+                <label class="slider"><span>Mask Ghost</span><input type="range" id="subjectGhost" min="0" max="100" value="0" /><output for="subjectGhost">0</output></label>
+                <label class="slider"><span>Ghost Copies</span><input type="range" id="ghostCopies" min="1" max="6" value="1" /><output for="ghostCopies">1</output></label>
+                <label class="slider"><span>Ghost Shift</span><input type="range" id="ghostShift" min="0" max="180" value="0" /><output for="ghostShift">0</output></label>
+                <label class="slider"><span>Polygon Tracking</span><input type="range" id="polygonTrack" min="0" max="100" value="0" /><output for="polygonTrack">0</output></label>
+                <p class="subgroup-title">Color / Finish</p>
+                <label class="slider"><span>Scanlines</span><input type="range" id="scanlineIntensity" min="0" max="100" value="0" /><output for="scanlineIntensity">0</output></label>
+                <label class="slider"><span>Bloom</span><input type="range" id="bloom" min="0" max="90" value="0" /><output for="bloom">0</output></label>
+                <label class="slider"><span>Posterize</span><input type="range" id="posterize" min="2" max="40" value="40" /><output for="posterize">40</output></label>
+                <label class="slider"><span>Hue Shift</span><input type="range" id="hueShift" min="-180" max="180" value="0" /><output for="hueShift">0</output></label>
+                <label class="slider"><span>Saturation</span><input type="range" id="saturation" min="0" max="200" value="100" /><output for="saturation">100</output></label>
+                <label class="slider"><span>Contrast</span><input type="range" id="contrast" min="40" max="220" value="100" /><output for="contrast">100</output></label>
+                <label class="slider"><span>Invert Blend</span><input type="range" id="invertBlend" min="0" max="100" value="0" /><output for="invertBlend">0</output></label>
+                <label class="slider"><span>Solarize</span><input type="range" id="solarize" min="0" max="100" value="0" /><output for="solarize">0</output></label>
+                <label class="slider"><span>Motion Trail FX</span><input type="range" id="motionTrail" min="0" max="100" value="0" /><output for="motionTrail">0</output></label>
+                <label class="slider"><span>Trail Decay</span><input type="range" id="trailDecay" min="0" max="100" value="68" /><output for="trailDecay">68</output></label>
+                <label class="slider"><span>Trail Threshold</span><input type="range" id="trailThreshold" min="0" max="100" value="42" /><output for="trailThreshold">42</output></label>
+                <label class="slider"><span>Trail Softness</span><input type="range" id="trailSoftness" min="0" max="100" value="40" /><output for="trailSoftness">40</output></label>
+                <label class="slider"><span>Motion Only</span><input type="range" id="trailMotionOnly" min="0" max="100" value="80" /><output for="trailMotionOnly">80</output></label>
+                <label class="slider"><span>Animated Distortion</span><input type="range" id="animDistort" min="0" max="100" value="0" /><output for="animDistort">0</output></label>
+                <label class="slider"><span>Anim Speed</span><input type="range" id="animSpeed" min="0" max="100" value="40" /><output for="animSpeed">40</output></label>
+                <label class="slider"><span>Error Complexity</span><input type="range" id="errorComplexity" min="0" max="100" value="0" /><output for="errorComplexity">0</output></label>
+              </div>
+
+              <div class="group mode-group legacy-fractal" data-modes="fractal,mix" data-studio-group="legacy" hidden>
+                <h2>Fractal Rack</h2>
+                <label class="inline-select">
+                  <span>Pattern</span>
+                  <select id="fractalPattern">
+                    <option value="kaleido">Kaleido Mirror</option>
+                    <option value="spiral">Spiral</option>
+                    <option value="mandala">Mandala</option>
+                    <option value="hybrid">Hybrid</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Fractal Source</span>
+                  <select id="fractalSource">
+                    <option value="original">Original Image</option>
+                    <option value="glitch">Glitch Base Image</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Segments (mirror)</span><input type="range" id="kaleidoSegments" min="1" max="24" value="1" /><output for="kaleidoSegments">1</output></label>
+                <label class="slider"><span>Layers</span><input type="range" id="kaleidoLayers" min="1" max="8" value="1" /><output for="kaleidoLayers">1</output></label>
+                <label class="slider"><span>Layer Echo</span><input type="range" id="layerEcho" min="0" max="100" value="0" /><output for="layerEcho">0</output></label>
+                <label class="slider"><span>Twist</span><input type="range" id="kaleidoTwist" min="0" max="100" value="0" /><output for="kaleidoTwist">0</output></label>
+                <label class="slider"><span>Fractal Zoom</span><input type="range" id="fractalZoom" min="40" max="260" value="100" /><output for="fractalZoom">100</output></label>
+                <label class="slider"><span>Fractal Pulse</span><input type="range" id="fractalPulse" min="0" max="100" value="0" /><output for="fractalPulse">0</output></label>
+                <p class="subgroup-title">Spiral / Mandala</p>
+                <label class="slider"><span>Spiral Amount</span><input type="range" id="spiralAmount" min="0" max="100" value="0" /><output for="spiralAmount">0</output></label>
+                <label class="slider"><span>Spiral Turns</span><input type="range" id="spiralTurns" min="1" max="28" value="8" /><output for="spiralTurns">8</output></label>
+                <label class="slider"><span>Mandala Petals</span><input type="range" id="mandalaPetals" min="2" max="28" value="8" /><output for="mandalaPetals">8</output></label>
+                <label class="slider"><span>Mandala Bloom</span><input type="range" id="mandalaBloom" min="0" max="100" value="0" /><output for="mandalaBloom">0</output></label>
+                <p class="subgroup-title">Psychedelic Color</p>
+                <label class="slider"><span>Psychedelic</span><input type="range" id="psychedelic" min="0" max="100" value="0" /><output for="psychedelic">0</output></label>
+                <label class="slider"><span>Color Cycle</span><input type="range" id="colorCycle" min="0" max="360" value="0" /><output for="colorCycle">0</output></label>
+              </div>
+
+              <div class="group mode-group" id="depthControlsGroup" data-modes="depth" data-studio-group="depth" hidden>
+                <h2>3D Stage</h2>
+                <p class="micro-tip">Tip: empieza con "3D Starter" y mueve el mouse en el viewport.</p>
+                <p class="subgroup-title">3D Geometry / Motion</p>
+                <label class="slider"><span>Depth Strength</span><input type="range" id="depthStrength" min="0" max="100" value="0" /><output for="depthStrength">0</output></label>
+                <label class="slider"><span>Point Map</span><input type="range" id="pointMap" min="0" max="100" value="0" /><output for="pointMap">0</output></label>
+                <label class="slider"><span>Point Density</span><input type="range" id="pointDensity" min="6" max="40" value="20" /><output for="pointDensity">20</output></label>
+                <label class="slider"><span>Point Size</span><input type="range" id="pointSize" min="1" max="10" value="2" /><output for="pointSize">2</output></label>
+                <label class="slider"><span>Point Float</span><input type="range" id="pointFloat" min="0" max="100" value="0" /><output for="pointFloat">0</output></label>
+                <label class="slider"><span>Organic Interaction</span><input type="range" id="pointOrganic" min="0" max="100" value="0" /><output for="pointOrganic">0</output></label>
+                <label class="slider"><span>Point Lift Z</span><input type="range" id="pointLift" min="0" max="100" value="0" /><output for="pointLift">0</output></label>
+                <label class="slider"><span>Mesh Map</span><input type="range" id="meshMap" min="0" max="100" value="0" /><output for="meshMap">0</output></label>
+                <label class="slider"><span>Mesh Density</span><input type="range" id="meshDensity" min="12" max="90" value="34" /><output for="meshDensity">34</output></label>
+                <label class="slider"><span>Mesh Lift Z</span><input type="range" id="meshLift" min="0" max="100" value="0" /><output for="meshLift">0</output></label>
+                <label class="slider"><span>Point Color Shift</span><input type="range" id="pointColorShift" min="0" max="360" value="0" /><output for="pointColorShift">0</output></label>
+                <label class="slider"><span>Mesh Color Shift</span><input type="range" id="meshColorShift" min="0" max="360" value="0" /><output for="meshColorShift">0</output></label>
+                <label class="slider"><span>Mesh Glow</span><input type="range" id="meshGlow" min="0" max="100" value="0" /><output for="meshGlow">0</output></label>
+                <label class="slider"><span>Ambient</span><input type="range" id="ambientLight" min="0" max="100" value="35" /><output for="ambientLight">35</output></label>
+                <label class="slider"><span>Light Power</span><input type="range" id="lightIntensity" min="0" max="180" value="80" /><output for="lightIntensity">80</output></label>
+                <label class="slider"><span>Exposure</span><input type="range" id="sceneExposure" min="40" max="220" value="110" /><output for="sceneExposure">110</output></label>
+                <label class="slider"><span>Depth Exaggeration</span><input type="range" id="depthExaggeration" min="40" max="320" value="100" /><output for="depthExaggeration">100</output></label>
+                <label class="slider"><span>Point Spread</span><input type="range" id="pointSpread" min="0" max="200" value="0" /><output for="pointSpread">0</output></label>
+                <div class="pad-label">3D Pad (Rotate + Lift)</div>
+                <div id="depthPad" class="depth-pad">
+                  <div id="depthPadDot" class="depth-pad-dot"></div>
+                </div>
+
+                <details class="advanced-only" open>
+                  <summary>Advanced 3D</summary>
+                  <label class="slider"><span>Depth Shift</span><input type="range" id="depthShift" min="0" max="80" value="0" /><output for="depthShift">0</output></label>
+                  <label class="slider"><span>Depth View</span><input type="range" id="depthView" min="0" max="100" value="0" /><output for="depthView">0</output></label>
+                  <label class="slider"><span>Rotate X</span><input type="range" id="pointRotateX" min="-90" max="90" value="0" /><output for="pointRotateX">0</output></label>
+                  <label class="slider"><span>Rotate Y</span><input type="range" id="pointRotateY" min="-90" max="90" value="0" /><output for="pointRotateY">0</output></label>
+                  <label class="slider"><span>Rotate Z</span><input type="range" id="pointRotateZ" min="-180" max="180" value="0" /><output for="pointRotateZ">0</output></label>
+                  <label class="slider"><span>3D Glitch Jitter</span><input type="range" id="glitch3d" min="0" max="100" value="0" /><output for="glitch3d">0</output></label>
+                  <h3>Lighting</h3>
+                <label class="slider"><span>Lighting Enable</span><input type="range" id="lightEnabled" min="0" max="100" value="100" /><output for="lightEnabled">100</output></label>
+                <label class="slider"><span>Flat Illustrated</span><input type="range" id="flatIllustrated" min="0" max="100" value="0" /><output for="flatIllustrated">0</output></label>
+                <label class="slider"><span>Light Azimuth</span><input type="range" id="lightAzimuth" min="-180" max="180" value="-40" /><output for="lightAzimuth">-40</output></label>
+                <label class="slider"><span>Light Elevation</span><input type="range" id="lightElevation" min="-80" max="80" value="30" /><output for="lightElevation">30</output></label>
+                <label class="slider"><span>Camera Zoom</span><input type="range" id="cameraZoom" min="40" max="180" value="100" /><output for="cameraZoom">100</output></label>
+                <label class="slider"><span>Cursor Camera</span><input type="range" id="cameraFollow" min="0" max="100" value="35" /><output for="cameraFollow">35</output></label>
+                <label class="slider"><span>Auto Rotate</span><input type="range" id="autoRotate" min="0" max="100" value="0" /><output for="autoRotate">0</output></label>
+                <p class="subgroup-title">Aesthetic / Light FX</p>
+                <label class="slider"><span>Point Color Pulse</span><input type="range" id="pointColorPulse" min="0" max="100" value="0" /><output for="pointColorPulse">0</output></label>
+                <label class="slider"><span>Depth Color Wave</span><input type="range" id="depthColorWave" min="0" max="100" value="0" /><output for="depthColorWave">0</output></label>
+                <p class="subgroup-title">3D Background</p>
+                <label class="inline-select">
+                  <span>Background Mode</span>
+                  <select id="bgMode">
+                    <option value="black">Black</option>
+                    <option value="solid">Solid</option>
+                    <option value="gradient-linear">Gradient Linear</option>
+                    <option value="gradient-radial">Gradient Radial</option>
+                    <option value="animated">Animated</option>
+                    <option value="grid">Grid Motion</option>
+                    <option value="psychedelic-fractal">Psychedelic Fractal</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Background Palette</span>
+                  <select id="bgPalette">
+                    <option value="custom">Custom</option>
+                    <option value="cyber">Cyber</option>
+                    <option value="sunset">Sunset</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="toxic">Toxic</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Background Color A</span>
+                  <input type="color" id="bgColorA" value="#0b1026" />
+                </label>
+                <label class="inline-select">
+                  <span>Background Color B</span>
+                  <input type="color" id="bgColorB" value="#30103d" />
+                </label>
+                <label class="slider"><span>Background Motion</span><input type="range" id="bgMotion" min="0" max="100" value="35" /><output for="bgMotion">35</output></label>
+                </details>
+              </div>
+            </section>
+          </aside>
+
+          <section class="right-panel">
+            <header class="visual-title" data-i18n="visualization_deck">Visualization Deck</header>
+            <div class="canvas-shell">
+              <canvas id="canvas" width="1000" height="680"></canvas>
+              <div id="canvasEntryOverlay" class="canvas-entry-overlay">
+                <div class="canvas-entry-card">
+                  <div class="canvas-entry-brand" data-text="B.ZU.AL Studios">
+                    <span>B.ZU.AL Studios</span>
+                  </div>
+                  <div class="canvas-entry-title">Start Input</div>
+                  <p class="canvas-entry-sub">Choose an input to begin visual performance</p>
+                  <div class="canvas-entry-actions">
+                    <button id="canvasOverlayImageBtn" class="btn canvas-entry-btn">
+                      <span class="canvas-entry-btn-icon">IMG</span>
+                      <span>Load Image</span>
+                    </button>
+                    <button id="canvasOverlayWebcamBtn" class="btn canvas-entry-btn">
+                      <span class="canvas-entry-btn-icon">CAM</span>
+                      <span>Enable Webcam</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="deck-controls" id="cameraDeckControls">
+              <label class="inline-select">
+                <span data-i18n="aspect_ratio">Aspect Ratio</span>
+                <select id="aspectRatioSelect">
+                  <option value="auto">Auto</option>
+                  <option value="16:9">16:9</option>
+                  <option value="4:3">4:3</option>
+                  <option value="1:1">1:1</option>
+                  <option value="9:16">9:16</option>
+                  <option value="21:9" selected>21:9</option>
+                </select>
+              </label>
+              <p class="subgroup-title" data-i18n="camera_modes">Camera Modes</p>
+              <div class="camera-mode-box">
+                <button id="camStaticBtn" class="btn cam-btn" data-i18n="cam_static">Static</button>
+                <button id="camCursorBtn" class="btn cam-btn" data-i18n="cam_cursor">Cursor</button>
+                <button id="camOrbitBtn" class="btn cam-btn" data-i18n="cam_orbit">Orbit</button>
+                <button id="camSweepBtn" class="btn cam-btn" data-i18n="cam_sweep">Sweep X</button>
+                <button id="camPulseBtn" class="btn cam-btn" data-i18n="cam_pulse">Dolly Pulse</button>
+                <button id="camHelixBtn" class="btn cam-btn" data-i18n="cam_helix">Helix</button>
+                <button id="camDriftBtn" class="btn cam-btn" data-i18n="cam_drift">Drift Glitch</button>
+                <button id="camLiquidBtn" class="btn cam-btn" data-i18n="cam_liquid">Liquid</button>
+              </div>
+              <label class="slider">
+                <span data-i18n="camera_move_speed">Camera Speed</span>
+                <input type="range" id="cameraMoveSpeed" min="0" max="100" value="28" />
+                <output for="cameraMoveSpeed">28</output>
+              </label>
+            </div>
+
+            <div class="output-zone">
+              <p class="subgroup-title" data-i18n="recording">Recording</p>
+              <div class="recording-head">
+                <label class="inline-select">
+                  <span data-i18n="record_source">Record Source</span>
+                  <select id="recordSource">
+                    <option value="canvas" data-i18n="record_source_canvas">Clean Canvas</option>
+                    <option value="screen" data-i18n="record_source_screen">Screen</option>
+                  </select>
+                </label>
+                <div class="rec-indicator" id="recordingIndicator" aria-live="polite">
+                  <span class="dot"></span>
+                  <span id="recordingStatusText" data-i18n="record_status_idle">IDLE</span>
+                </div>
+              </div>
+              <div class="audio-reactive-box">
+                <button id="recordStartBtn" class="btn" data-i18n="record">Record</button>
+                <button id="recordSaveBtn" class="btn" data-i18n="save_recording">Save Recording</button>
+              </div>
+              <p class="subgroup-title" data-i18n="exports">Exports</p>
+              <div class="audio-reactive-box">
+                <button id="exportVideoBtn" class="btn" data-i18n="export_video">Export 5s Video</button>
+                <button id="exportGifBtn" class="btn" data-i18n="export_gif">Export 5s GIF*</button>
+                <button id="exportPhotoBtn" class="btn" data-i18n="export_photo">Photo HQ</button>
+              </div>
+              <p class="subgroup-title" data-i18n="clean_output">Clean Output</p>
+              <div class="audio-reactive-box">
+                <button id="openCleanOutputBtn" class="btn" data-i18n="open_clean_output">Open Clean Output</button>
+                <button id="closeCleanOutputBtn" class="btn" data-i18n="close_clean_output">Close Clean Output</button>
+              </div>
+            </div>
+
+            <video id="webcam" autoplay playsinline muted hidden></video>
+            <div class="performance-bar">
+              <button id="freezeBtn" class="btn mini" data-i18n="freeze">Freeze</button>
+              <button id="panicBtn" class="btn mini panic" data-i18n="panic">Panic</button>
+              <button id="snapshotSaveBtn" class="btn mini" data-i18n="snapshot_save">Snapshot Save</button>
+              <div class="snapshot-row">
+                <button class="btn mini snapshot-slot" data-slot="1">1</button>
+                <button class="btn mini snapshot-slot" data-slot="2">2</button>
+                <button class="btn mini snapshot-slot" data-slot="3">3</button>
+                <button class="btn mini snapshot-slot" data-slot="4">4</button>
+                <button class="btn mini snapshot-slot" data-slot="5">5</button>
+                <button class="btn mini snapshot-slot" data-slot="6">6</button>
+                <button class="btn mini snapshot-slot" data-slot="7">7</button>
+                <button class="btn mini snapshot-slot" data-slot="8">8</button>
+              </div>
+            </div>
+            <div class="deck-footer">
+              <span data-i18n="footer_mouse">Mouse: 3D tilt + drag orbit</span>
+              <span data-i18n="footer_engine">Render Engine 2K</span>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
