@@ -3,6 +3,8 @@ const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const canvasEntryOverlay = document.getElementById("canvasEntryOverlay");
 const canvasOverlayImageBtn = document.getElementById("canvasOverlayImageBtn");
 const canvasOverlayWebcamBtn = document.getElementById("canvasOverlayWebcamBtn");
+const moduleRouteHint = document.getElementById("moduleRouteHint");
+const moduleRouteButtons = [...document.querySelectorAll(".module-route-btn")];
 
 const imageInput = document.getElementById("imageInput");
 const inputSpecs = document.getElementById("inputSpecs");
@@ -31,7 +33,12 @@ const camHelixBtn = document.getElementById("camHelixBtn");
 const camDriftBtn = document.getElementById("camDriftBtn");
 const camLiquidBtn = document.getElementById("camLiquidBtn");
 const cameraMoveSpeed = document.getElementById("cameraMoveSpeed");
+const cameraControlsDetails = document.getElementById("cameraControlsDetails");
 const micBtn = document.getElementById("micBtn");
+const audioFileInput = document.getElementById("audioFileInput");
+const audioFilePlayerWrap = document.getElementById("audioFilePlayerWrap");
+const audioFilePlayer = document.getElementById("audioFilePlayer");
+const audioFileClearBtn = document.getElementById("audioFileClearBtn");
 const audioInputSource = document.getElementById("audioInputSource");
 const audioTarget = document.getElementById("audioTarget");
 const audioAnimation = document.getElementById("audioAnimation");
@@ -40,11 +47,19 @@ const bgPalette = document.getElementById("bgPalette");
 const bgColorA = document.getElementById("bgColorA");
 const bgColorB = document.getElementById("bgColorB");
 const recordStartBtn = document.getElementById("recordStartBtn");
+const recordStartIcon = document.getElementById("recordStartIcon");
 const recordPauseBtn = document.getElementById("recordPauseBtn");
 const recordSaveBtn = document.getElementById("recordSaveBtn");
 const recordSource = document.getElementById("recordSource");
+const recordQuality = document.getElementById("recordQuality");
+const recordResolution = document.getElementById("recordResolution");
 const recordingIndicator = document.getElementById("recordingIndicator");
 const recordingStatusText = document.getElementById("recordingStatusText");
+const recordNameModal = document.getElementById("recordNameModal");
+const recordNameInput = document.getElementById("recordNameInput");
+const recordNameCancelBtn = document.getElementById("recordNameCancelBtn");
+const recordNameSaveBtn = document.getElementById("recordNameSaveBtn");
+if (recordNameModal) recordNameModal.hidden = true;
 const aspectRatioSelect = document.getElementById("aspectRatioSelect");
 const cameraDeckControls = document.getElementById("cameraDeckControls");
 const openCleanOutputBtn = document.getElementById("openCleanOutputBtn");
@@ -61,15 +76,55 @@ const performanceHint = document.getElementById("performanceHint");
 const freezeBtn = document.getElementById("freezeBtn");
 const panicBtn = document.getElementById("panicBtn");
 const snapshotSaveBtn = document.getElementById("snapshotSaveBtn");
+const snapshotLoadBtn = document.getElementById("snapshotLoadBtn");
+const snapshotClearBtn = document.getElementById("snapshotClearBtn");
 const snapshotSlots = [...document.querySelectorAll(".snapshot-slot")];
 const depthPad = document.getElementById("depthPad");
 const depthPadDot = document.getElementById("depthPadDot");
 const liveModeGlitchBtn = document.getElementById("liveModeGlitchBtn");
+const liveModeFractalBtn = document.getElementById("liveModeFractalBtn");
 const liveMode3dBtn = document.getElementById("liveMode3dBtn");
 const liveModeParticlesBtn = document.getElementById("liveModeParticlesBtn");
+const liveAudioToggleBtn = document.getElementById("liveAudioToggleBtn");
+const liveAudioLoadBtn = document.getElementById("liveAudioLoadBtn");
+const liveAudioInputQuick = document.getElementById("liveAudioInputQuick");
+const liveAudioTargetQuick = document.getElementById("liveAudioTargetQuick");
+const liveAudioSensitivityQuick = document.getElementById("liveAudioSensitivityQuick");
+const liveAudioStatusQuick = document.getElementById("liveAudioStatusQuick");
+const liveAudioFileMini = document.getElementById("liveAudioFileMini");
+const liveAudioFileName = document.getElementById("liveAudioFileName");
+const liveAudioPlayPauseBtn = document.getElementById("liveAudioPlayPauseBtn");
+const liveAudioSeek = document.getElementById("liveAudioSeek");
+const liveAudioTime = document.getElementById("liveAudioTime");
+const liveAudioClearBtn = document.getElementById("liveAudioClearBtn");
 const livePaneGlitch = document.getElementById("livePaneGlitch");
+const livePaneFractal = document.getElementById("livePaneFractal");
 const livePane3d = document.getElementById("livePane3d");
 const livePaneParticles = document.getElementById("livePaneParticles");
+const liveFractalPreset = document.getElementById("liveFractalPreset");
+const liveFractalQuality = document.getElementById("liveFractalQuality");
+const liveFractalCameraMode = document.getElementById("liveFractalCameraMode");
+const liveFractalDomeMode = document.getElementById("liveFractalDomeMode");
+const liveFractalCamSpeed = document.getElementById("liveFractalCamSpeed");
+const liveFractalDistance = document.getElementById("liveFractalDistance");
+const liveFractalShape = document.getElementById("liveFractalShape");
+const liveFractalSymmetry = document.getElementById("liveFractalSymmetry");
+const liveFractalPower = document.getElementById("liveFractalPower");
+const liveFractalFog = document.getElementById("liveFractalFog");
+const liveFractalGlow = document.getElementById("liveFractalGlow");
+const liveFractalLight = document.getElementById("liveFractalLight");
+const liveFractalSpin = document.getElementById("liveFractalSpin");
+const liveFractalBreath = document.getElementById("liveFractalBreath");
+const liveFractalWarmth = document.getElementById("liveFractalWarmth");
+const liveFractalTexture = document.getElementById("liveFractalTexture");
+const liveFractalTexture2 = document.getElementById("liveFractalTexture2");
+const liveFractalTextureMix = document.getElementById("liveFractalTextureMix");
+const liveFractalRenderMode = document.getElementById("liveFractalRenderMode");
+const liveFractalStyle = document.getElementById("liveFractalStyle");
+const liveFractalBackground = document.getElementById("liveFractalBackground");
+const liveFractalFlatColor = document.getElementById("liveFractalFlatColor");
+const liveFractalAudio = document.getElementById("liveFractalAudio");
+const liveFractalAudioGain = document.getElementById("liveFractalAudioGain");
 const liveGlitchIntensity = document.getElementById("liveGlitchIntensity");
 const liveGlitchColor = document.getElementById("liveGlitchColor");
 const liveGlitchError = document.getElementById("liveGlitchError");
@@ -85,8 +140,10 @@ const live3dLightingMode = document.getElementById("live3dLightingMode");
 const live3dLight = document.getElementById("live3dLight");
 const live3dFxMode = document.getElementById("live3dFxMode");
 const live3dFxAmount = document.getElementById("live3dFxAmount");
+const live3dAudioSync = document.getElementById("live3dAudioSync");
 const live3dAnaglyph = document.getElementById("live3dAnaglyph");
 const live3dAnaglyphStrength = document.getElementById("live3dAnaglyphStrength");
+const liveModeRandomBtn = document.getElementById("liveModeRandomBtn");
 const liveCameraMode = document.getElementById("liveCameraMode");
 const liveGlitchPad = document.getElementById("liveGlitchPad");
 const liveGlitchPadDot = document.getElementById("liveGlitchPadDot");
@@ -106,6 +163,10 @@ const live3dRotPad = document.getElementById("live3dRotPad");
 const live3dRotPadDot = document.getElementById("live3dRotPadDot");
 const live3dColorPad = document.getElementById("live3dColorPad");
 const live3dColorPadDot = document.getElementById("live3dColorPadDot");
+const live3dBgMode = document.getElementById("live3dBgMode");
+const live3dBgPalette = document.getElementById("live3dBgPalette");
+const live3dBgColorA = document.getElementById("live3dBgColorA");
+const live3dBgColorB = document.getElementById("live3dBgColorB");
 const liveParticlesCount = document.getElementById("liveParticlesCount");
 const liveParticlesEmitter = document.getElementById("liveParticlesEmitter");
 const liveParticlesSize = document.getElementById("liveParticlesSize");
@@ -120,10 +181,24 @@ const liveParticlesColorMode = document.getElementById("liveParticlesColorMode")
 const liveParticlesHue = document.getElementById("liveParticlesHue");
 const liveParticlesAudio = document.getElementById("liveParticlesAudio");
 const liveParticlesAudioAmount = document.getElementById("liveParticlesAudioAmount");
+const liveParticlesStructure = document.getElementById("liveParticlesStructure");
+const liveParticlesAudioSplit = document.getElementById("liveParticlesAudioSplit");
+const liveParticlesOrder = document.getElementById("liveParticlesOrder");
 const liveParticlesDamping = document.getElementById("liveParticlesDamping");
 const liveParticlesVortex = document.getElementById("liveParticlesVortex");
 const liveParticlesSpawn = document.getElementById("liveParticlesSpawn");
 const liveParticlesMotionThreshold = document.getElementById("liveParticlesMotionThreshold");
+const liveParticlesDrift = document.getElementById("liveParticlesDrift");
+const liveParticlesFocus = document.getElementById("liveParticlesFocus");
+const liveParticlesGradientMode = document.getElementById("liveParticlesGradientMode");
+const liveParticlesColorMix = document.getElementById("liveParticlesColorMix");
+const liveParticlesGradientSpread = document.getElementById("liveParticlesGradientSpread");
+const liveParticlesGradientA = document.getElementById("liveParticlesGradientA");
+const liveParticlesGradientB = document.getElementById("liveParticlesGradientB");
+const liveParticlesBgMode = document.getElementById("liveParticlesBgMode");
+const liveParticlesBgPalette = document.getElementById("liveParticlesBgPalette");
+const liveParticlesBgColorA = document.getElementById("liveParticlesBgColorA");
+const liveParticlesBgColorB = document.getElementById("liveParticlesBgColorB");
 const liveOutputView = document.getElementById("liveOutputView");
 const domeSourceMap = document.getElementById("domeSourceMap");
 const domeWarp = document.getElementById("domeWarp");
@@ -138,7 +213,23 @@ const liveModPadDot = document.getElementById("liveModPadDot");
 const languageSelect = document.getElementById("languageSelect");
 const workflowTabs = [...document.querySelectorAll(".workflow-tab")];
 const studioModeGlitchBtn = document.getElementById("studioModeGlitchBtn");
+const studioModeFractalBtn = document.getElementById("studioModeFractalBtn");
 const studioMode3dBtn = document.getElementById("studioMode3dBtn");
+const studioModeParticlesBtn = document.getElementById("studioModeParticlesBtn");
+const studioParticlesStructure = document.getElementById("studioParticlesStructure");
+const studioParticlesAudioSplit = document.getElementById("studioParticlesAudioSplit");
+const studioParticlesOrder = document.getElementById("studioParticlesOrder");
+const studioParticlesDrift = document.getElementById("studioParticlesDrift");
+const studioParticlesFocus = document.getElementById("studioParticlesFocus");
+const studioParticlesDamping = document.getElementById("studioParticlesDamping");
+const studioParticlesVortex = document.getElementById("studioParticlesVortex");
+const studioParticlesSpawn = document.getElementById("studioParticlesSpawn");
+const studioParticlesMotionThreshold = document.getElementById("studioParticlesMotionThreshold");
+const studioParticlesGradientMode = document.getElementById("studioParticlesGradientMode");
+const studioParticlesColorMix = document.getElementById("studioParticlesColorMix");
+const studioParticlesGradientSpread = document.getElementById("studioParticlesGradientSpread");
+const studioParticlesGradientA = document.getElementById("studioParticlesGradientA");
+const studioParticlesGradientB = document.getElementById("studioParticlesGradientB");
 const workspacePanels = {
   setup: document.getElementById("panelSetup"),
   live: document.getElementById("panelLive"),
@@ -328,8 +419,8 @@ const defaults = {
   depthExaggeration: 100,
   pointSpread: 0,
   bgMotion: 35,
-  audioSensitivity: 75,
-  audioTolerance: 18,
+  audioSensitivity: 92,
+  audioTolerance: 12,
   audioPointsIntensity: 120,
   audioMeshIntensity: 120,
   audioAnimVariation: 100,
@@ -667,6 +758,8 @@ let particlesGpuReady = false;
 let particlesGpuTriedInit = false;
 let particlesGpu = null;
 let particlesGpuForcedOff = true;
+const fractalGlCanvas = document.createElement("canvas");
+let fractalGl = null;
 let smoothCamFollow = null;
 let smoothCamZoom = null;
 let smoothRotX = null;
@@ -694,11 +787,19 @@ let webcamActive = false;
 let selectedCameraDeviceId = "";
 let recordingActive = false;
 let cameraMode = "cursor";
+let cameraModePrev = "cursor";
+let cameraModeBlendStart = 0;
 let micStream = null;
 let micActive = false;
+let audioFileActive = false;
+let audioFileUrl = "";
+let audioFileElementSource = null;
+let audioSourceNode = null;
+let audioAnalyserMonitor = false;
 let audioCtx = null;
 let analyser = null;
 let audioData = null;
+let audioTimeData = null;
 let audioLevel = 0;
 let liveRecorder = null;
 let liveRecordingStream = null;
@@ -707,6 +808,12 @@ let liveRecordingChunks = [];
 let liveRecordingState = "idle";
 let liveRecordingExt = "webm";
 let liveRecordingMimeType = "";
+let liveRecordingVideoBitrate = 8_000_000;
+let liveRecordingAudioBitrate = 192_000;
+let liveRecordCanvas = null;
+let liveRecordCtx = null;
+let liveRecordDrawTimer = null;
+let recordNameDialogResolve = null;
 let livePausePending = false;
 let liveFinalizePending = false;
 let faceDetector = null;
@@ -737,6 +844,8 @@ let perfScale = 1;
 let modSignalSmoothed = 0;
 let transientEnergy = 0;
 let lastBandEnergy = 0;
+let audioNoiseFloor = 0.02;
+let audioReactiveEnv = 0;
 let currentSnapshotSlot = 1;
 let bgSyncMode = false;
 const snapshots = new Array(8).fill(null);
@@ -769,6 +878,11 @@ let cleanFront3dActive = false;
 let cleanFront3dSnapshot = null;
 let lastCameraShuffleTs = 0;
 let cameraShufflePhase = Math.random() * Math.PI * 2;
+let fractalCamYaw = 0;
+let fractalCamPitch = 0;
+let fractalCamYawTarget = 0;
+let fractalCamPitchTarget = 0;
+let fractalCamDistSmooth = 3.9;
 let renderErrorCount = 0;
 
 const LIVE_CANVAS_MAX_W = 1180;
@@ -789,9 +903,16 @@ const i18n = {
     tab_studio: "Studio",
     setup_title: "Entrada + Ruteo",
     live_title: "Performance Rack",
+    live_audio_quick: "Audio Inicio Rápido",
+    live_audio_toggle: "Activar audio reactivo",
+    live_audio_load: "Cargar archivo de audio",
+    now_playing: "Reproduciendo",
+    play: "Play",
     studio_title: "Studio Avanzado",
     studio_glitch: "Studio Glitch",
+    studio_fractal: "Studio Fractal",
     studio_3d: "Studio 3D",
+    studio_particles: "Studio Partículas",
     load_image: "Cargar Imagen",
     preset: "Preset",
     enable_webcam: "Activar webcam",
@@ -799,6 +920,8 @@ const i18n = {
     camera_auto: "Automática",
     refresh_cameras: "Refrescar cámaras",
     enable_mic: "Activar mic",
+    load_audio: "Cargar audio",
+    clear_audio: "Quitar audio",
     mode_clean: "Clean",
     mode_glitch: "Glitch",
     mode_fractal: "Fractal",
@@ -808,6 +931,7 @@ const i18n = {
     audio_reactive: "Audio Reactivo",
     audio_input: "Entrada de Audio",
     audio_input_mic: "Micrófono",
+    audio_input_file: "Archivo de audio",
     audio_input_system: "Audio interno / dispositivo",
     audio_target: "Objetivo",
     audio_target_points: "Puntos",
@@ -837,12 +961,18 @@ const i18n = {
     freeze: "Freeze",
     panic: "Panic",
     snapshot_save: "Snapshot Save",
+    sessions_title: "Sesiones",
+    sessions_hint: "Shift+1..8 guardar, 1..8 cargar",
+    sessions_save: "Guardar sesión",
+    sessions_load: "Cargar sesión",
+    sessions_clear: "Borrar slot",
     random: "Random",
     reseed: "Re-seed",
     reset: "Reset",
     save_png: "Guardar PNG",
     visualization_deck: "Visualization Deck",
     camera_modes: "Modos de Cámara",
+    camera_controls: "Controles de cámara",
     cam_static: "Static",
     cam_cursor: "Cursor",
     cam_orbit: "Orbit",
@@ -858,6 +988,18 @@ const i18n = {
     record_source: "Fuente de Grabación",
     record_source_canvas: "Canva limpio",
     record_source_screen: "Pantalla",
+    record_quality: "Calidad de grabación",
+    record_quality_low: "Baja",
+    record_quality_medium: "Media",
+    record_quality_high: "Alta",
+    record_resolution: "Resolución de grabación",
+    record_resolution_auto: "Auto (canvas)",
+    record_name_title: "B.ZU.AL Studios",
+    record_name_subtitle: "¿Cómo quieres guardar esta grabación?",
+    record_name_label: "Nombre del archivo",
+    record_name_hint: "Se agregará automáticamente: - B.ZU.AL Studios Clip",
+    record_name_cancel: "Cancelar",
+    record_name_save: "Guardar",
     record: "Grabar",
     record_start: "Grabar",
     record_pause: "Pausar",
@@ -909,6 +1051,7 @@ const i18n = {
       "Audio del sistema: el navegador pide compartir pantalla/pestaña para capturar sonido interno.",
     audio_status_idle: "Audio: inactivo",
     audio_status_mic: "Audio: micrófono activo",
+    audio_status_file: "Audio: archivo activo",
     audio_status_system: "Audio: captura de sistema/pestaña activa",
     input_none: "Entrada: ninguna",
     input_webcam: "Entrada: Webcam",
@@ -930,9 +1073,16 @@ const i18n = {
     tab_studio: "Studio",
     setup_title: "Input + Routing",
     live_title: "Performance Rack",
+    live_audio_quick: "Audio Quick Start",
+    live_audio_toggle: "Enable Audio React",
+    live_audio_load: "Load Audio File",
+    now_playing: "Now Playing",
+    play: "Play",
     studio_title: "Advanced Studio",
     studio_glitch: "Glitch Studio",
+    studio_fractal: "Fractal Studio",
     studio_3d: "3D Studio",
+    studio_particles: "Particles Studio",
     load_image: "Load Image",
     preset: "Preset",
     enable_webcam: "Enable Webcam",
@@ -940,6 +1090,8 @@ const i18n = {
     camera_auto: "Auto",
     refresh_cameras: "Refresh Cameras",
     enable_mic: "Enable Mic",
+    load_audio: "Load Audio",
+    clear_audio: "Clear Audio",
     mode_clean: "Clean",
     mode_glitch: "Glitch",
     mode_fractal: "Fractal",
@@ -949,6 +1101,7 @@ const i18n = {
     audio_reactive: "Audio Reactive",
     audio_input: "Audio Input",
     audio_input_mic: "Microphone",
+    audio_input_file: "Audio File",
     audio_input_system: "System / Device Audio",
     audio_target: "Target",
     audio_target_points: "Points",
@@ -977,12 +1130,18 @@ const i18n = {
     freeze: "Freeze",
     panic: "Panic",
     snapshot_save: "Snapshot Save",
+    sessions_title: "Sessions",
+    sessions_hint: "Shift+1..8 save, 1..8 load",
+    sessions_save: "Save Session",
+    sessions_load: "Load Session",
+    sessions_clear: "Clear Slot",
     random: "Random",
     reseed: "Re-seed",
     reset: "Reset",
     save_png: "Save PNG",
     visualization_deck: "Visualization Deck",
     camera_modes: "Camera Modes",
+    camera_controls: "Camera Controls",
     cam_static: "Static",
     cam_cursor: "Cursor",
     cam_orbit: "Orbit",
@@ -998,6 +1157,18 @@ const i18n = {
     record_source: "Record Source",
     record_source_canvas: "Clean Canvas",
     record_source_screen: "Screen",
+    record_quality: "Record Quality",
+    record_quality_low: "Low",
+    record_quality_medium: "Medium",
+    record_quality_high: "High",
+    record_resolution: "Record Resolution",
+    record_resolution_auto: "Auto (canvas)",
+    record_name_title: "B.ZU.AL Studios",
+    record_name_subtitle: "How do you want to save this recording?",
+    record_name_label: "File name",
+    record_name_hint: "Will append automatically: - B.ZU.AL Studios Clip",
+    record_name_cancel: "Cancel",
+    record_name_save: "Save",
     record: "Record",
     record_start: "Record",
     record_pause: "Pause",
@@ -1049,6 +1220,7 @@ const i18n = {
       "System audio mode: browser asks for screen/tab sharing to capture internal audio.",
     audio_status_idle: "Audio: idle",
     audio_status_mic: "Audio: microphone active",
+    audio_status_file: "Audio: file active",
     audio_status_system: "Audio: system/tab capture active",
     input_none: "Input: none",
     input_webcam: "Input: Webcam",
@@ -1079,6 +1251,20 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function hexToRgb01(hex) {
+  if (typeof hex !== "string") return [0.05, 0.06, 0.11];
+  const raw = hex.trim().replace("#", "");
+  const s =
+    raw.length === 3
+      ? `${raw[0]}${raw[0]}${raw[1]}${raw[1]}${raw[2]}${raw[2]}`
+      : raw.length === 6
+        ? raw
+        : "0d0f1b";
+  const n = Number.parseInt(s, 16);
+  if (!Number.isFinite(n)) return [0.05, 0.06, 0.11];
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
 function t(key) {
   return i18n[locale]?.[key] || i18n.es[key] || key;
 }
@@ -1087,9 +1273,11 @@ const extendedLocaleTexts = {
   es: {
     selectors: {
       "#liveModeGlitchBtn span:last-child": "Glitch Live",
+      "#liveModeFractalBtn span:last-child": "Fractal Live",
       "#liveMode3dBtn span:last-child": "3D Live",
       "#liveModeParticlesBtn span:last-child": "Partículas Live",
       "#livePaneGlitch h2": "Esenciales Glitch",
+      "#livePaneFractal h2": "Esenciales Fractal",
       "#livePane3d h2": "Esenciales 3D",
       "#livePaneParticles h2": "Esenciales Partículas",
       "#livePane3d .micro-tip": "Tip: usa WASD/flechas para paneo 3D y arrastra para orbitar.",
@@ -1125,6 +1313,12 @@ const extendedLocaleTexts = {
       "#canvasEntryOverlay .canvas-entry-sub": "Elige una entrada para comenzar el performance visual",
       "#canvasOverlayImageBtn span:last-child": "Cargar imagen",
       "#canvasOverlayWebcamBtn span:last-child": "Activar webcam",
+      "#moduleRouteHint .module-route-title": "Elige camino visual",
+      "#moduleRouteHint .module-route-sub": "Después de cargar la entrada, comienza por Glitch, Fractal, 3D o Partículas.",
+      "#moduleRouteHint .module-route-btn[data-module-route='glitch'] span:last-child": "Glitch Live",
+      "#moduleRouteHint .module-route-btn[data-module-route='fractal'] span:last-child": "Fractal Live",
+      "#moduleRouteHint .module-route-btn[data-module-route='depth'] span:last-child": "3D Live",
+      "#moduleRouteHint .module-route-btn[data-module-route='particles'] span:last-child": "Partículas Live",
     },
     labels: {
       liveGlitchIntensity: "Intensidad",
@@ -1133,6 +1327,30 @@ const extendedLocaleTexts = {
       liveGlitchTracking: "Tracking FX",
       liveGlitchTrail: "Estela de movimiento",
       liveGlitchAnim: "Distorsión animada",
+      liveFractalPreset: "Preset",
+      liveFractalQuality: "Calidad",
+      liveFractalCameraMode: "Cámara fractal",
+      liveFractalDomeMode: "Domo fractal",
+      liveFractalCamSpeed: "Velocidad de cámara",
+      liveFractalDistance: "Distancia de cámara",
+      liveFractalShape: "Forma matemática",
+      liveFractalSymmetry: "Simetría",
+      liveFractalPower: "Poder fractal",
+      liveFractalFog: "Densidad de niebla",
+      liveFractalGlow: "Glow",
+      liveFractalLight: "Intensidad de luz",
+      liveFractalSpin: "Spin",
+      liveFractalBreath: "Respiración",
+      liveFractalWarmth: "Calidez de color",
+      liveFractalTexture: "Textura fractal",
+      liveFractalTexture2: "Textura capa 2",
+      liveFractalTextureMix: "Mezcla capa 2",
+      liveFractalRenderMode: "Render fractal",
+      liveFractalStyle: "Estilo fractal",
+      liveFractalBackground: "Fondo fractal",
+      liveFractalFlatColor: "Color plano",
+      liveFractalAudio: "Usar audio",
+      liveFractalAudioGain: "Ganancia de audio",
       liveCameraMode: "Movimiento de cámara",
       live3dPoints: "Puntos",
       live3dMesh: "Malla",
@@ -1163,6 +1381,27 @@ const extendedLocaleTexts = {
       liveParticlesVortex: "Vórtice",
       liveParticlesSpawn: "Tasa de spawn",
       liveParticlesMotionThreshold: "Umbral de movimiento",
+      liveParticlesDrift: "Reposo / deriva",
+      liveParticlesFocus: "Puntos focales",
+      liveParticlesGradientMode: "Modo gradiente",
+      liveParticlesColorMix: "Mezcla color-gradiente",
+      liveParticlesGradientSpread: "Extensión gradiente",
+      liveParticlesGradientA: "Color gradiente A",
+      liveParticlesGradientB: "Color gradiente B",
+      studioParticlesStructure: "Estructura",
+      studioParticlesAudioSplit: "Audio split",
+      studioParticlesOrder: "Orden / forma",
+      studioParticlesDrift: "Reposo (menos movimiento)",
+      studioParticlesFocus: "Puntos focales",
+      studioParticlesDamping: "Damping",
+      studioParticlesVortex: "Vórtice",
+      studioParticlesSpawn: "Spawn rate",
+      studioParticlesMotionThreshold: "Umbral de movimiento",
+      studioParticlesGradientMode: "Modo gradiente",
+      studioParticlesColorMix: "Mezcla color-gradiente",
+      studioParticlesGradientSpread: "Extensión gradiente",
+      studioParticlesGradientA: "Color gradiente A",
+      studioParticlesGradientB: "Color gradiente B",
       liveOutputView: "Vista de salida",
       domeSourceMap: "Mapa de fuente Domo",
       domeWarp: "Warp Domo",
@@ -1284,6 +1523,60 @@ const extendedLocaleTexts = {
         high: "Alta",
         ultra: "Ultra",
       },
+      liveFractalQuality: {
+        low: "Baja",
+        med: "Media",
+        high: "Alta",
+      },
+      liveFractalPreset: {
+        sacred: "Sagrado",
+        ether: "Éter",
+        inside: "Centro 360",
+        flat: "Plano ilustración",
+      },
+      liveFractalCameraMode: {
+        orbit: "Órbita planeta",
+        inside: "Centro 360",
+      },
+      liveFractalDomeMode: {
+        off: "Off",
+        "dome-standard": "Domo estándar",
+        "dome-equirect": "Domo equirect",
+      },
+      liveFractalShape: {
+        mandel: "Mandelbulb",
+        torus: "Toro",
+        gyroid: "Giroide",
+        poly: "Poliédrica",
+      },
+      liveFractalTexture: {
+        smooth: "Suave",
+        crystal: "Cristal",
+        ink: "Tinta",
+        contour: "Contorno",
+      },
+      liveFractalTexture2: {
+        none: "Ninguna",
+        noise: "Ruido velo",
+        ripples: "Ondas",
+        cells: "Celular",
+      },
+      liveFractalRenderMode: {
+        shaded: "Sombreado",
+        wire: "Malla",
+        points: "Mapa de puntos",
+        hybrid: "Malla + puntos",
+      },
+      liveFractalStyle: {
+        lit: "Iluminado",
+        flat: "Plano / Ilustración",
+      },
+      liveFractalBackground: {
+        ethereal: "Etéreo",
+        sunset: "Atardecer",
+        cosmic: "Cósmico",
+        solid: "Plano sólido",
+      },
       liveParticlesEmitter: {
         grid: "Grid",
         volume: "Volumen",
@@ -1293,6 +1586,30 @@ const extendedLocaleTexts = {
         source: "Desde fuente",
         palette: "Paleta",
         audio: "Mapa calor audio",
+      },
+      liveParticlesGradientMode: {
+        radial: "Radial",
+        "axis-x": "Eje X",
+        "axis-y": "Eje Y",
+        spiral: "Espiral",
+      },
+      studioParticlesStructure: {
+        cloud: "Nube",
+        grid: "Grid",
+        ring: "Anillo",
+        helix: "Hélice",
+        mandala: "Mandala",
+      },
+      studioParticlesAudioSplit: {
+        off: "Off",
+        basic: "Básico",
+        zones: "Zonas",
+      },
+      studioParticlesGradientMode: {
+        radial: "Radial",
+        "axis-x": "Eje X",
+        "axis-y": "Eje Y",
+        spiral: "Espiral",
       },
       liveOutputView: { normal: "Normal", dome: "Domo" },
       domeSourceMap: {
@@ -1331,9 +1648,11 @@ const extendedLocaleTexts = {
   en: {
     selectors: {
       "#liveModeGlitchBtn span:last-child": "Glitch Live",
+      "#liveModeFractalBtn span:last-child": "Fractal Live",
       "#liveMode3dBtn span:last-child": "3D Live",
       "#liveModeParticlesBtn span:last-child": "Particles Live",
       "#livePaneGlitch h2": "Glitch Essentials",
+      "#livePaneFractal h2": "Fractal Essentials",
       "#livePane3d h2": "3D Essentials",
       "#livePaneParticles h2": "Particles Essentials",
       "#livePane3d .micro-tip": "Tip: use WASD/arrows for 3D panning and drag to orbit.",
@@ -1369,6 +1688,12 @@ const extendedLocaleTexts = {
       "#canvasEntryOverlay .canvas-entry-sub": "Choose an input to begin visual performance",
       "#canvasOverlayImageBtn span:last-child": "Load Image",
       "#canvasOverlayWebcamBtn span:last-child": "Enable Webcam",
+      "#moduleRouteHint .module-route-title": "Choose Visual Path",
+      "#moduleRouteHint .module-route-sub": "After loading input, start with Glitch, Fractal, 3D or Particles.",
+      "#moduleRouteHint .module-route-btn[data-module-route='glitch'] span:last-child": "Glitch Live",
+      "#moduleRouteHint .module-route-btn[data-module-route='fractal'] span:last-child": "Fractal Live",
+      "#moduleRouteHint .module-route-btn[data-module-route='depth'] span:last-child": "3D Live",
+      "#moduleRouteHint .module-route-btn[data-module-route='particles'] span:last-child": "Particles Live",
     },
     labels: {
       liveGlitchIntensity: "Intensity",
@@ -1377,6 +1702,30 @@ const extendedLocaleTexts = {
       liveGlitchTracking: "Tracking FX",
       liveGlitchTrail: "Motion Trail",
       liveGlitchAnim: "Anim Distort",
+      liveFractalPreset: "Preset",
+      liveFractalQuality: "Quality",
+      liveFractalCameraMode: "Fractal camera",
+      liveFractalDomeMode: "Fractal dome",
+      liveFractalCamSpeed: "Camera speed",
+      liveFractalDistance: "Camera distance",
+      liveFractalShape: "Math shape",
+      liveFractalSymmetry: "Symmetry",
+      liveFractalPower: "Fractal Power",
+      liveFractalFog: "Fog Density",
+      liveFractalGlow: "Glow",
+      liveFractalLight: "Light Intensity",
+      liveFractalSpin: "Spin",
+      liveFractalBreath: "Breath",
+      liveFractalWarmth: "Color Warmth",
+      liveFractalTexture: "Fractal texture",
+      liveFractalTexture2: "Texture layer 2",
+      liveFractalTextureMix: "Layer 2 mix",
+      liveFractalRenderMode: "Fractal render",
+      liveFractalStyle: "Fractal style",
+      liveFractalBackground: "Fractal background",
+      liveFractalFlatColor: "Flat color",
+      liveFractalAudio: "Use Audio",
+      liveFractalAudioGain: "Audio Gain",
       liveCameraMode: "Camera Move",
       live3dPoints: "Points",
       live3dMesh: "Mesh",
@@ -1407,6 +1756,27 @@ const extendedLocaleTexts = {
       liveParticlesVortex: "Vortex",
       liveParticlesSpawn: "Spawn Rate",
       liveParticlesMotionThreshold: "Motion Threshold",
+      liveParticlesDrift: "Drift / stillness",
+      liveParticlesFocus: "Focal points",
+      liveParticlesGradientMode: "Gradient mode",
+      liveParticlesColorMix: "Color-gradient mix",
+      liveParticlesGradientSpread: "Gradient spread",
+      liveParticlesGradientA: "Gradient color A",
+      liveParticlesGradientB: "Gradient color B",
+      studioParticlesStructure: "Structure",
+      studioParticlesAudioSplit: "Audio split",
+      studioParticlesOrder: "Order / form",
+      studioParticlesDrift: "Stillness (less motion)",
+      studioParticlesFocus: "Focal points",
+      studioParticlesDamping: "Damping",
+      studioParticlesVortex: "Vortex",
+      studioParticlesSpawn: "Spawn rate",
+      studioParticlesMotionThreshold: "Motion threshold",
+      studioParticlesGradientMode: "Gradient mode",
+      studioParticlesColorMix: "Color-gradient mix",
+      studioParticlesGradientSpread: "Gradient spread",
+      studioParticlesGradientA: "Gradient color A",
+      studioParticlesGradientB: "Gradient color B",
       liveOutputView: "Output View",
       domeSourceMap: "Dome Source Map",
       domeWarp: "Dome Warp",
@@ -1528,6 +1898,60 @@ const extendedLocaleTexts = {
         high: "High",
         ultra: "Ultra",
       },
+      liveFractalQuality: {
+        low: "Low",
+        med: "Med",
+        high: "High",
+      },
+      liveFractalPreset: {
+        sacred: "Sacred Bloom",
+        ether: "Ether Orbit",
+        inside: "Inside 360",
+        flat: "Flat Illustration",
+      },
+      liveFractalCameraMode: {
+        orbit: "Orbit Planet",
+        inside: "Center 360",
+      },
+      liveFractalDomeMode: {
+        off: "Off",
+        "dome-standard": "Dome Standard",
+        "dome-equirect": "Dome Equirect",
+      },
+      liveFractalShape: {
+        mandel: "Mandelbulb",
+        torus: "Torus Field",
+        gyroid: "Gyroid Field",
+        poly: "Polyhedral",
+      },
+      liveFractalTexture: {
+        smooth: "Smooth",
+        crystal: "Crystal",
+        ink: "Ink Lines",
+        contour: "Contour",
+      },
+      liveFractalTexture2: {
+        none: "None",
+        noise: "Noise Veil",
+        ripples: "Ripples",
+        cells: "Cellular",
+      },
+      liveFractalRenderMode: {
+        shaded: "Shaded",
+        wire: "Wire Mesh",
+        points: "Point Map",
+        hybrid: "Mesh + Points",
+      },
+      liveFractalStyle: {
+        lit: "Lit",
+        flat: "Flat / Illustration",
+      },
+      liveFractalBackground: {
+        ethereal: "Ethereal",
+        sunset: "Sunset",
+        cosmic: "Cosmic",
+        solid: "Solid Flat",
+      },
       liveParticlesEmitter: {
         grid: "Grid",
         volume: "Volume",
@@ -1537,6 +1961,30 @@ const extendedLocaleTexts = {
         source: "From Source",
         palette: "Palette",
         audio: "Audio Heatmap",
+      },
+      liveParticlesGradientMode: {
+        radial: "Radial",
+        "axis-x": "Axis X",
+        "axis-y": "Axis Y",
+        spiral: "Spiral",
+      },
+      studioParticlesStructure: {
+        cloud: "Cloud",
+        grid: "Grid",
+        ring: "Ring",
+        helix: "Helix",
+        mandala: "Mandala",
+      },
+      studioParticlesAudioSplit: {
+        off: "Off",
+        basic: "Basic",
+        zones: "Zones",
+      },
+      studioParticlesGradientMode: {
+        radial: "Radial",
+        "axis-x": "Axis X",
+        "axis-y": "Axis Y",
+        spiral: "Spiral",
       },
       liveOutputView: { normal: "Normal", dome: "Dome" },
       domeSourceMap: {
@@ -1635,7 +2083,15 @@ function setWorkspacePanel(name) {
     btn.classList.toggle("active", btn.dataset.panel === name);
   });
   if (name === "studio") {
-    setStudioTab(mode === "depth" || mode === "mix" ? "depth" : "glitch");
+    setStudioTab(
+      mode === "depth" || mode === "mix"
+        ? "depth"
+        : mode === "particles"
+          ? "particles"
+          : mode === "fractal"
+            ? "fractal"
+            : "glitch",
+    );
     return;
   }
   // Recompute mode-group visibility whenever the workspace tab changes.
@@ -1645,22 +2101,114 @@ function setWorkspacePanel(name) {
 }
 
 function setStudioTab(tabName) {
-  studioActiveTab = tabName === "depth" ? "depth" : "glitch";
+  studioActiveTab =
+    tabName === "depth" ? "depth" : tabName === "particles" ? "particles" : tabName === "fractal" ? "fractal" : "glitch";
   if (studioModeGlitchBtn) studioModeGlitchBtn.classList.toggle("active", studioActiveTab === "glitch");
+  if (studioModeFractalBtn) studioModeFractalBtn.classList.toggle("active", studioActiveTab === "fractal");
   if (studioMode3dBtn) studioMode3dBtn.classList.toggle("active", studioActiveTab === "depth");
+  if (studioModeParticlesBtn) studioModeParticlesBtn.classList.toggle("active", studioActiveTab === "particles");
   syncModeUi();
 }
 
 function updateAudioRoutingUi() {
   if (!audioHelpText || !audioRouteStatus) return;
   const usingSystem = audioInputSource && audioInputSource.value === "system";
+  const usingFile = audioInputSource && audioInputSource.value === "file";
   audioHelpText.textContent = usingSystem ? t("audio_help_system") : t("audio_help_mic");
+  if (usingFile) audioHelpText.textContent = t("audio_help_mic");
 
-  if (!micActive) {
+  if (!micActive && !audioFileActive) {
     audioRouteStatus.textContent = t("audio_status_idle");
     return;
   }
+  if (audioFileActive) {
+    audioRouteStatus.textContent = t("audio_status_file");
+    return;
+  }
   audioRouteStatus.textContent = usingSystem ? t("audio_status_system") : t("audio_status_mic");
+}
+
+function hasAudioReactiveInput() {
+  return Boolean((micActive || audioFileActive) && analyser && audioData);
+}
+
+function isAudioPlaybackActive() {
+  const filePlaying = Boolean(audioFilePlayer && audioFilePlayer.src && !audioFilePlayer.paused);
+  return Boolean(filePlaying || micActive);
+}
+
+function teardownAudioPipeline() {
+  if (audioSourceNode) {
+    try {
+      audioSourceNode.disconnect();
+    } catch {}
+  }
+  if (analyser) {
+    try {
+      if (audioAnalyserMonitor && audioCtx?.destination) analyser.disconnect(audioCtx.destination);
+      analyser.disconnect();
+    } catch {}
+  }
+  audioSourceNode = null;
+  analyser = null;
+  audioData = null;
+  audioTimeData = null;
+  audioAnalyserMonitor = false;
+}
+
+async function ensureAudioContext() {
+  if (!audioCtx) audioCtx = new AudioContext();
+  if (audioCtx.state === "suspended") {
+    try {
+      await audioCtx.resume();
+    } catch {}
+  }
+}
+
+function attachAnalyserFromSource(sourceNode, monitor = false) {
+  teardownAudioPipeline();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 512;
+  analyser.smoothingTimeConstant = 0.72;
+  audioSourceNode = sourceNode;
+  audioAnalyserMonitor = monitor;
+  sourceNode.connect(analyser);
+  if (monitor && audioCtx?.destination) analyser.connect(audioCtx.destination);
+  audioData = new Uint8Array(analyser.frequencyBinCount);
+  audioTimeData = new Uint8Array(analyser.fftSize);
+}
+
+function stopMicInput() {
+  if (micStream) micStream.getTracks().forEach((t) => t.stop());
+  micStream = null;
+  micActive = false;
+}
+
+function deactivateAudioFileSource() {
+  audioFileActive = false;
+  teardownAudioPipeline();
+  audioLevel = 0;
+  if (audioFilePlayer) audioFilePlayer.pause();
+  updateLiveAudioFileMini();
+}
+
+function stopAudioFileInput() {
+  deactivateAudioFileSource();
+  if (audioFilePlayer) {
+    audioFilePlayer.removeAttribute("src");
+    audioFilePlayer.load();
+  }
+  if (audioFileUrl) {
+    URL.revokeObjectURL(audioFileUrl);
+    audioFileUrl = "";
+  }
+  if (audioFilePlayerWrap) audioFilePlayerWrap.hidden = true;
+  if (liveAudioFileName) {
+    liveAudioFileName.textContent = "-";
+    liveAudioFileName.dataset.text = "";
+  }
+  if (liveAudioTime) liveAudioTime.textContent = "00:00 / 00:00";
+  if (liveAudioSeek) liveAudioSeek.value = "0";
 }
 
 function updateDynamicUiTexts() {
@@ -1668,9 +2216,101 @@ function updateDynamicUiTexts() {
     webcamBtn.innerHTML = `${webcamActive ? t("webcam_disable") : t("webcam_enable")} <span class="input-entry-icon">CAM</span>`;
   }
   if (micBtn) micBtn.textContent = micActive ? t("mic_disable") : t("mic_enable");
+  syncAspectRatioControlForInput();
+  updateRecordSettingsUi();
   updateRecordingButtons();
   updateAudioRoutingUi();
+  syncLiveAudioQuickUi();
+  syncLiveBackgroundQuickUi();
   updateCanvasEntryOverlay();
+}
+
+function setButtonActionLabel(btn, text) {
+  if (!btn) return;
+  const label = btn.querySelector(".action-label");
+  if (label) label.textContent = text;
+  else btn.textContent = text;
+}
+
+function syncLiveAudioQuickUi() {
+  if (liveAudioInputQuick && audioInputSource) liveAudioInputQuick.value = audioInputSource.value;
+  if (liveAudioTargetQuick && audioTarget) liveAudioTargetQuick.value = audioTarget.value;
+  if (liveAudioSensitivityQuick && controls.audioSensitivity) {
+    liveAudioSensitivityQuick.value = controls.audioSensitivity.value;
+    const out = liveAudioSensitivityQuick.parentElement?.querySelector("output");
+    if (out) out.textContent = String(liveAudioSensitivityQuick.value);
+  }
+  if (liveAudioStatusQuick) {
+    liveAudioStatusQuick.textContent = audioRouteStatus ? audioRouteStatus.textContent : t("audio_status_idle");
+  }
+  if (liveAudioToggleBtn) {
+    setButtonActionLabel(liveAudioToggleBtn, hasAudioReactiveInput() ? t("pause") : t("live_audio_toggle"));
+    liveAudioToggleBtn.classList.toggle("audio-active", hasAudioReactiveInput());
+  }
+  const showFileMini = Boolean(
+    liveAudioFileMini &&
+      audioFilePlayer &&
+      audioFilePlayer.src &&
+      audioInputSource &&
+      audioInputSource.value === "file"
+  );
+  if (liveAudioFileMini) liveAudioFileMini.hidden = !showFileMini;
+  if (liveAudioPlayPauseBtn && audioFilePlayer) {
+    liveAudioPlayPauseBtn.textContent = audioFilePlayer.paused ? t("play") : t("pause");
+  }
+  if (showFileMini) updateLiveAudioFileMini();
+}
+
+function syncLiveBackgroundQuickUi() {
+  const modeVal = bgMode ? bgMode.value : "black";
+  const paletteVal = bgPalette ? bgPalette.value : "custom";
+  const colorAVal = bgColorA ? bgColorA.value : "#0b1026";
+  const colorBVal = bgColorB ? bgColorB.value : "#30103d";
+
+  if (live3dBgMode && document.activeElement !== live3dBgMode) live3dBgMode.value = modeVal;
+  if (live3dBgPalette && document.activeElement !== live3dBgPalette) live3dBgPalette.value = paletteVal;
+  if (live3dBgColorA && document.activeElement !== live3dBgColorA) live3dBgColorA.value = colorAVal;
+  if (live3dBgColorB && document.activeElement !== live3dBgColorB) live3dBgColorB.value = colorBVal;
+
+  if (liveParticlesBgMode && document.activeElement !== liveParticlesBgMode) liveParticlesBgMode.value = modeVal;
+  if (liveParticlesBgPalette && document.activeElement !== liveParticlesBgPalette) liveParticlesBgPalette.value = paletteVal;
+  if (liveParticlesBgColorA && document.activeElement !== liveParticlesBgColorA) liveParticlesBgColorA.value = colorAVal;
+  if (liveParticlesBgColorB && document.activeElement !== liveParticlesBgColorB) liveParticlesBgColorB.value = colorBVal;
+}
+
+function applyLiveBackgroundQuickFrom(source) {
+  if (!bgMode || !bgPalette || !bgColorA || !bgColorB || !source) return;
+  if (source.mode && source.mode.value) bgMode.value = source.mode.value;
+  if (source.palette && source.palette.value) bgPalette.value = source.palette.value;
+  if (source.colorA && source.colorA.value) bgColorA.value = source.colorA.value;
+  if (source.colorB && source.colorB.value) bgColorB.value = source.colorB.value;
+  syncLiveBackgroundQuickUi();
+  scheduleRender();
+}
+
+function formatMediaTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return "00:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function updateLiveAudioFileMini() {
+  if (!audioFilePlayer) return;
+  if (liveAudioPlayPauseBtn) {
+    liveAudioPlayPauseBtn.textContent = audioFilePlayer.paused ? t("play") : t("pause");
+  }
+  if (liveAudioSeek) {
+    const dur = Number.isFinite(audioFilePlayer.duration) ? audioFilePlayer.duration : 0;
+    const curr = Number.isFinite(audioFilePlayer.currentTime) ? audioFilePlayer.currentTime : 0;
+    const ratio = dur > 0 ? clamp(curr / dur, 0, 1) : 0;
+    liveAudioSeek.value = String(Math.round(ratio * 1000));
+  }
+  if (liveAudioTime) {
+    const curr = Number.isFinite(audioFilePlayer.currentTime) ? audioFilePlayer.currentTime : 0;
+    const dur = Number.isFinite(audioFilePlayer.duration) ? audioFilePlayer.duration : 0;
+    liveAudioTime.textContent = `${formatMediaTime(curr)} / ${formatMediaTime(dur)}`;
+  }
 }
 
 function updateInputSpecs() {
@@ -1696,9 +2336,27 @@ function hasActiveInput() {
   return Boolean(webcamActive || loadedImage || originalImageData);
 }
 
+function updateModuleRouteHint() {
+  if (!moduleRouteHint) return;
+  // Show the 3 module paths once an input exists, hide on cold start.
+  moduleRouteHint.classList.toggle("hidden", !hasActiveInput());
+}
+
 function updateCanvasEntryOverlay() {
   if (!canvasEntryOverlay) return;
   canvasEntryOverlay.classList.toggle("hidden", hasActiveInput());
+  updateModuleRouteHint();
+}
+
+function updateRecordSettingsUi() {
+  const isScreen = recordSource && recordSource.value === "screen";
+  if (recordResolution) recordResolution.disabled = Boolean(isScreen);
+}
+
+function syncAspectRatioControlForInput() {
+  if (!aspectRatioSelect) return;
+  // Keep ratio selectable for webcam and image inputs.
+  aspectRatioSelect.disabled = false;
 }
 
 async function refreshCameraDeviceList(preserveSelection = true) {
@@ -1784,21 +2442,33 @@ function updatePerfScale() {
 }
 
 function updateAudioAnalysis() {
-  if (!micActive || !analyser || !audioData) {
+  if (!hasAudioReactiveInput()) {
     audioFeatures.rms = 0;
     audioFeatures.bands = [0, 0, 0, 0];
     audioFeatures.transient = 0;
     transientEnergy = 0;
+    audioReactiveEnv = 0;
     return;
   }
   analyser.getByteFrequencyData(audioData);
+  if (audioTimeData) analyser.getByteTimeDomainData(audioTimeData);
   const n = audioData.length;
-  let sumSq = 0;
+  let freqSumSq = 0;
   for (let i = 0; i < n; i++) {
     const v = audioData[i] / 255;
-    sumSq += v * v;
+    freqSumSq += v * v;
   }
-  const rmsRaw = Math.sqrt(sumSq / n);
+  const rmsFreq = Math.sqrt(freqSumSq / n);
+  let rmsTime = 0;
+  if (audioTimeData && audioTimeData.length) {
+    let sum = 0;
+    for (let i = 0; i < audioTimeData.length; i++) {
+      const v = (audioTimeData[i] - 128) / 128;
+      sum += v * v;
+    }
+    rmsTime = Math.sqrt(sum / audioTimeData.length);
+  }
+  const rmsRaw = rmsFreq * 0.45 + rmsTime * 0.55;
 
   const bins = [
     [0, Math.floor(n * 0.1)],
@@ -1817,7 +2487,12 @@ function updateAudioAnalysis() {
   lastBandEnergy = bandEnergy * 0.84 + lastBandEnergy * 0.16;
   transientEnergy = transientEnergy * 0.82 + delta * 2.2;
 
-  audioFeatures.rms = audioFeatures.rms * 0.72 + rmsRaw * 0.28;
+  const floorTarget = clamp(rmsRaw * 0.7 + bands[0] * 0.22, 0.004, 0.24);
+  audioNoiseFloor = audioNoiseFloor * 0.985 + floorTarget * 0.015;
+  const gatedRms = Math.max(0, rmsRaw - audioNoiseFloor * 0.9);
+  const normRms = clamp(gatedRms / Math.max(0.02, 1 - audioNoiseFloor), 0, 1.6);
+
+  audioFeatures.rms = audioFeatures.rms * 0.7 + normRms * 0.3;
   audioFeatures.bands = audioFeatures.bands.map((prev, i) => prev * 0.7 + bands[i] * 0.3);
   audioFeatures.transient = clamp(transientEnergy, 0, 1.4);
 }
@@ -1955,6 +2630,18 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveGlitchTracking", liveGlitchTracking ? liveGlitchTracking.value : 0);
   updateQuickOutputById("liveGlitchTrail", liveGlitchTrail ? liveGlitchTrail.value : 0);
   updateQuickOutputById("liveGlitchAnim", liveGlitchAnim ? liveGlitchAnim.value : 0);
+  updateQuickOutputById("liveFractalSymmetry", liveFractalSymmetry ? liveFractalSymmetry.value : 0);
+  updateQuickOutputById("liveFractalCamSpeed", liveFractalCamSpeed ? liveFractalCamSpeed.value : 0);
+  updateQuickOutputById("liveFractalDistance", liveFractalDistance ? liveFractalDistance.value : 0);
+  updateQuickOutputById("liveFractalPower", liveFractalPower ? liveFractalPower.value : 0);
+  updateQuickOutputById("liveFractalFog", liveFractalFog ? liveFractalFog.value : 0);
+  updateQuickOutputById("liveFractalGlow", liveFractalGlow ? liveFractalGlow.value : 0);
+  updateQuickOutputById("liveFractalLight", liveFractalLight ? liveFractalLight.value : 0);
+  updateQuickOutputById("liveFractalSpin", liveFractalSpin ? liveFractalSpin.value : 0);
+  updateQuickOutputById("liveFractalBreath", liveFractalBreath ? liveFractalBreath.value : 0);
+  updateQuickOutputById("liveFractalWarmth", liveFractalWarmth ? liveFractalWarmth.value : 0);
+  updateQuickOutputById("liveFractalAudioGain", liveFractalAudioGain ? liveFractalAudioGain.value : 0);
+  updateQuickOutputById("liveFractalTextureMix", liveFractalTextureMix ? liveFractalTextureMix.value : 0);
   updateQuickOutputById("live3dPoints", live3dPoints ? live3dPoints.value : 0);
   updateQuickOutputById("live3dMesh", live3dMesh ? live3dMesh.value : 0);
   updateQuickOutputById("live3dSeparation", live3dSeparation ? live3dSeparation.value : 0);
@@ -1973,10 +2660,24 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveParticlesCamZ", liveParticlesCamZ ? liveParticlesCamZ.value : 0);
   updateQuickOutputById("liveParticlesHue", liveParticlesHue ? liveParticlesHue.value : 0);
   updateQuickOutputById("liveParticlesAudioAmount", liveParticlesAudioAmount ? liveParticlesAudioAmount.value : 0);
+  updateQuickOutputById("liveParticlesOrder", liveParticlesOrder ? liveParticlesOrder.value : 0);
   updateQuickOutputById("liveParticlesDamping", liveParticlesDamping ? liveParticlesDamping.value : 0);
   updateQuickOutputById("liveParticlesVortex", liveParticlesVortex ? liveParticlesVortex.value : 0);
   updateQuickOutputById("liveParticlesSpawn", liveParticlesSpawn ? liveParticlesSpawn.value : 0);
   updateQuickOutputById("liveParticlesMotionThreshold", liveParticlesMotionThreshold ? liveParticlesMotionThreshold.value : 0);
+  updateQuickOutputById("liveParticlesDrift", liveParticlesDrift ? liveParticlesDrift.value : 0);
+  updateQuickOutputById("liveParticlesFocus", liveParticlesFocus ? liveParticlesFocus.value : 0);
+  updateQuickOutputById("liveParticlesColorMix", liveParticlesColorMix ? liveParticlesColorMix.value : 0);
+  updateQuickOutputById("liveParticlesGradientSpread", liveParticlesGradientSpread ? liveParticlesGradientSpread.value : 0);
+  updateQuickOutputById("studioParticlesOrder", studioParticlesOrder ? studioParticlesOrder.value : 0);
+  updateQuickOutputById("studioParticlesDrift", studioParticlesDrift ? studioParticlesDrift.value : 0);
+  updateQuickOutputById("studioParticlesFocus", studioParticlesFocus ? studioParticlesFocus.value : 0);
+  updateQuickOutputById("studioParticlesDamping", studioParticlesDamping ? studioParticlesDamping.value : 0);
+  updateQuickOutputById("studioParticlesVortex", studioParticlesVortex ? studioParticlesVortex.value : 0);
+  updateQuickOutputById("studioParticlesSpawn", studioParticlesSpawn ? studioParticlesSpawn.value : 0);
+  updateQuickOutputById("studioParticlesMotionThreshold", studioParticlesMotionThreshold ? studioParticlesMotionThreshold.value : 0);
+  updateQuickOutputById("studioParticlesColorMix", studioParticlesColorMix ? studioParticlesColorMix.value : 0);
+  updateQuickOutputById("studioParticlesGradientSpread", studioParticlesGradientSpread ? studioParticlesGradientSpread.value : 0);
   updateQuickOutputById("domeWarp", domeWarp ? domeWarp.value : 0);
   updateQuickOutputById("domeTilt", domeTilt ? domeTilt.value : 0);
   updateQuickOutputById("domeRotate", domeRotate ? domeRotate.value : 0);
@@ -2309,6 +3010,30 @@ function syncLiveQuickControls() {
     active === liveGlitchTracking ||
     active === liveGlitchTrail ||
     active === liveGlitchAnim ||
+    active === liveFractalQuality ||
+    active === liveFractalPreset ||
+    active === liveFractalCameraMode ||
+    active === liveFractalDomeMode ||
+    active === liveFractalCamSpeed ||
+    active === liveFractalDistance ||
+    active === liveFractalShape ||
+    active === liveFractalSymmetry ||
+    active === liveFractalPower ||
+    active === liveFractalFog ||
+    active === liveFractalGlow ||
+    active === liveFractalLight ||
+    active === liveFractalSpin ||
+    active === liveFractalBreath ||
+    active === liveFractalWarmth ||
+    active === liveFractalTexture ||
+    active === liveFractalTexture2 ||
+    active === liveFractalTextureMix ||
+    active === liveFractalRenderMode ||
+    active === liveFractalStyle ||
+    active === liveFractalBackground ||
+    active === liveFractalFlatColor ||
+    active === liveFractalAudio ||
+    active === liveFractalAudioGain ||
     active === live3dPoints ||
     active === live3dMesh ||
     active === live3dSeparation ||
@@ -2317,9 +3042,14 @@ function syncLiveQuickControls() {
     active === live3dLight ||
     active === live3dFxMode ||
     active === live3dFxAmount ||
+    active === live3dAudioSync ||
     active === live3dAnaglyph ||
     active === live3dAnaglyphStrength ||
     active === live3dLightingMode ||
+    active === live3dBgMode ||
+    active === live3dBgPalette ||
+    active === live3dBgColorA ||
+    active === live3dBgColorB ||
     active === liveParticlesCount ||
     active === liveParticlesEmitter ||
     active === liveParticlesSize ||
@@ -2331,10 +3061,24 @@ function syncLiveQuickControls() {
     active === liveParticlesHue ||
     active === liveParticlesAudio ||
     active === liveParticlesAudioAmount ||
+    active === liveParticlesStructure ||
+    active === liveParticlesAudioSplit ||
+    active === liveParticlesOrder ||
     active === liveParticlesDamping ||
     active === liveParticlesVortex ||
     active === liveParticlesSpawn ||
     active === liveParticlesMotionThreshold ||
+    active === liveParticlesDrift ||
+    active === liveParticlesFocus ||
+    active === liveParticlesGradientMode ||
+    active === liveParticlesColorMix ||
+    active === liveParticlesGradientSpread ||
+    active === liveParticlesGradientA ||
+    active === liveParticlesGradientB ||
+    active === liveParticlesBgMode ||
+    active === liveParticlesBgPalette ||
+    active === liveParticlesBgColorA ||
+    active === liveParticlesBgColorB ||
     active === liveOutputView ||
     active === domeWarp ||
     active === domeTilt ||
@@ -2384,6 +3128,7 @@ function syncLiveQuickControls() {
     live3dLightingMode.value = Number(controls.flatIllustrated.value) > 45 ? "flat" : "lit";
   }
   if (liveCameraMode) liveCameraMode.value = cameraMode;
+  syncLiveBackgroundQuickUi();
   updateLiveFxPadDots();
   updateLiveQuickOutputs();
 }
@@ -2448,27 +3193,105 @@ function applyLive3dMacros() {
   });
 }
 
+function applyFractalPreset(presetId) {
+  const preset = presetId || (liveFractalPreset ? liveFractalPreset.value : "sacred");
+  if (preset === "inside") {
+    if (liveFractalCameraMode) liveFractalCameraMode.value = "inside";
+    if (liveFractalCamSpeed) liveFractalCamSpeed.value = "18";
+    if (liveFractalDistance) liveFractalDistance.value = "28";
+    if (liveFractalSymmetry) liveFractalSymmetry.value = "18";
+    if (liveFractalPower) liveFractalPower.value = "94";
+    if (liveFractalFog) liveFractalFog.value = "20";
+    if (liveFractalGlow) liveFractalGlow.value = "70";
+    if (liveFractalLight) liveFractalLight.value = "104";
+    if (liveFractalTexture) liveFractalTexture.value = "contour";
+    if (liveFractalRenderMode) liveFractalRenderMode.value = "hybrid";
+    if (liveFractalShape) liveFractalShape.value = "gyroid";
+    if (liveFractalTexture2) liveFractalTexture2.value = "cells";
+    if (liveFractalTextureMix) liveFractalTextureMix.value = "56";
+    if (liveFractalBackground) liveFractalBackground.value = "cosmic";
+    if (liveFractalStyle) liveFractalStyle.value = "lit";
+  } else if (preset === "flat") {
+    if (liveFractalCameraMode) liveFractalCameraMode.value = "orbit";
+    if (liveFractalCamSpeed) liveFractalCamSpeed.value = "20";
+    if (liveFractalDistance) liveFractalDistance.value = "82";
+    if (liveFractalSymmetry) liveFractalSymmetry.value = "12";
+    if (liveFractalPower) liveFractalPower.value = "76";
+    if (liveFractalFog) liveFractalFog.value = "6";
+    if (liveFractalGlow) liveFractalGlow.value = "26";
+    if (liveFractalLight) liveFractalLight.value = "85";
+    if (liveFractalTexture) liveFractalTexture.value = "ink";
+    if (liveFractalRenderMode) liveFractalRenderMode.value = "wire";
+    if (liveFractalShape) liveFractalShape.value = "poly";
+    if (liveFractalTexture2) liveFractalTexture2.value = "none";
+    if (liveFractalTextureMix) liveFractalTextureMix.value = "28";
+    if (liveFractalBackground) liveFractalBackground.value = "solid";
+    if (liveFractalStyle) liveFractalStyle.value = "flat";
+    if (liveFractalFlatColor) liveFractalFlatColor.value = "#000000";
+  } else if (preset === "ether") {
+    if (liveFractalCameraMode) liveFractalCameraMode.value = "orbit";
+    if (liveFractalCamSpeed) liveFractalCamSpeed.value = "34";
+    if (liveFractalDistance) liveFractalDistance.value = "74";
+    if (liveFractalSymmetry) liveFractalSymmetry.value = "14";
+    if (liveFractalPower) liveFractalPower.value = "84";
+    if (liveFractalFog) liveFractalFog.value = "28";
+    if (liveFractalGlow) liveFractalGlow.value = "60";
+    if (liveFractalLight) liveFractalLight.value = "128";
+    if (liveFractalTexture) liveFractalTexture.value = "smooth";
+    if (liveFractalRenderMode) liveFractalRenderMode.value = "shaded";
+    if (liveFractalShape) liveFractalShape.value = "mandel";
+    if (liveFractalTexture2) liveFractalTexture2.value = "noise";
+    if (liveFractalTextureMix) liveFractalTextureMix.value = "44";
+    if (liveFractalBackground) liveFractalBackground.value = "ethereal";
+    if (liveFractalStyle) liveFractalStyle.value = "lit";
+  } else {
+    if (liveFractalCameraMode) liveFractalCameraMode.value = "orbit";
+    if (liveFractalCamSpeed) liveFractalCamSpeed.value = "28";
+    if (liveFractalDistance) liveFractalDistance.value = "76";
+    if (liveFractalSymmetry) liveFractalSymmetry.value = "16";
+    if (liveFractalPower) liveFractalPower.value = "90";
+    if (liveFractalFog) liveFractalFog.value = "24";
+    if (liveFractalGlow) liveFractalGlow.value = "58";
+    if (liveFractalLight) liveFractalLight.value = "120";
+    if (liveFractalTexture) liveFractalTexture.value = "crystal";
+    if (liveFractalRenderMode) liveFractalRenderMode.value = "hybrid";
+    if (liveFractalShape) liveFractalShape.value = "torus";
+    if (liveFractalTexture2) liveFractalTexture2.value = "ripples";
+    if (liveFractalTextureMix) liveFractalTextureMix.value = "52";
+    if (liveFractalBackground) liveFractalBackground.value = "sunset";
+    if (liveFractalStyle) liveFractalStyle.value = "lit";
+  }
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
 function syncLiveModeTabsFromMode() {
-  const tab = mode === "depth" ? "depth" : mode === "particles" ? "particles" : "glitch";
+  const tab = mode === "depth" ? "depth" : mode === "particles" ? "particles" : mode === "fractal" ? "fractal" : "glitch";
   liveActiveTab = tab;
   if (liveModeGlitchBtn) liveModeGlitchBtn.classList.toggle("active", tab === "glitch");
+  if (liveModeFractalBtn) liveModeFractalBtn.classList.toggle("active", tab === "fractal");
   if (liveMode3dBtn) liveMode3dBtn.classList.toggle("active", tab === "depth");
   if (liveModeParticlesBtn) liveModeParticlesBtn.classList.toggle("active", tab === "particles");
   if (livePaneGlitch) livePaneGlitch.hidden = tab !== "glitch";
+  if (livePaneFractal) livePaneFractal.hidden = tab !== "fractal";
   if (livePane3d) livePane3d.hidden = tab !== "depth";
   if (livePaneParticles) livePaneParticles.hidden = tab !== "particles";
 }
 
 function setLiveModeTab(tabName) {
   const prevTab = liveActiveTab;
-  liveActiveTab = tabName === "depth" ? "depth" : tabName === "particles" ? "particles" : "glitch";
+  liveActiveTab =
+    tabName === "depth" ? "depth" : tabName === "particles" ? "particles" : tabName === "fractal" ? "fractal" : "glitch";
   if (liveModeGlitchBtn) liveModeGlitchBtn.classList.toggle("active", liveActiveTab === "glitch");
+  if (liveModeFractalBtn) liveModeFractalBtn.classList.toggle("active", liveActiveTab === "fractal");
   if (liveMode3dBtn) liveMode3dBtn.classList.toggle("active", liveActiveTab === "depth");
   if (liveModeParticlesBtn) liveModeParticlesBtn.classList.toggle("active", liveActiveTab === "particles");
   if (livePaneGlitch) livePaneGlitch.hidden = liveActiveTab !== "glitch";
+  if (livePaneFractal) livePaneFractal.hidden = liveActiveTab !== "fractal";
   if (livePane3d) livePane3d.hidden = liveActiveTab !== "depth";
   if (livePaneParticles) livePaneParticles.hidden = liveActiveTab !== "particles";
-  const nextMode = liveActiveTab === "depth" ? "depth" : liveActiveTab === "particles" ? "particles" : "glitch";
+  const nextMode =
+    liveActiveTab === "depth" ? "depth" : liveActiveTab === "particles" ? "particles" : liveActiveTab === "fractal" ? "fractal" : "glitch";
   const radio = modeInputs.find((m) => m.value === nextMode);
   if (radio) radio.checked = true;
   setMode(nextMode);
@@ -2523,11 +3346,11 @@ if ("HandDetector" in window) {
 function getCameraMotion(settings, tSec) {
   const follow = settings.cameraFollow / 100;
   const speedKnob = cameraMoveSpeed ? Number(cameraMoveSpeed.value) / 100 : 0.28;
-  // Strong low-speed bias for smoother cinematic movement and finer control.
+  // Keep low-speed precision but allow a slightly higher top speed than before.
   const speedCurve = Math.pow(clamp(speedKnob, 0, 1), 2.6);
-  const targetCameraModeSpeed = 0.08 + speedCurve * 0.82;
+  const targetCameraModeSpeed = 0.12 + speedCurve * 0.9;
   smoothCameraModeSpeed += (targetCameraModeSpeed - smoothCameraModeSpeed) * 0.045;
-  const speed = (0.22 + settings.autoRotate / 120) * smoothCameraModeSpeed;
+  const speed = (0.28 + settings.autoRotate / 120) * smoothCameraModeSpeed;
   const nowMs = performance.now();
   const dt = clamp((nowMs - lastCameraAnimTs) / 1000, 0, 0.09);
   lastCameraAnimTs = nowMs;
@@ -2535,49 +3358,68 @@ function getCameraMotion(settings, tSec) {
   const phase = cameraAnimTime;
   const baseCursorX = pointerTiltX * 26 * follow;
   const baseCursorY = pointerTiltY * 24 * follow;
-
-  let extraRotX = dragRotateX;
-  let extraRotY = dragRotateY;
-  let extraRotZ = 0;
-  let zoomMul = 1;
-  let cursorWeight = 1;
   const panMul = 0.45 + follow * 0.75;
+  const buildByMode = (modeName) => {
+    let extraRotX = dragRotateX;
+    let extraRotY = dragRotateY;
+    let extraRotZ = 0;
+    let zoomMul = 1;
+    let cursorWeight = 1;
+    if (modeName === "static") {
+      cursorWeight = 0;
+    } else if (modeName === "cursor") {
+      cursorWeight = 1;
+    } else if (modeName === "orbit") {
+      cursorWeight = 0.12;
+      extraRotY += (phase * 44) % 360;
+      extraRotX += Math.sin(phase * 0.6) * 12;
+    } else if (modeName === "sweep") {
+      cursorWeight = 0.2;
+      extraRotY += Math.sin(phase * 0.9) * 46;
+      extraRotX += Math.sin(phase * 0.45) * 6;
+    } else if (modeName === "pulse") {
+      cursorWeight = 0.3;
+      extraRotZ = Math.sin(phase) * 7;
+      zoomMul = 1 + Math.sin(phase * 1.6) * 0.12;
+    } else if (modeName === "helix") {
+      cursorWeight = 0.18;
+      extraRotY += (phase * 30) % 360;
+      extraRotX += Math.sin(phase * 1.4) * 14;
+      extraRotZ += Math.cos(phase * 0.7) * 10;
+      zoomMul = 1 + Math.sin(phase * 1.1) * 0.08;
+    } else if (modeName === "drift") {
+      cursorWeight = 0.1;
+      const step = Math.floor(phase * 3.2) % 6;
+      extraRotY += Math.sin(phase * 0.35) * 22 + (step - 2.5) * 2.3;
+      extraRotX += Math.cos(phase * 0.22) * 9;
+      extraRotZ += Math.sin(phase * 0.55) * 13;
+      zoomMul = 1 + Math.sin(phase * 2.1) * 0.06;
+    } else if (modeName === "liquid") {
+      cursorWeight = 0.08;
+      extraRotY += Math.sin(phase * 0.28) * 18 + Math.cos(phase * 0.16) * 8;
+      extraRotX += Math.cos(phase * 0.23) * 11;
+      extraRotZ += Math.sin(phase * 0.31) * 7;
+      zoomMul = 1 + Math.sin(phase * 0.62) * 0.05;
+    }
+    return { extraRotX, extraRotY, extraRotZ, zoomMul, cursorWeight };
+  };
 
-  if (cameraMode === "static") {
-    cursorWeight = 0;
-  } else if (cameraMode === "cursor") {
-    cursorWeight = 1;
-  } else if (cameraMode === "orbit") {
-    cursorWeight = 0.12;
-    extraRotY += (phase * 44) % 360;
-    extraRotX += Math.sin(phase * 0.6) * 12;
-  } else if (cameraMode === "sweep") {
-    cursorWeight = 0.2;
-    extraRotY += Math.sin(phase * 0.9) * 46;
-    extraRotX += Math.sin(phase * 0.45) * 6;
-  } else if (cameraMode === "pulse") {
-    cursorWeight = 0.3;
-    extraRotZ = Math.sin(phase) * 7;
-    zoomMul = 1 + Math.sin(phase * 1.6) * 0.12;
-  } else if (cameraMode === "helix") {
-    cursorWeight = 0.18;
-    extraRotY += (phase * 30) % 360;
-    extraRotX += Math.sin(phase * 1.4) * 14;
-    extraRotZ += Math.cos(phase * 0.7) * 10;
-    zoomMul = 1 + Math.sin(phase * 1.1) * 0.08;
-  } else if (cameraMode === "drift") {
-    cursorWeight = 0.1;
-    const step = Math.floor(phase * 3.2) % 6;
-    extraRotY += Math.sin(phase * 0.35) * 22 + (step - 2.5) * 2.3;
-    extraRotX += Math.cos(phase * 0.22) * 9;
-    extraRotZ += Math.sin(phase * 0.55) * 13;
-    zoomMul = 1 + Math.sin(phase * 2.1) * 0.06;
-  } else if (cameraMode === "liquid") {
-    cursorWeight = 0.08;
-    extraRotY += Math.sin(phase * 0.28) * 18 + Math.cos(phase * 0.16) * 8;
-    extraRotX += Math.cos(phase * 0.23) * 11;
-    extraRotZ += Math.sin(phase * 0.31) * 7;
-    zoomMul = 1 + Math.sin(phase * 0.62) * 0.05;
+  const curr = buildByMode(cameraMode);
+  let modeBlend = 1;
+  if (cameraModeBlendStart > 0 && cameraModePrev !== cameraMode) {
+    modeBlend = clamp((nowMs - cameraModeBlendStart) / 640, 0, 1);
+  }
+  const ease = modeBlend * modeBlend * (3 - 2 * modeBlend);
+  const prev = modeBlend < 1 ? buildByMode(cameraModePrev) : curr;
+  const mix = (a, b) => a * (1 - ease) + b * ease;
+  const extraRotX = mix(prev.extraRotX, curr.extraRotX);
+  const extraRotY = mix(prev.extraRotY, curr.extraRotY);
+  const extraRotZ = mix(prev.extraRotZ, curr.extraRotZ);
+  const zoomMul = mix(prev.zoomMul, curr.zoomMul);
+  const cursorWeight = mix(prev.cursorWeight, curr.cursorWeight);
+  if (modeBlend >= 1) {
+    cameraModePrev = cameraMode;
+    cameraModeBlendStart = 0;
   }
 
   return {
@@ -2607,8 +3449,34 @@ function getLiquidWarp(x, y, depth, tSec, strength, seed, w, h) {
   return [wx, wy, wz];
 }
 
-function setCameraMode(modeName) {
+function setCameraMode(modeName, options = {}) {
+  const instant = Boolean(options.instant);
+  if (cameraMode === modeName) {
+    if (liveCameraMode) liveCameraMode.value = cameraMode;
+    [camStaticBtn, camCursorBtn, camOrbitBtn, camSweepBtn, camPulseBtn, camHelixBtn, camDriftBtn, camLiquidBtn]
+      .filter(Boolean)
+      .forEach((btn) => btn.classList.remove("active"));
+    const map = {
+      static: camStaticBtn,
+      cursor: camCursorBtn,
+      orbit: camOrbitBtn,
+      sweep: camSweepBtn,
+      pulse: camPulseBtn,
+      helix: camHelixBtn,
+      drift: camDriftBtn,
+      liquid: camLiquidBtn,
+    };
+    if (map[cameraMode]) map[cameraMode].classList.add("active");
+    return;
+  }
+  cameraModePrev = cameraMode;
+  cameraModeBlendStart = instant ? 0 : performance.now();
   cameraMode = modeName;
+  if (instant) {
+    cameraModePrev = cameraMode;
+    cameraModeBlendStart = 0;
+    lastCameraAnimTs = performance.now();
+  }
   const map = {
     static: camStaticBtn,
     cursor: camCursorBtn,
@@ -2768,11 +3636,511 @@ function getParticlesSettings() {
     hue: liveParticlesHue ? Number(liveParticlesHue.value) : 0,
     audioOn: liveParticlesAudio ? liveParticlesAudio.checked : true,
     audioAmount: liveParticlesAudioAmount ? Number(liveParticlesAudioAmount.value) : 54,
+    structure: liveParticlesStructure ? liveParticlesStructure.value : "cloud",
+    audioSplit: liveParticlesAudioSplit ? liveParticlesAudioSplit.value : "basic",
+    order: liveParticlesOrder ? Number(liveParticlesOrder.value) : 48,
     damping: liveParticlesDamping ? Number(liveParticlesDamping.value) : 18,
     vortex: liveParticlesVortex ? Number(liveParticlesVortex.value) : 22,
     spawn: liveParticlesSpawn ? Number(liveParticlesSpawn.value) : 68,
     motionThreshold: liveParticlesMotionThreshold ? Number(liveParticlesMotionThreshold.value) : 32,
+    drift: liveParticlesDrift ? Number(liveParticlesDrift.value) : 34,
+    focus: liveParticlesFocus ? Number(liveParticlesFocus.value) : 38,
+    gradientMode: liveParticlesGradientMode ? liveParticlesGradientMode.value : "radial",
+    colorMix: liveParticlesColorMix ? Number(liveParticlesColorMix.value) : 44,
+    gradientSpread: liveParticlesGradientSpread ? Number(liveParticlesGradientSpread.value) : 52,
+    gradientA: liveParticlesGradientA ? liveParticlesGradientA.value : "#00d8ff",
+    gradientB: liveParticlesGradientB ? liveParticlesGradientB.value : "#ff2ea6",
   };
+}
+
+function getFractalLiveSettings() {
+  const quality = liveFractalQuality ? liveFractalQuality.value : "med";
+  const qualitySteps = quality === "low" ? 72 : quality === "high" ? 128 : 96;
+  const qualityIter = quality === "low" ? 7 : quality === "high" ? 11 : 9;
+  const textureMode = liveFractalTexture ? liveFractalTexture.value : "smooth";
+  const texture2Mode = liveFractalTexture2 ? liveFractalTexture2.value : "none";
+  const renderMode = liveFractalRenderMode ? liveFractalRenderMode.value : "shaded";
+  const bgMode = liveFractalBackground ? liveFractalBackground.value : "solid";
+  const camMode = liveFractalCameraMode ? liveFractalCameraMode.value : "orbit";
+  const shapeMode = liveFractalShape ? liveFractalShape.value : "mandel";
+  const style = liveFractalStyle ? liveFractalStyle.value : "flat";
+  return {
+    quality,
+    camMode,
+    camSpeed: liveFractalCamSpeed ? Number(liveFractalCamSpeed.value) / 100 : 0.28,
+    camDistance: liveFractalDistance ? Number(liveFractalDistance.value) / 30 : 2.53,
+    symmetry: liveFractalSymmetry ? Number(liveFractalSymmetry.value) : 14,
+    power: liveFractalPower ? Number(liveFractalPower.value) / 10 : 8.4,
+    fog: liveFractalFog ? Number(liveFractalFog.value) / 1000 : 0.024,
+    glow: liveFractalGlow ? Number(liveFractalGlow.value) / 50 : 1.04,
+    light: liveFractalLight ? Number(liveFractalLight.value) / 100 : 1.2,
+    spin: liveFractalSpin ? Number(liveFractalSpin.value) / 100 : 0.36,
+    breath: liveFractalBreath ? Number(liveFractalBreath.value) / 100 : 0.48,
+    warmth: liveFractalWarmth ? Number(liveFractalWarmth.value) / 100 : 0.66,
+    textureMode,
+    textureModeCode:
+      textureMode === "crystal" ? 1 : textureMode === "ink" ? 2 : textureMode === "contour" ? 3 : 0,
+    renderMode,
+    renderModeCode:
+      renderMode === "wire" ? 1 : renderMode === "points" ? 2 : renderMode === "hybrid" ? 3 : 0,
+    shapeModeCode:
+      shapeMode === "torus" ? 1 : shapeMode === "gyroid" ? 2 : shapeMode === "poly" ? 3 : 0,
+    texture2ModeCode:
+      texture2Mode === "noise" ? 1 : texture2Mode === "ripples" ? 2 : texture2Mode === "cells" ? 3 : 0,
+    texture2Mix: liveFractalTextureMix ? Number(liveFractalTextureMix.value) / 100 : 0.42,
+    bgMode,
+    bgModeCode: bgMode === "sunset" ? 1 : bgMode === "cosmic" ? 2 : bgMode === "solid" ? 3 : 0,
+    style,
+    flatMode: style === "flat" ? 1 : 0,
+    flatColor: hexToRgb01(liveFractalFlatColor ? liveFractalFlatColor.value : "#000000"),
+    useAudio: liveFractalAudio ? liveFractalAudio.checked : true,
+    audioGain: liveFractalAudioGain ? Number(liveFractalAudioGain.value) / 100 : 1,
+    steps: qualitySteps,
+    iter: qualityIter,
+    maxDist: quality === "low" ? 18 : quality === "high" ? 30 : 24,
+    epsilon: quality === "high" ? 0.0011 : 0.0017,
+  };
+}
+
+function createFractalProgram(gl, vsSource, fsSource) {
+  const compile = (type, src) => {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, src);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      const log = gl.getShaderInfoLog(shader) || "shader compile error";
+      gl.deleteShader(shader);
+      throw new Error(log);
+    }
+    return shader;
+  };
+  const vs = compile(gl.VERTEX_SHADER, vsSource);
+  const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+  const program = gl.createProgram();
+  gl.attachShader(program, vs);
+  gl.attachShader(program, fs);
+  gl.linkProgram(program);
+  gl.deleteShader(vs);
+  gl.deleteShader(fs);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    const log = gl.getProgramInfoLog(program) || "program link error";
+    gl.deleteProgram(program);
+    throw new Error(log);
+  }
+  return program;
+}
+
+function ensureFractalRenderer() {
+  if (fractalGl) return fractalGl;
+  const gl = fractalGlCanvas.getContext("webgl", { antialias: false, alpha: false, preserveDrawingBuffer: false });
+  if (!gl) return null;
+
+  const vs = `
+    attribute vec2 aPos;
+    varying vec2 vUv;
+    void main() {
+      vUv = aPos * 0.5 + 0.5;
+      gl_Position = vec4(aPos, 0.0, 1.0);
+    }
+  `;
+  const fs = `
+    precision highp float;
+    varying vec2 vUv;
+    uniform vec2 uResolution;
+    uniform float uTime;
+    uniform float uBass;
+    uniform float uMid;
+    uniform float uHigh;
+    uniform float uEnergy;
+    uniform float uSymmetry;
+    uniform float uFractalPower;
+    uniform float uIter;
+    uniform float uSteps;
+    uniform float uMaxDist;
+    uniform float uEpsilon;
+    uniform float uFogDensity;
+    uniform float uGlow;
+    uniform float uLightIntensity;
+    uniform float uSpin;
+    uniform float uBreath;
+    uniform float uColorWarmth;
+    uniform float uCamMode;
+    uniform float uCamYaw;
+    uniform float uCamPitch;
+    uniform float uCamDist;
+    uniform float uCamSpeed;
+    uniform float uShapeMode;
+    uniform float uTextureMode;
+    uniform float uTexture2Mode;
+    uniform float uTexture2Mix;
+    uniform float uRenderMode;
+    uniform float uBgMode;
+    uniform float uFlatMode;
+    uniform vec3 uFlatColor;
+
+    mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c,-s,s,c); }
+
+    vec3 applySymmetry(vec3 p) {
+      float sym = clamp(floor(uSymmetry + 0.5), 2.0, 48.0);
+      float sector = 6.28318530718 / sym;
+      float angle = atan(p.z, p.x);
+      float r = length(p.xz);
+      angle = mod(angle, sector);
+      angle = abs(angle - sector * 0.5);
+      p.x = cos(angle) * r;
+      p.z = sin(angle) * r;
+      return p;
+    }
+
+    float deMandelbulb(vec3 p) {
+      vec3 z = p;
+      float dr = 1.0;
+      float r = 0.0;
+      float power = clamp(uFractalPower + 0.6 * (uEnergy - 0.5) * uBreath, 6.0, 12.0);
+      int iterMax = 12;
+      for (int i = 0; i < 12; i++) {
+        if (i >= int(clamp(uIter, 1.0, 12.0))) break;
+        r = length(z);
+        if (!all(equal(z, z)) || r > 8.0) break;
+        float theta = acos(clamp(z.y / max(r, 1e-4), -1.0, 1.0));
+        float phi = atan(z.z, z.x);
+        dr = pow(r, power - 1.0) * power * dr + 1.0;
+        float zr = pow(r, power);
+        theta *= power;
+        phi *= power;
+        z = zr * vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
+        z += p;
+      }
+      return 0.5 * log(max(r, 1e-4)) * r / max(dr, 1e-4);
+    }
+
+    float mapScene(vec3 p) {
+      float breath = 0.5 + 0.5 * sin(uTime * (0.22 + 0.18 * max(uBreath, 0.2)));
+      float spin = uTime * (0.08 + 0.25 * uSpin * (0.2 + uBass));
+      p.xz *= rot(spin);
+      p.xy *= rot(spin * 0.7);
+      p *= 0.92 + breath * 0.16;
+      p = applySymmetry(p);
+      float texMode = floor(uTextureMode + 0.5);
+      if (texMode > 0.5) {
+        float warp = sin(p.x * 2.7 + uTime * 0.25) * cos(p.y * 3.4 - uTime * 0.22) * 0.04;
+        if (texMode > 1.5) warp += sin((p.x + p.z) * 9.0) * 0.02;
+        if (texMode > 2.5) warp += cos((p.y - p.z) * 13.0) * 0.01;
+        p += normalize(vec3(p.z, p.x, p.y) + 0.0001) * warp;
+      }
+      float dBulb = deMandelbulb(p);
+      float shapeMode = floor(uShapeMode + 0.5);
+      float dShape = dBulb;
+      if (shapeMode > 0.5 && shapeMode < 1.5) {
+        vec2 q = vec2(length(p.xz) - 0.75, p.y * 0.7);
+        dShape = length(q) - 0.22;
+      } else if (shapeMode > 1.5 && shapeMode < 2.5) {
+        float gy = abs(dot(sin(p * 2.4), cos(p.yzx * 2.4))) - 0.22;
+        dShape = gy * 0.55;
+      } else if (shapeMode > 2.5) {
+        float oct = (abs(p.x) + abs(p.y) + abs(p.z) - 1.05) * 0.46;
+        dShape = oct;
+      }
+      float d = min(dBulb, dShape);
+      if (!(d > -1e8 && d < 1e8)) return 1e3;
+      return d;
+    }
+
+    vec3 calcNormal(vec3 p) {
+      float e = uEpsilon;
+      vec2 h = vec2(e, 0.0);
+      float dx = mapScene(p + vec3(h.x, h.y, h.y)) - mapScene(p - vec3(h.x, h.y, h.y));
+      float dy = mapScene(p + vec3(h.y, h.x, h.y)) - mapScene(p - vec3(h.y, h.x, h.y));
+      float dz = mapScene(p + vec3(h.y, h.y, h.x)) - mapScene(p - vec3(h.y, h.y, h.x));
+      return normalize(vec3(dx, dy, dz));
+    }
+
+    vec3 palette(float t) {
+      vec3 warmA = mix(vec3(0.94,0.58,0.42), vec3(0.90,0.35,0.58), 0.5 + 0.5 * sin(t + uTime * 0.04));
+      vec3 warmB = mix(vec3(0.84,0.76,0.42), vec3(0.52,0.72,0.98), 0.5 + 0.5 * cos(t * 0.8 + uTime * 0.03));
+      return mix(warmB, warmA, clamp(uColorWarmth, 0.0, 1.0));
+    }
+
+    void main() {
+      vec2 uv = (vUv * 2.0 - 1.0);
+      uv.x *= uResolution.x / max(uResolution.y, 1.0);
+      float yaw = uCamYaw;
+      float pitch = clamp(uCamPitch, -1.45, 1.45);
+      float autoYaw = uTime * (0.05 + uCamSpeed * 0.35) * (uCamMode < 0.5 ? 1.0 : 0.35);
+      yaw += autoYaw;
+      vec3 orbitPos = vec3(sin(yaw) * uCamDist, sin(uTime * 0.09) * 0.24, cos(yaw) * uCamDist);
+      vec3 insideDir = normalize(vec3(
+        cos(pitch) * sin(yaw),
+        sin(pitch),
+        cos(pitch) * cos(yaw)
+      ));
+      vec3 ro = (uCamMode < 0.5) ? orbitPos : insideDir * 0.03;
+      vec3 viewDir = (uCamMode < 0.5) ? normalize(-orbitPos) : insideDir;
+      vec3 worldUp = abs(viewDir.y) > 0.98 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
+      vec3 right = normalize(cross(viewDir, worldUp));
+      vec3 up = normalize(cross(right, viewDir));
+      vec3 rd = normalize(viewDir * 1.35 + right * uv.x + up * uv.y);
+      float t = 0.0;
+      float d = 0.0;
+      float glowAcc = 0.0;
+      float maxDist = clamp(uMaxDist, 5.0, 60.0);
+      for (int i = 0; i < 160; i++) {
+        if (i >= int(clamp(uSteps, 8.0, 160.0))) break;
+        vec3 p = ro + rd * t;
+        d = mapScene(p);
+        float absd = abs(d);
+        glowAcc += exp(-absd * 18.0) * (0.14 + 0.86 * uMid);
+        if (absd < uEpsilon || t > maxDist) break;
+        t += clamp(abs(d), 0.001, 1.2);
+      }
+
+      vec3 col;
+      if (t <= maxDist && abs(d) < uEpsilon * 3.0) {
+        vec3 p = ro + rd * t;
+        vec3 n = calcNormal(p);
+        vec3 l1 = normalize(vec3(0.5, 0.7, -0.4));
+        vec3 l2 = normalize(vec3(-0.6, 0.3, -0.8));
+        float diff1 = max(dot(n, l1), 0.0);
+        float diff2 = max(dot(n, l2), 0.0) * 0.45;
+        float fres = pow(1.0 - max(dot(n, -rd), 0.0), 2.5);
+        vec3 base = palette(length(p) * 1.3 + atan(p.z, p.x) * 0.6);
+        float light = (diff1 + diff2 + 0.25 + fres * 0.35) * (uLightIntensity * (0.8 + 0.4 * uHigh));
+        float texMode = floor(uTextureMode + 0.5);
+        if (texMode > 0.5) {
+          float grain = sin((p.x + p.y + p.z) * 20.0 + uTime * 0.8) * 0.07;
+          light *= 1.0 + grain;
+        }
+        if (texMode > 1.5) {
+          float ink = smoothstep(0.35, 0.8, abs(dot(n, rd)));
+          base = mix(base, vec3(0.96, 0.92, 0.84), ink * 0.28);
+        }
+        if (texMode > 2.5) {
+          float contour = abs(sin(length(p) * 8.0));
+          light *= 0.72 + contour * 0.5;
+        }
+        float tex2Mode = floor(uTexture2Mode + 0.5);
+        float tex2 = 0.0;
+        if (tex2Mode > 0.5 && tex2Mode < 1.5) {
+          tex2 = 0.5 + 0.5 * sin(dot(p, vec3(7.3, 5.2, 6.1)) + uTime * 0.7);
+        } else if (tex2Mode > 1.5 && tex2Mode < 2.5) {
+          tex2 = 0.5 + 0.5 * sin(length(p.xy) * 22.0 - uTime * 1.1);
+        } else if (tex2Mode > 2.5) {
+          vec3 cp = abs(fract(p * 5.0) - 0.5);
+          tex2 = 1.0 - smoothstep(0.06, 0.28, min(min(cp.x, cp.y), cp.z));
+        }
+        if (tex2Mode > 0.5) {
+          float mixK = clamp(uTexture2Mix, 0.0, 1.0);
+          base = mix(base, base.zyx, tex2 * mixK * 0.45);
+          light *= 1.0 + tex2 * mixK * 0.22;
+        }
+        float renderMode = floor(uRenderMode + 0.5);
+        vec3 grid = abs(fract(p * 6.0) - 0.5);
+        float wire = 1.0 - smoothstep(0.03, 0.085, min(min(grid.x, grid.y), grid.z));
+        vec3 pg = abs(fract(p * 9.5) - 0.5);
+        float dots = 1.0 - smoothstep(0.22, 0.34, length(pg));
+        if (uFlatMode > 0.5) {
+          float toon = floor(clamp(light * 0.85, 0.0, 1.0) * 4.0) / 4.0;
+          col = mix(base * toon, base, 0.18);
+        } else {
+          col = base * light;
+        }
+        if (renderMode > 0.5 && renderMode < 1.5) {
+          col = mix(base * 0.08, col, wire);
+          col += base * wire * 0.22;
+        } else if (renderMode > 1.5 && renderMode < 2.5) {
+          col = mix(base * 0.05, col, dots);
+          col += base * dots * 0.28;
+        } else if (renderMode > 2.5) {
+          float hybrid = max(wire, dots * 0.9);
+          col = mix(base * 0.06, col, hybrid);
+          col += base * hybrid * 0.24;
+        }
+      } else {
+        float bgMode = floor(uBgMode + 0.5);
+        float bg = 0.5 + 0.5 * sin(uTime * 0.06 + uv.x * 1.7 + uv.y * 2.3);
+        vec3 c1 = vec3(0.03,0.02,0.05);
+        vec3 c2 = vec3(0.12,0.05,0.15);
+        if (bgMode > 0.5) {
+          c1 = vec3(0.12,0.05,0.03);
+          c2 = vec3(0.35,0.11,0.12);
+        }
+        if (bgMode > 1.5) {
+          c1 = vec3(0.01,0.03,0.09);
+          c2 = vec3(0.16,0.08,0.30);
+        }
+        if (bgMode > 2.5 || uFlatMode > 0.5) {
+          col = uFlatColor;
+        } else {
+          col = mix(c1, c2, bg);
+        }
+      }
+
+      float fog = 1.0 - exp(-t * uFogDensity);
+      vec3 fogCol = mix(vec3(0.28,0.16,0.10), vec3(0.32,0.12,0.28), 0.45 + 0.55 * uColorWarmth);
+      if (uFlatMode < 0.5) {
+        col = mix(col, fogCol, clamp(fog, 0.0, 1.0));
+      }
+      col += glowAcc * 0.004 * uGlow * palette(uTime * 0.06 + uv.x + uv.y) * (uFlatMode > 0.5 ? 0.45 : 1.0);
+      col = clamp(col, 0.0, 1.0);
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+
+  let program;
+  try {
+    program = createFractalProgram(gl, vs, fs);
+  } catch {
+    return null;
+  }
+
+  const posBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(program, "aPos");
+  const uniforms = {
+    uResolution: gl.getUniformLocation(program, "uResolution"),
+    uTime: gl.getUniformLocation(program, "uTime"),
+    uBass: gl.getUniformLocation(program, "uBass"),
+    uMid: gl.getUniformLocation(program, "uMid"),
+    uHigh: gl.getUniformLocation(program, "uHigh"),
+    uEnergy: gl.getUniformLocation(program, "uEnergy"),
+    uSymmetry: gl.getUniformLocation(program, "uSymmetry"),
+    uFractalPower: gl.getUniformLocation(program, "uFractalPower"),
+    uIter: gl.getUniformLocation(program, "uIter"),
+    uSteps: gl.getUniformLocation(program, "uSteps"),
+    uMaxDist: gl.getUniformLocation(program, "uMaxDist"),
+    uEpsilon: gl.getUniformLocation(program, "uEpsilon"),
+    uFogDensity: gl.getUniformLocation(program, "uFogDensity"),
+    uGlow: gl.getUniformLocation(program, "uGlow"),
+    uLightIntensity: gl.getUniformLocation(program, "uLightIntensity"),
+    uSpin: gl.getUniformLocation(program, "uSpin"),
+    uBreath: gl.getUniformLocation(program, "uBreath"),
+    uColorWarmth: gl.getUniformLocation(program, "uColorWarmth"),
+    uCamMode: gl.getUniformLocation(program, "uCamMode"),
+    uCamYaw: gl.getUniformLocation(program, "uCamYaw"),
+    uCamPitch: gl.getUniformLocation(program, "uCamPitch"),
+    uCamDist: gl.getUniformLocation(program, "uCamDist"),
+    uCamSpeed: gl.getUniformLocation(program, "uCamSpeed"),
+    uShapeMode: gl.getUniformLocation(program, "uShapeMode"),
+    uTextureMode: gl.getUniformLocation(program, "uTextureMode"),
+    uTexture2Mode: gl.getUniformLocation(program, "uTexture2Mode"),
+    uTexture2Mix: gl.getUniformLocation(program, "uTexture2Mix"),
+    uRenderMode: gl.getUniformLocation(program, "uRenderMode"),
+    uBgMode: gl.getUniformLocation(program, "uBgMode"),
+    uFlatMode: gl.getUniformLocation(program, "uFlatMode"),
+    uFlatColor: gl.getUniformLocation(program, "uFlatColor"),
+  };
+
+  fractalGl = { gl, program, posBuffer, aPos, uniforms };
+  return fractalGl;
+}
+
+function renderFractalLive(tSec) {
+  const renderer = ensureFractalRenderer();
+  if (!renderer) return false;
+  const { gl, program, posBuffer, aPos, uniforms } = renderer;
+  if (fractalGlCanvas.width !== canvas.width || fractalGlCanvas.height !== canvas.height) {
+    fractalGlCanvas.width = canvas.width;
+    fractalGlCanvas.height = canvas.height;
+  }
+  const fs = getFractalLiveSettings();
+  fractalCamYaw += (fractalCamYawTarget - fractalCamYaw) * 0.08;
+  fractalCamPitch += (fractalCamPitchTarget - fractalCamPitch) * 0.08;
+  const camDistTarget = clamp(fs.camDistance, 1.2, 8);
+  fractalCamDistSmooth += (camDistTarget - fractalCamDistSmooth) * 0.08;
+  const bass = fs.useAudio ? clamp((audioFeatures.bands[0] * 0.85 + audioFeatures.bands[1] * 0.75) * fs.audioGain, 0, 1) : 0;
+  const mid = fs.useAudio ? clamp((audioFeatures.bands[1] * 0.4 + audioFeatures.bands[2] * 0.7) * fs.audioGain, 0, 1) : 0;
+  const high = fs.useAudio ? clamp((audioFeatures.bands[3] * 0.9 + audioFeatures.transient * 0.35) * fs.audioGain, 0, 1) : 0;
+  const energy = fs.useAudio ? clamp((audioLevel * 0.8 + audioFeatures.transient * 0.28) * fs.audioGain, 0, 1) : 0;
+
+  gl.viewport(0, 0, fractalGlCanvas.width, fractalGlCanvas.height);
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  gl.uniform2f(uniforms.uResolution, fractalGlCanvas.width, fractalGlCanvas.height);
+  gl.uniform1f(uniforms.uTime, tSec);
+  gl.uniform1f(uniforms.uBass, bass);
+  gl.uniform1f(uniforms.uMid, mid);
+  gl.uniform1f(uniforms.uHigh, high);
+  gl.uniform1f(uniforms.uEnergy, energy);
+  gl.uniform1f(uniforms.uSymmetry, fs.symmetry);
+  gl.uniform1f(uniforms.uFractalPower, fs.power);
+  gl.uniform1f(uniforms.uIter, fs.iter);
+  gl.uniform1f(uniforms.uSteps, fs.steps);
+  gl.uniform1f(uniforms.uMaxDist, fs.maxDist);
+  gl.uniform1f(uniforms.uEpsilon, fs.epsilon);
+  gl.uniform1f(uniforms.uFogDensity, fs.fog);
+  gl.uniform1f(uniforms.uGlow, fs.glow);
+  gl.uniform1f(uniforms.uLightIntensity, fs.light);
+  gl.uniform1f(uniforms.uSpin, fs.spin);
+  gl.uniform1f(uniforms.uBreath, fs.breath);
+  gl.uniform1f(uniforms.uColorWarmth, fs.warmth);
+  gl.uniform1f(uniforms.uCamMode, fs.camMode === "inside" ? 1 : 0);
+  gl.uniform1f(uniforms.uCamYaw, fractalCamYaw);
+  gl.uniform1f(uniforms.uCamPitch, fractalCamPitch);
+  gl.uniform1f(uniforms.uCamDist, fractalCamDistSmooth);
+  gl.uniform1f(uniforms.uCamSpeed, fs.camSpeed);
+  gl.uniform1f(uniforms.uShapeMode, fs.shapeModeCode);
+  gl.uniform1f(uniforms.uTextureMode, fs.textureModeCode);
+  gl.uniform1f(uniforms.uTexture2Mode, fs.texture2ModeCode);
+  gl.uniform1f(uniforms.uTexture2Mix, fs.texture2Mix);
+  gl.uniform1f(uniforms.uRenderMode, fs.renderModeCode);
+  gl.uniform1f(uniforms.uBgMode, fs.bgModeCode);
+  gl.uniform1f(uniforms.uFlatMode, fs.flatMode);
+  gl.uniform3f(uniforms.uFlatColor, fs.flatColor[0], fs.flatColor[1], fs.flatColor[2]);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  ctx.drawImage(fractalGlCanvas, 0, 0, canvas.width, canvas.height);
+  return true;
+}
+
+const particleStudioControlPairs = [
+  [studioParticlesStructure, liveParticlesStructure],
+  [studioParticlesAudioSplit, liveParticlesAudioSplit],
+  [studioParticlesOrder, liveParticlesOrder],
+  [studioParticlesDrift, liveParticlesDrift],
+  [studioParticlesFocus, liveParticlesFocus],
+  [studioParticlesDamping, liveParticlesDamping],
+  [studioParticlesVortex, liveParticlesVortex],
+  [studioParticlesSpawn, liveParticlesSpawn],
+  [studioParticlesMotionThreshold, liveParticlesMotionThreshold],
+  [studioParticlesGradientMode, liveParticlesGradientMode],
+  [studioParticlesColorMix, liveParticlesColorMix],
+  [studioParticlesGradientSpread, liveParticlesGradientSpread],
+  [studioParticlesGradientA, liveParticlesGradientA],
+  [studioParticlesGradientB, liveParticlesGradientB],
+];
+
+function syncStudioParticlesControlsFromLive() {
+  particleStudioControlPairs.forEach(([studioControl, liveControl]) => {
+    if (!studioControl || !liveControl) return;
+    if (document.activeElement === studioControl) return;
+    if (studioControl.type === "checkbox") {
+      studioControl.checked = Boolean(liveControl.checked);
+    } else {
+      studioControl.value = liveControl.value;
+    }
+  });
+}
+
+function applyStudioParticlesControl(studioControl, liveControl) {
+  if (!studioControl || !liveControl) return;
+  const sync = () => {
+    if (studioControl.type === "checkbox") {
+      liveControl.checked = Boolean(studioControl.checked);
+    } else {
+      liveControl.value = studioControl.value;
+    }
+    if (liveControl === liveParticlesStructure || liveControl === liveParticlesCount || liveControl === liveParticlesEmitter) {
+      particlesBufferN = 0;
+    }
+    updateOutputs();
+    scheduleRender();
+  };
+  const evt = studioControl.tagName === "SELECT" || studioControl.type === "checkbox" ? "change" : "input";
+  studioControl.addEventListener(evt, sync);
 }
 
 function updateOutputs() {
@@ -2785,6 +4153,7 @@ function updateOutputs() {
     if (out) out.textContent = control.value;
   });
   updateQuickOutputById("cameraMoveSpeed", cameraMoveSpeed ? cameraMoveSpeed.value : 28);
+  syncStudioParticlesControlsFromLive();
   updateDepthPadDot();
   updateLiveModPadDot();
   syncLiveQuickControls();
@@ -2869,11 +4238,23 @@ function computeCanvasSizeForSource(srcW, srcH, limits = getLiveCanvasLimits()) 
       height: Math.max(2, Math.floor(srcH * scale)),
     };
   }
-  let width = Math.min(maxW, Math.floor(maxH * ratioOverride));
-  let height = Math.floor(width / ratioOverride);
-  if (height > maxH) {
-    height = maxH;
+  let width;
+  let height;
+  // Portrait ratios (e.g. 9:16) need taller internal resolution to avoid soft output.
+  if (ratioOverride < 1) {
+    height = Math.min(Math.max(maxH, LIVE_CANVAS_MAX_W), 1400);
     width = Math.floor(height * ratioOverride);
+    if (width > maxW) {
+      width = maxW;
+      height = Math.floor(width / ratioOverride);
+    }
+  } else {
+    width = Math.min(maxW, Math.floor(maxH * ratioOverride));
+    height = Math.floor(width / ratioOverride);
+    if (height > maxH) {
+      height = maxH;
+      width = Math.floor(height * ratioOverride);
+    }
   }
   return {
     width: Math.max(2, width),
@@ -3015,7 +4396,7 @@ function scheduleRender() {
       renderErrorCount += 1;
       console.error("Render error", err);
       // Keep webcam/session responsive if a transient frame fails.
-      if (renderErrorCount <= 4 && (webcamActive || micActive || recordingActive)) {
+      if (renderErrorCount <= 4 && (webcamActive || hasAudioReactiveInput() || recordingActive)) {
         setTimeout(scheduleRender, 16);
       }
     }
@@ -3039,6 +4420,12 @@ function loadImageToCanvas(file) {
     domeViewPitch = 0;
     isDraggingDome = false;
     loadedImage = img;
+    if (aspectRatioSelect && !webcamActive) {
+      // For imported images, default to native ratio once. User can change it afterwards.
+      aspectRatioSelect.value = "auto";
+      aspectRatioSelect.disabled = false;
+    }
+    syncAspectRatioControlForInput();
     renderLoadedImageToCanvas();
     updateDynamicUiTexts();
     URL.revokeObjectURL(url);
@@ -3123,7 +4510,9 @@ function refreshSnapshotUi() {
     const hasData = Boolean(snapshots[slot - 1]);
     btn.classList.toggle("filled", hasData);
     btn.classList.toggle("active", slot === currentSnapshotSlot);
-    btn.title = hasData ? `Slot ${slot}: ${t("slot_saved")}` : `Slot ${slot}: ${t("slot_empty")}`;
+    btn.title = hasData
+      ? `Slot ${slot}: ${t("slot_saved")} · dbl-click = ${t("sessions_load")}`
+      : `Slot ${slot}: ${t("slot_empty")}`;
   });
 }
 
@@ -3166,6 +4555,13 @@ function applySnapshot(slot) {
   updateOutputs();
   refreshSnapshotUi();
   scheduleRender();
+}
+
+function clearSnapshot(slot) {
+  const idx = clamp(slot - 1, 0, 7);
+  snapshots[idx] = null;
+  currentSnapshotSlot = slot;
+  refreshSnapshotUi();
 }
 
 async function updateTrackingFromFrame() {
@@ -3220,9 +4616,11 @@ function shouldRunTracking(settings) {
 function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
   return (
     mode === "particles" ||
+    mode === "fractal" ||
     webcamActive ||
     recordingActive ||
-    micActive ||
+    hasAudioReactiveInput() ||
+    isAudioPlaybackActive() ||
     isDomeAutoRotateActive() ||
     keyPanMoved ||
     smoothCameraMoved ||
@@ -3341,6 +4739,7 @@ function stopWebcamInput() {
 async function toggleWebcam() {
   if (webcamActive) {
     stopWebcamInput();
+    if (aspectRatioSelect) aspectRatioSelect.disabled = false;
     updateDynamicUiTexts();
     updateInputSpecs();
     refreshCameraDeviceList(true);
@@ -3391,6 +4790,7 @@ async function toggleWebcam() {
     if (webcamVideo) {
       webcamVideo.srcObject = stream;
       const syncWebcamView = () => {
+        if (aspectRatioSelect) aspectRatioSelect.disabled = false;
         applyAspectRatioChange();
         updateInputSpecs();
         scheduleRender();
@@ -3425,9 +4825,8 @@ async function toggleWebcam() {
 
 async function toggleMic() {
   if (micActive) {
-    if (micStream) micStream.getTracks().forEach((t) => t.stop());
-    micStream = null;
-    micActive = false;
+    stopMicInput();
+    teardownAudioPipeline();
     audioLevel = 0;
     updateDynamicUiTexts();
     return;
@@ -3444,6 +4843,12 @@ async function toggleMic() {
   }
 
   try {
+    if (audioInputSource && audioInputSource.value === "file") {
+      audioInputSource.value = "mic";
+    }
+    if (audioFileActive) {
+      deactivateAudioFileSource();
+    }
     if (audioInputSource && audioInputSource.value === "system") {
       const sysStream = await navigator.mediaDevices.getDisplayMedia({
         video: { frameRate: 5 },
@@ -3462,13 +4867,9 @@ async function toggleMic() {
     } else {
       micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     }
-    if (!audioCtx) audioCtx = new AudioContext();
+    await ensureAudioContext();
     const source = audioCtx.createMediaStreamSource(micStream);
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    analyser.smoothingTimeConstant = 0.85;
-    source.connect(analyser);
-    audioData = new Uint8Array(analyser.frequencyBinCount);
+    attachAnalyserFromSource(source, false);
     micActive = true;
     updateDynamicUiTexts();
     scheduleRender();
@@ -3487,20 +4888,72 @@ async function toggleMic() {
   }
 }
 
+async function activateAudioFileSource() {
+  if (!audioFilePlayer || !audioFilePlayer.src) return;
+  try {
+    stopMicInput();
+    await ensureAudioContext();
+    if (!audioFileElementSource) {
+      audioFileElementSource = audioCtx.createMediaElementSource(audioFilePlayer);
+    }
+    attachAnalyserFromSource(audioFileElementSource, true);
+    audioFileActive = true;
+    updateDynamicUiTexts();
+    scheduleRender();
+  } catch (err) {
+    const reason = err && err.name ? err.name : "Error desconocido";
+    alert(`${t("mic_fail")} (${reason}). ${t("mic_hint_regular")}`);
+  }
+}
+
+function loadAudioFile(file) {
+  if (!file || !audioFilePlayer) return;
+  stopMicInput();
+  teardownAudioPipeline();
+  if (audioFileUrl) {
+    URL.revokeObjectURL(audioFileUrl);
+    audioFileUrl = "";
+  }
+  audioFileUrl = URL.createObjectURL(file);
+  audioFilePlayer.src = audioFileUrl;
+  audioFilePlayerWrap.hidden = false;
+  if (liveAudioFileName) {
+    liveAudioFileName.textContent = file.name;
+    liveAudioFileName.dataset.text = file.name;
+  }
+  if (audioInputSource) audioInputSource.value = "file";
+  updateDynamicUiTexts();
+  updateLiveAudioFileMini();
+  activateAudioFileSource();
+  audioFilePlayer.play().catch(() => {});
+  scheduleRender();
+}
+
 function updateAudioLevel(settings) {
   updateAudioAnalysis();
-  if (!micActive) {
+  if (!hasAudioReactiveInput()) {
     audioLevel = 0;
+    audioReactiveEnv = 0;
     return 0;
   }
-  const avg = audioFeatures.rms * 0.55 + audioFeatures.bands[1] * 0.3 + audioFeatures.transient * 0.15;
+  const isFileInput = Boolean(audioInputSource && audioInputSource.value === "file");
+  const avg =
+    audioFeatures.rms * 0.44 +
+    audioFeatures.bands[1] * 0.22 +
+    audioFeatures.bands[2] * 0.18 +
+    audioFeatures.transient * 0.28;
   const sensitivity = settings.audioSensitivity / 100;
   const tolerance = settings.audioTolerance / 100;
-  const gate = 0.01 + tolerance * 0.32;
+  const gateBase = isFileInput ? 0.003 : 0.008;
+  const gate = gateBase + audioNoiseFloor * (0.85 + tolerance * 1.25);
   const gated = Math.max(0, avg - gate);
-  const normalized = clamp(gated / Math.max(0.08, 1 - gate), 0, 1.8);
-  const boosted = Math.pow(normalized, 0.68) * (0.8 + sensitivity * 5.4);
-  audioLevel = clamp(boosted, 0, 1.5);
+  const normalized = clamp(gated / Math.max(isFileInput ? 0.04 : 0.06, 0.6 - gate * 0.2), 0, 2.4);
+  const target = Math.pow(normalized, 0.58) * (0.65 + sensitivity * 4.9) * (isFileInput ? 1.15 : 1);
+  const attack = isFileInput ? 0.34 : 0.3;
+  const release = isFileInput ? 0.11 : 0.09;
+  const k = target > audioReactiveEnv ? attack : release;
+  audioReactiveEnv += (target - audioReactiveEnv) * k;
+  audioLevel = clamp(audioReactiveEnv, 0, 1.7);
   return audioLevel;
 }
 
@@ -5016,7 +6469,7 @@ function updateDomeAutoSeamFromImageData(imageData) {
 function isGlitchDomePanMode() {
   if (!liveOutputView || liveOutputView.value !== "dome") return false;
   if (!domeSourceMap || domeSourceMap.value !== "equirect") return false;
-  if (mode !== "glitch") return false;
+  if (mode !== "glitch" && mode !== "fractal") return false;
   return Boolean(loadedImage || originalImageData);
 }
 
@@ -5029,7 +6482,7 @@ function isDomeAutoRotateActive() {
 
 function applyOutputViewWarp() {
   if (!liveOutputView || liveOutputView.value !== "dome") return;
-  if (mode !== "depth" && mode !== "mix" && mode !== "glitch" && mode !== "particles") return;
+  if (mode !== "depth" && mode !== "mix" && mode !== "glitch" && mode !== "particles" && mode !== "fractal") return;
   const w = canvas.width;
   const h = canvas.height;
   if (w <= 1 || h <= 1) return;
@@ -5261,16 +6714,25 @@ function renderPointCloud(baseData, depthMap, settings, seed, tSec, lightDir) {
   const audioVar = clamp((settings.audioAnimVariation || 100) / 100, 0, 2.2);
   const audioAnim = audioAnimation ? audioAnimation.value : "lift";
   const audioTargetMode = audioTarget ? audioTarget.value : "points";
-  const audioToPoints = micActive && (audioTargetMode === "points" || audioTargetMode === "both");
+  const audioOn = hasAudioReactiveInput();
+  const bands = audioFeatures.bands || [0, 0, 0, 0];
+  const bassBand = clamp((bands[1] * 1.1 + bands[0] * 0.45 + audioFeatures.transient * 0.35), 0, 1.8);
+  const highBand = clamp((bands[3] * 1.15 + bands[2] * 0.55), 0, 1.8);
+  const audioSyncMotion = Boolean(live3dAudioSync && live3dAudioSync.checked);
+  const audioToPoints = audioOn && (audioTargetMode === "points" || audioTargetMode === "both");
   const audioBoost = audioToPoints ? audioLevel : 0;
-  const audioDrive = audioToPoints ? audioEnvelopeGate(audioBoost) * pointsAudioIntensity : 0;
-  const reactiveFloat = micActive ? pointFloat * audioDrive : pointFloat;
-  const reactiveOrganic = micActive ? organic * audioDrive : organic;
-  const reactiveJ3d = micActive ? j3d * audioDrive : j3d;
-  const audioLiftBoost = audioToPoints && (audioAnim === "lift" || audioAnim === "all") ? audioDrive * 1.7 : 0;
-  const audioWaveBoost = audioToPoints && (audioAnim === "wave" || audioAnim === "all") ? audioDrive * (1.45 * audioVar) : 0;
-  const audioColorBoost = audioToPoints && (audioAnim === "color" || audioAnim === "all") ? audioDrive * 1.12 : 0;
-  const audioGeoBoost = audioToPoints ? audioDrive * 1.5 : 0;
+  const audioDriveBase = audioToPoints ? audioEnvelopeGate(audioBoost) * pointsAudioIntensity : 0;
+  const audioDrive = clamp(audioDriveBase * 0.82 + bassBand * 0.42 + highBand * 0.22, 0, 2.3);
+  const idleFloat = audioSyncMotion ? 0 : pointFloat;
+  const idleOrganic = audioSyncMotion ? 0 : organic;
+  const idleJ3d = audioSyncMotion ? 0 : j3d;
+  const reactiveFloat = idleFloat + pointFloat * audioDrive * (audioSyncMotion ? 1.25 : 0.95);
+  const reactiveOrganic = idleOrganic + organic * (audioDrive * 0.9 + highBand * 0.28);
+  const reactiveJ3d = idleJ3d + j3d * (audioDrive * 0.82 + bassBand * 0.2);
+  const audioLiftBoost = audioToPoints && (audioAnim === "lift" || audioAnim === "all") ? (audioDrive * 1.2 + bassBand * 0.75) : 0;
+  const audioWaveBoost = audioToPoints && (audioAnim === "wave" || audioAnim === "all") ? (audioDrive * (1.15 * audioVar) + highBand * 0.78) : 0;
+  const audioColorBoost = audioToPoints && (audioAnim === "color" || audioAnim === "all") ? (audioDrive * 0.9 + highBand * 0.7) : 0;
+  const audioGeoBoost = audioToPoints ? (audioDrive * 1.05 + bassBand * 0.62) : 0;
 
   const rx = ((settings.pointRotateX + motion.rxDeg) * Math.PI) / 180;
   const ry = ((settings.pointRotateY + motion.ryDeg) * Math.PI) / 180;
@@ -5398,16 +6860,25 @@ function renderMesh(depthMap, settings, seed, tSec, lightDir) {
   const audioVar = clamp((settings.audioAnimVariation || 100) / 100, 0, 2.2);
   const audioAnim = audioAnimation ? audioAnimation.value : "lift";
   const audioTargetMode = audioTarget ? audioTarget.value : "mesh";
-  const audioToMesh = micActive && (audioTargetMode === "mesh" || audioTargetMode === "both");
+  const audioOn = hasAudioReactiveInput();
+  const bands = audioFeatures.bands || [0, 0, 0, 0];
+  const bassBand = clamp((bands[1] * 1.15 + bands[0] * 0.5 + audioFeatures.transient * 0.35), 0, 1.9);
+  const highBand = clamp((bands[3] * 1.12 + bands[2] * 0.6), 0, 1.9);
+  const audioSyncMotion = Boolean(live3dAudioSync && live3dAudioSync.checked);
+  const audioToMesh = audioOn && (audioTargetMode === "mesh" || audioTargetMode === "both");
   const audioBoost = audioToMesh ? audioLevel : 0;
-  const audioDrive = audioToMesh ? audioEnvelopeGate(audioBoost) * meshAudioIntensity : 0;
-  const reactiveFloat = micActive ? pointFloat * audioDrive : pointFloat;
-  const reactiveOrganic = micActive ? organic * audioDrive : organic;
-  const reactiveJ3d = micActive ? j3d * audioDrive : j3d;
-  const audioLiftBoost = audioToMesh && (audioAnim === "lift" || audioAnim === "all") ? audioDrive * 1.65 : 0;
-  const audioWaveBoost = audioToMesh && (audioAnim === "wave" || audioAnim === "all") ? audioDrive * (1.38 * audioVar) : 0;
-  const audioColorBoost = audioToMesh && (audioAnim === "color" || audioAnim === "all") ? audioDrive * 1.1 : 0;
-  const audioGeoBoost = audioToMesh ? audioDrive * 1.42 : 0;
+  const audioDriveBase = audioToMesh ? audioEnvelopeGate(audioBoost) * meshAudioIntensity : 0;
+  const audioDrive = clamp(audioDriveBase * 0.8 + bassBand * 0.45 + highBand * 0.22, 0, 2.3);
+  const idleFloat = audioSyncMotion ? 0 : pointFloat;
+  const idleOrganic = audioSyncMotion ? 0 : organic;
+  const idleJ3d = audioSyncMotion ? 0 : j3d;
+  const reactiveFloat = idleFloat + pointFloat * (audioDrive * 0.92 + bassBand * 0.2);
+  const reactiveOrganic = idleOrganic + organic * (audioDrive * 0.88 + highBand * 0.26);
+  const reactiveJ3d = idleJ3d + j3d * (audioDrive * 0.8 + bassBand * 0.2);
+  const audioLiftBoost = audioToMesh && (audioAnim === "lift" || audioAnim === "all") ? (audioDrive * 1.08 + bassBand * 0.78) : 0;
+  const audioWaveBoost = audioToMesh && (audioAnim === "wave" || audioAnim === "all") ? (audioDrive * (1.08 * audioVar) + highBand * 0.75) : 0;
+  const audioColorBoost = audioToMesh && (audioAnim === "color" || audioAnim === "all") ? (audioDrive * 0.86 + highBand * 0.72) : 0;
+  const audioGeoBoost = audioToMesh ? (audioDrive * 1.0 + bassBand * 0.66) : 0;
 
   const rx = ((settings.pointRotateX + motion.rxDeg) * Math.PI) / 180;
   const ry = ((settings.pointRotateY + motion.ryDeg) * Math.PI) / 180;
@@ -5638,7 +7109,13 @@ function initParticlesState(baseImageData, ps, fullReset = false) {
     particlesSeed[i] = seed;
     particlesU[i] = u0;
     particlesV[i] = v0;
-    if (ps.emitter === "volume") {
+    const split = getParticleAudioSplitState(ps, seed, 0);
+    const target = getStructuredParticleTarget(ps, u0, v0, seed, i, n, 0, split);
+    if (ps.structure && ps.structure !== "cloud") {
+      particlesX[i] = target.x;
+      particlesY[i] = target.y;
+      particlesZ[i] = target.z;
+    } else if (ps.emitter === "volume") {
       particlesX[i] = seed * 2 - 1;
       particlesY[i] = randHash(i, 11, randomSeed + 701) * 2 - 1;
       particlesZ[i] = randHash(i, 19, randomSeed + 703) * 2 - 1;
@@ -5661,6 +7138,107 @@ function initParticlesState(baseImageData, ps, fullReset = false) {
     }
     particlesLife[i] = 0.55 + randHash(i, 73, randomSeed + 727) * 0.45;
   }
+}
+
+function getParticleAudioSplitState(ps, seed = 0, tSec = 0) {
+  const bands = audioFeatures.bands || [0, 0, 0, 0];
+  const splitMode = ps.audioSplit || "basic";
+  const audioOn = Boolean(ps.audioOn);
+  const amt = clamp((ps.audioAmount || 0) / 100, 0, 1.6);
+  if (!audioOn || splitMode === "off") {
+    return { low: 0, bass: 0, mid: 0, high: 0, transient: 0, radial: 0, angular: 0, lift: 0 };
+  }
+  const base = clamp(audioLevel * amt, 0, 2);
+  const transient = clamp(audioFeatures.transient * 0.95 * amt, 0, 2);
+  const low = clamp((bands[0] * 0.9 + bands[1] * 0.5) * amt, 0, 2);
+  const bass = clamp((bands[1] * 1.1 + bands[0] * 0.35) * amt, 0, 2);
+  const mid = clamp((bands[2] * 1.05 + bands[1] * 0.25) * amt, 0, 2);
+  const high = clamp((bands[3] * 1.18 + bands[2] * 0.2) * amt, 0, 2);
+  if (splitMode === "zones") {
+    // Zonal mapping: each particle region reads a dominant band.
+    const zone = Math.floor(fract01(seed * 13.137 + tSec * 0.03) * 4);
+    const zVal = zone === 0 ? bass : zone === 1 ? mid : zone === 2 ? high : low;
+    return {
+      low,
+      bass,
+      mid,
+      high,
+      transient,
+      radial: clamp(zVal * 0.9 + transient * 0.25, 0, 2),
+      angular: clamp((mid * 0.65 + high * 0.55 + transient * 0.35), 0, 2),
+      lift: clamp((bass * 0.75 + low * 0.45 + transient * 0.5), 0, 2),
+      base,
+    };
+  }
+  return {
+    low,
+    bass,
+    mid,
+    high,
+    transient,
+    radial: clamp((bass * 0.8 + mid * 0.4 + transient * 0.3), 0, 2),
+    angular: clamp((high * 0.8 + mid * 0.35), 0, 2),
+    lift: clamp((low * 0.65 + bass * 0.45 + transient * 0.4), 0, 2),
+    base,
+  };
+}
+
+function getStructuredParticleTarget(ps, u, v, seed, idx, n, tSec, split) {
+  const structure = ps.structure || "cloud";
+  const order = clamp((ps.order || 0) / 100, 0, 1);
+  const centeredX = u * 2 - 1;
+  const centeredY = v * 2 - 1;
+  const theta = Math.atan2(centeredY, centeredX);
+  const radius2d = Math.hypot(centeredX, centeredY);
+  const turns = 2 + Math.floor(order * 10);
+  const twist = tSec * (0.15 + split.angular * 0.22);
+  const radialPulse = 1 + split.radial * 0.24;
+  const lift = split.lift * 0.5;
+
+  if (structure === "grid") {
+    return {
+      x: centeredX * (0.92 + split.mid * 0.08),
+      y: centeredY * (0.92 + split.high * 0.06),
+      z: (v - 0.5) * (0.9 + split.bass * 0.35) + Math.sin((u + v + seed) * 8 + tSec * 1.2) * (0.04 + split.transient * 0.1),
+    };
+  }
+  if (structure === "ring") {
+    const ringR = clamp(0.42 + order * 0.42 + split.radial * 0.14, 0.18, 1.22);
+    const a = theta + twist + seed * 0.22;
+    return {
+      x: Math.cos(a) * ringR * radialPulse,
+      y: Math.sin(a) * ringR * radialPulse,
+      z: (radius2d - 0.7) * 0.5 + Math.sin(a * 3 + tSec * 1.1) * (0.08 + lift * 0.18),
+    };
+  }
+  if (structure === "helix") {
+    const t = idx / Math.max(1, n - 1);
+    const a = t * Math.PI * 2 * turns + twist * 2 + seed * 0.35;
+    const r = clamp(0.22 + order * 0.42 + split.mid * 0.14, 0.12, 1.12);
+    return {
+      x: Math.cos(a) * r,
+      y: Math.sin(a) * r,
+      z: (t - 0.5) * (1.8 + split.bass * 0.7) + Math.sin(a * 0.5 + tSec) * (0.05 + split.transient * 0.14),
+    };
+  }
+  if (structure === "mandala") {
+    const petals = 4 + Math.floor(order * 16);
+    const a = theta + twist * 0.9 + seed * 0.18;
+    const petal = Math.cos(a * petals);
+    const r = clamp((0.25 + radius2d * 0.58 + petal * 0.2) * radialPulse, 0.06, 1.28);
+    return {
+      x: Math.cos(a) * r,
+      y: Math.sin(a) * r,
+      z: petal * (0.22 + split.lift * 0.28) + Math.sin(a * 2 + tSec * 0.8) * 0.08,
+    };
+  }
+
+  // cloud/default
+  return {
+    x: centeredX * 0.92 + (randHash(idx, 109, randomSeed + 811) * 2 - 1) * 0.14,
+    y: centeredY * 0.92 + (randHash(idx, 113, randomSeed + 813) * 2 - 1) * 0.14,
+    z: (v - 0.5) * (0.8 + split.bass * 0.22),
+  };
 }
 
 function sampleSourceColor(baseImageData, u, v) {
@@ -6020,7 +7598,12 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
 
   const flowMotion = clamp(visualFeatures.motion * 1.2, 0, 1.2);
   const audioAmt = (ps.audioOn ? ps.audioAmount : 0) / 100;
-  const audioDrive = clamp((audioFeatures.rms * 0.8 + audioFeatures.transient * 0.4) * audioAmt, 0, 1.6);
+  const audioDrive = clamp(
+    (audioLevel * 0.95 + audioFeatures.transient * 0.35 + (audioFeatures.bands[1] + audioFeatures.bands[2]) * 0.22) *
+      audioAmt,
+    0,
+    1.9
+  );
   particlesCamXSmooth += (ps.camX - particlesCamXSmooth) * 0.08;
   particlesCamYSmooth += (ps.camY - particlesCamYSmooth) * 0.08;
   particlesCamZSmooth += (ps.camZ - particlesCamZSmooth) * 0.08;
@@ -6072,7 +7655,7 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   g.glCanvas.height = canvas.height;
   gl.viewport(0, 0, g.glCanvas.width, g.glCanvas.height);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.clearColor(0, 0, 0, 1);
+  gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -6131,19 +7714,26 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
 
   const w = canvas.width;
   const h = canvas.height;
-  const out = ctx.createImageData(w, h);
+  const out = ctx.getImageData(0, 0, w, h);
   const od = out.data;
   const n = particlesBufferN;
   const dt = 0.016;
   const noiseA = ps.noise / 100;
   const attractA = ps.attractor / 100;
   const flowA = ps.flow / 100;
+  const driftA = clamp(ps.drift / 100, 0, 1);
+  const focusA = clamp(ps.focus / 100, 0, 1);
   const damp = clamp(1 - ps.damping / 100 * 0.11, 0.82, 0.999);
   const vort = ps.vortex / 100;
   const zScale = 0.22 + (ps.depth / 100) * 1.9;
   const audioAmt = (ps.audioOn ? ps.audioAmount : 0) / 100;
   const bands = audioFeatures.bands;
-  const audioDrive = clamp((audioFeatures.rms * 0.8 + audioFeatures.transient * 0.4) * audioAmt, 0, 1.6);
+  const audioDrive = clamp(
+    (audioLevel * 0.95 + audioFeatures.transient * 0.35 + (audioFeatures.bands[1] + audioFeatures.bands[2]) * 0.22) *
+      audioAmt,
+    0,
+    1.9
+  );
   const flowMotion = clamp(visualFeatures.motion * 1.2, 0, 1.2);
   const webcamBoost = webcamActive ? clamp(visualFeatures.motion * 2.2, 0, 2.2) : 0;
   particlesCamXSmooth += (ps.camX - particlesCamXSmooth) * 0.08;
@@ -6160,6 +7750,25 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
   const worldScale = 170;
   const sizePx = 0.8 + (ps.size / 100) * 2.2;
   const thr = ps.motionThreshold / 100;
+  const splitMode = ps.audioSplit || "basic";
+  const structureMode = ps.structure || "cloud";
+  const orderK = clamp((ps.order || 0) / 100, 0, 1);
+  const springKBase = 0.002 + orderK * 0.02;
+  const gradientMode = ps.gradientMode || "radial";
+  const colorMixA = clamp((ps.colorMix || 0) / 100, 0, 1);
+  const gradientSpread = 0.38 + clamp((ps.gradientSpread || 0) / 100, 0, 1) * 1.95;
+  const gradA = hexToRgb(ps.gradientA || "#00d8ff");
+  const gradB = hexToRgb(ps.gradientB || "#ff2ea6");
+  const focal1 = {
+    x: Math.cos(tSec * 0.23) * 0.54,
+    y: Math.sin(tSec * 0.17) * 0.38,
+    z: Math.sin(tSec * 0.13) * 0.22,
+  };
+  const focal2 = {
+    x: Math.sin(tSec * 0.21 + 1.7) * 0.48,
+    y: Math.cos(tSec * 0.19 + 0.8) * 0.33,
+    z: Math.cos(tSec * 0.11 + 0.4) * 0.2,
+  };
 
   for (let i = 0; i < n; i += particlesDrawStride) {
     const seed = particlesSeed[i];
@@ -6174,9 +7783,10 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
     const nx = Math.sin(tSec * (0.8 + seed * 0.6) + y * 2.7 + seed * 9.2);
     const ny = Math.cos(tSec * (0.74 + seed * 0.5) + x * 2.1 + seed * 7.4);
     const nz = Math.sin(tSec * (0.63 + seed * 0.4) + (x + y) * 1.9 + seed * 6.1);
-    vx += nx * (0.0022 + noiseA * 0.011 + webcamBoost * 0.0025);
-    vy += ny * (0.0022 + noiseA * 0.011 + webcamBoost * 0.0025);
-    vz += nz * (0.0018 + noiseA * 0.009 + webcamBoost * 0.002);
+    const driftDrive = 0.06 + driftA * 0.96 + audioDrive * 0.28;
+    vx += nx * (0.0002 + (noiseA * 0.009 + webcamBoost * 0.0022) * driftDrive);
+    vy += ny * (0.0002 + (noiseA * 0.009 + webcamBoost * 0.0022) * driftDrive);
+    vz += nz * (0.0002 + (noiseA * 0.0075 + webcamBoost * 0.0018) * driftDrive);
 
     vx += -x * (0.001 + attractA * 0.008);
     vy += -y * (0.001 + attractA * 0.008);
@@ -6192,6 +7802,31 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
     vx += (pointerTiltX * 0.8 + stageGeomMotionX * 2.2) * flowK;
     vy += (pointerTiltY * 0.8 + stageGeomMotionY * 2.2) * flowK;
     vz += (audioFeatures.transient * 0.3 + bands[1] * 0.25) * flowK;
+
+    const split = getParticleAudioSplitState(ps, seed, tSec);
+    if (splitMode === "zones") {
+      const zone = i % 4;
+      const zoneDrive = zone === 0 ? split.bass : zone === 1 ? split.mid : zone === 2 ? split.high : split.low;
+      vx += Math.cos(tSec * (0.8 + zone * 0.2) + seed * 6.3) * zoneDrive * 0.0025;
+      vy += Math.sin(tSec * (0.7 + zone * 0.17) + seed * 7.1) * zoneDrive * 0.0025;
+      vz += (split.transient * 0.002 + zoneDrive * 0.0014) * (zone % 2 === 0 ? 1 : -1);
+    }
+
+    if (structureMode !== "cloud") {
+      const target = getStructuredParticleTarget(ps, particlesU[i], particlesV[i], seed, i, n, tSec, split);
+      const springK = springKBase * (1 + split.radial * 0.22);
+      vx += (target.x - x) * springK;
+      vy += (target.y - y) * springK;
+      vz += (target.z - z) * (springK * 0.9);
+    }
+
+    if (focusA > 0.001) {
+      const focal = seed < 0.5 ? focal1 : focal2;
+      const focusBoost = focusA * (0.001 + audioDrive * 0.0028 + split.transient * 0.0019);
+      vx += (focal.x - x) * focusBoost;
+      vy += (focal.y - y) * focusBoost;
+      vz += (focal.z - z) * (focusBoost * 0.82);
+    }
 
     vx *= damp;
     vy *= damp;
@@ -6216,9 +7851,10 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
         y = (v * 2 - 1) * 0.9 + (randHash(i, 113, randomSeed + 813) * 2 - 1) * mBoost;
         z = (randHash(i, 127, randomSeed + 815) * 2 - 1) * 0.6;
       }
-      vx = (randHash(i, 131, randomSeed + 817) * 2 - 1) * 0.01;
-      vy = (randHash(i, 137, randomSeed + 819) * 2 - 1) * 0.01;
-      vz = (randHash(i, 139, randomSeed + 821) * 2 - 1) * 0.01;
+      const spawnVel = 0.003 + driftA * 0.01;
+      vx = (randHash(i, 131, randomSeed + 817) * 2 - 1) * spawnVel;
+      vy = (randHash(i, 137, randomSeed + 819) * 2 - 1) * spawnVel;
+      vz = (randHash(i, 139, randomSeed + 821) * 2 - 1) * spawnVel;
       life = 0.45 + randHash(i, 149, randomSeed + 823) * 0.55;
     }
 
@@ -6252,6 +7888,30 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
       [r, g, b] = hslToRgb(hue, 0.78, 0.52 + audioDrive * 0.08);
     }
 
+    const gx = x / gradientSpread;
+    const gy = y / gradientSpread;
+    let gradT = 0.5;
+    if (gradientMode === "axis-x") gradT = gx * 0.5 + 0.5;
+    else if (gradientMode === "axis-y") gradT = gy * 0.5 + 0.5;
+    else if (gradientMode === "spiral") {
+      const ang = Math.atan2(gy, gx) / (Math.PI * 2) + 0.5;
+      const rad = Math.sqrt(gx * gx + gy * gy) * 0.72;
+      gradT = ang * 0.68 + rad * 0.42 + tSec * 0.04;
+    } else {
+      const radial = Math.sqrt(gx * gx + gy * gy);
+      gradT = 1 - radial;
+    }
+    gradT = clamp((gradT % 1 + 1) % 1, 0, 1);
+    const rg = Math.round(gradA.r * (1 - gradT) + gradB.r * gradT);
+    const gg = Math.round(gradA.g * (1 - gradT) + gradB.g * gradT);
+    const bg = Math.round(gradA.b * (1 - gradT) + gradB.b * gradT);
+    if (colorMixA > 0.001) {
+      const k = clamp(colorMixA * (0.8 + split.radial * 0.35), 0, 1);
+      r = Math.round(r * (1 - k) + rg * k);
+      g = Math.round(g * (1 - k) + gg * k);
+      b = Math.round(b * (1 - k) + bg * k);
+    }
+
     const alpha = clamp((0.45 + life * 0.55 + audioDrive * 0.2) * 255, 0, 255);
     const radius = Math.max(1, Math.round(sizePx * (0.6 + persp * 0.95)));
     const drawPx = (px, py, blend = 1) => {
@@ -6281,7 +7941,11 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
 }
 
 function renderParticlesMode(baseImageData, tSec, settings) {
-  if (!particlesGpuForcedOff && renderParticlesModeGpu(baseImageData, tSec, settings)) return;
+  const ps = getParticlesSettings();
+  const forceCpuStructured = ps.structure && ps.structure !== "cloud";
+  const forceCpuSplit = ps.audioSplit === "zones";
+  const shouldForceCpu = forceCpuStructured || forceCpuSplit;
+  if (!shouldForceCpu && !particlesGpuForcedOff && renderParticlesModeGpu(baseImageData, tSec, settings)) return;
   renderParticlesModeCpu(baseImageData, tSec, settings);
 }
 
@@ -6294,6 +7958,16 @@ function renderFrame() {
   const tSec = performance.now() / 1000;
   const s = getSettings();
   if (shouldRunTracking(s)) updateTrackingFromFrame();
+  if (
+    audioInputSource &&
+    audioInputSource.value === "file" &&
+    audioFilePlayer &&
+    audioFilePlayer.src &&
+    !audioFilePlayer.paused &&
+    !hasAudioReactiveInput()
+  ) {
+    activateAudioFileSource();
+  }
 
   if (mode === "none") {
     ctx.putImageData(sourceImage, 0, 0);
@@ -6314,26 +7988,40 @@ function renderFrame() {
     drawTrackingOverlay(s);
     applyOutputViewWarp();
     syncCleanOutput();
-    if (webcamActive || micActive || recordingActive || s.animDistort > 0 || s.motionTrail > 0 || isDomeAutoRotateActive()) scheduleRender();
+    if (webcamActive || hasAudioReactiveInput() || isAudioPlaybackActive() || recordingActive || s.animDistort > 0 || s.motionTrail > 0 || isDomeAutoRotateActive()) scheduleRender();
     return;
   }
 
-  if (mode === "particles") {
-    renderParticlesMode(base, tSec, s);
+    if (mode === "particles") {
+      const lightDir = getLightDirection(s);
+      drawSceneBackground(base.width, base.height, lightDir, s, tSec);
+      renderParticlesMode(base, tSec, s);
     applyOutputViewWarp();
     syncCleanOutput();
-    if (webcamActive || micActive || recordingActive || isDomeAutoRotateActive() || mode === "particles") scheduleRender();
+    if (webcamActive || hasAudioReactiveInput() || isAudioPlaybackActive() || recordingActive || isDomeAutoRotateActive() || mode === "particles") scheduleRender();
     return;
   }
 
   if (mode === "fractal") {
-    const fractalBase = copyImageData(sourceImage);
-    if (fractalFromGlitch) applyGlitchPipeline(fractalBase, s, randomSeed, tSec);
-    const result = applyKaleidoFractal(fractalBase, s, randomSeed);
-    ctx.putImageData(result, 0, 0);
+    let rendered = false;
+    try {
+      rendered = renderFractalLive(tSec);
+    } catch {
+      rendered = false;
+    }
+    if (!rendered) {
+      const fractalBase = copyImageData(sourceImage);
+      if (fractalFromGlitch) applyGlitchPipeline(fractalBase, s, randomSeed, tSec);
+      const result = applyKaleidoFractal(fractalBase, s, randomSeed);
+      if (result && result.data && result.width > 0 && result.height > 0) {
+        ctx.putImageData(result, 0, 0);
+      } else {
+        ctx.putImageData(sourceImage, 0, 0);
+      }
+    }
     applyOutputViewWarp();
     syncCleanOutput();
-    if (webcamActive || isDomeAutoRotateActive()) scheduleRender();
+    scheduleRender();
     return;
   }
 
@@ -6523,6 +8211,62 @@ function toggle3DCleanFrontMode() {
 }
 
 function randomizeActiveMode() {
+  if (mode === "fractal") {
+    if (liveFractalPreset) {
+      const opts = ["sacred", "ether", "inside", "flat"];
+      liveFractalPreset.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalQuality) {
+      const opts = ["low", "med", "high"];
+      liveFractalQuality.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalCameraMode) {
+      const opts = ["orbit", "inside"];
+      liveFractalCameraMode.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalCamSpeed) liveFractalCamSpeed.value = String(Math.round(Math.random() * 100));
+    if (liveFractalDistance) liveFractalDistance.value = String(Math.round(20 + Math.random() * 160));
+    if (liveFractalShape) {
+      const opts = ["mandel", "torus", "gyroid", "poly"];
+      liveFractalShape.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalSymmetry) liveFractalSymmetry.value = String(Math.round(8 + Math.random() * 16));
+    if (liveFractalPower) liveFractalPower.value = String(Math.round(60 + Math.random() * 60));
+    if (liveFractalFog) liveFractalFog.value = String(Math.round(Math.random() * 80));
+    if (liveFractalGlow) liveFractalGlow.value = String(Math.round(Math.random() * 100));
+    if (liveFractalLight) liveFractalLight.value = String(Math.round(20 + Math.random() * 280));
+    if (liveFractalSpin) liveFractalSpin.value = String(Math.round(Math.random() * 100));
+    if (liveFractalBreath) liveFractalBreath.value = String(Math.round(Math.random() * 100));
+    if (liveFractalWarmth) liveFractalWarmth.value = String(Math.round(Math.random() * 100));
+    if (liveFractalTexture) {
+      const opts = ["smooth", "crystal", "ink", "contour"];
+      liveFractalTexture.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalTexture2) {
+      const opts = ["none", "noise", "ripples", "cells"];
+      liveFractalTexture2.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalTextureMix) liveFractalTextureMix.value = String(Math.round(Math.random() * 100));
+    if (liveFractalRenderMode) {
+      const opts = ["shaded", "wire", "points", "hybrid"];
+      liveFractalRenderMode.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalStyle) liveFractalStyle.value = Math.random() > 0.72 ? "flat" : "lit";
+    if (liveFractalBackground) {
+      const opts = ["ethereal", "sunset", "cosmic", "solid"];
+      liveFractalBackground.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveFractalFlatColor) {
+      liveFractalFlatColor.value = `#${Math.floor(Math.random() * 0xffffff)
+        .toString(16)
+        .padStart(6, "0")}`;
+    }
+    if (liveFractalAudio) liveFractalAudio.checked = Math.random() > 0.12;
+    if (liveFractalAudioGain) liveFractalAudioGain.value = String(Math.round(Math.random() * 200));
+    updateOutputs();
+    scheduleRender();
+    return;
+  }
   if (mode === "particles") {
     if (liveParticlesCount) {
       const opts = ["low", "med", "high", "ultra"];
@@ -6536,6 +8280,14 @@ function randomizeActiveMode() {
       const opts = ["source", "palette", "audio"];
       liveParticlesColorMode.value = opts[Math.floor(Math.random() * opts.length)];
     }
+    if (liveParticlesStructure) {
+      const opts = ["grid", "ring", "helix", "mandala", "cloud"];
+      liveParticlesStructure.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesAudioSplit) {
+      const opts = ["basic", "zones", "off"];
+      liveParticlesAudioSplit.value = opts[Math.floor(Math.random() * opts.length)];
+    }
     if (liveParticlesSize) liveParticlesSize.value = String(Math.round(18 + Math.random() * 72));
     if (liveParticlesDepth) liveParticlesDepth.value = String(Math.round(22 + Math.random() * 70));
     if (liveParticlesNoise) liveParticlesNoise.value = String(Math.round(Math.random() * 100));
@@ -6546,11 +8298,20 @@ function randomizeActiveMode() {
     if (liveParticlesCamZ) liveParticlesCamZ.value = String(Math.round(-90 + Math.random() * 180));
     if (liveParticlesHue) liveParticlesHue.value = String(Math.round(Math.random() * 360));
     if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesOrder) liveParticlesOrder.value = String(Math.round(30 + Math.random() * 70));
     if (liveParticlesAudio) liveParticlesAudio.checked = Math.random() > 0.2;
     if (liveParticlesDamping) liveParticlesDamping.value = String(Math.round(Math.random() * 100));
     if (liveParticlesVortex) liveParticlesVortex.value = String(Math.round(Math.random() * 100));
     if (liveParticlesSpawn) liveParticlesSpawn.value = String(Math.round(20 + Math.random() * 80));
     if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesDrift) liveParticlesDrift.value = String(Math.round(12 + Math.random() * 64));
+    if (liveParticlesFocus) liveParticlesFocus.value = String(Math.round(10 + Math.random() * 75));
+    if (liveParticlesGradientMode) {
+      const opts = ["radial", "axis-x", "axis-y", "spiral"];
+      liveParticlesGradientMode.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesColorMix) liveParticlesColorMix.value = String(Math.round(20 + Math.random() * 75));
+    if (liveParticlesGradientSpread) liveParticlesGradientSpread.value = String(Math.round(20 + Math.random() * 80));
     particlesBufferN = 0;
     updateOutputs();
     scheduleRender();
@@ -6761,6 +8522,10 @@ function syncModeUi() {
       const studioGroup = group.dataset.studioGroup || "";
       if (studioGroup === "depth") {
         group.hidden = studioActiveTab !== "depth";
+      } else if (studioGroup === "particles") {
+        group.hidden = studioActiveTab !== "particles";
+      } else if (studioGroup === "fractal") {
+        group.hidden = studioActiveTab !== "fractal";
       } else if (studioGroup === "glitch") {
         group.hidden = studioActiveTab !== "glitch";
       } else {
@@ -6774,7 +8539,27 @@ function syncModeUi() {
   updatePresetOptions();
 }
 
+function resetCameraTransientState() {
+  targetPanX = null;
+  targetPanY = null;
+  targetCamFollow = null;
+  targetCamZoom = null;
+  targetRotX = null;
+  targetRotY = null;
+  targetRotZ = null;
+  cameraFlowEase = 0;
+  smoothCamFollow = controls.cameraFollow ? Number(controls.cameraFollow.value) : 0;
+  smoothCamZoom = controls.cameraZoom ? Number(controls.cameraZoom.value) : 100;
+  smoothRotX = controls.pointRotateX ? Number(controls.pointRotateX.value) : 0;
+  smoothRotY = controls.pointRotateY ? Number(controls.pointRotateY.value) : 0;
+  smoothRotZ = controls.pointRotateZ ? Number(controls.pointRotateZ.value) : 0;
+  cameraModePrev = cameraMode;
+  cameraModeBlendStart = 0;
+  lastCameraAnimTs = performance.now();
+}
+
 function setMode(newMode) {
+  const previousMode = mode;
   mode = newMode;
   populateModTargets();
   if (newMode !== "glitch" && newMode !== "mix" && glitchTrailCanvas.width > 0 && glitchTrailCanvas.height > 0) {
@@ -6798,11 +8583,23 @@ function setMode(newMode) {
   }
 
   if (newMode === "depth") {
+    if (previousMode !== "depth" && previousMode !== "mix" && previousMode !== "particles") {
+      setCameraMode("cursor", { instant: true });
+      dragRotateX = 0;
+      dragRotateY = 0;
+      resetCameraTransientState();
+    }
     const pointsOff = Number(controls.pointMap.value) === 0;
     const meshOff = Number(controls.meshMap.value) === 0;
     if (pointsOff && meshOff) setValues({ ...defaults, ...presets.depth[0].values });
   }
   if (newMode === "particles") {
+    if (previousMode !== "depth" && previousMode !== "mix" && previousMode !== "particles") {
+      setCameraMode("cursor", { instant: true });
+      dragRotateX = 0;
+      dragRotateY = 0;
+      resetCameraTransientState();
+    }
     // Rebuild particle buffers and recenter camera on each entry for predictable startup.
     particlesBufferN = 0;
     cameraPanX = 0;
@@ -6824,7 +8621,14 @@ function setMode(newMode) {
 
 function updateCameraDeckVisibility() {
   if (!cameraDeckControls) return;
-  const hideCamAnim = mode === "glitch";
+  const hideCamAnim = mode === "glitch" || mode === "fractal";
+  if (cameraControlsDetails) {
+    cameraControlsDetails.hidden = hideCamAnim;
+    if (!hideCamAnim && !cameraControlsDetails.open) {
+      // Keep compact by default; user can expand when needed.
+      cameraControlsDetails.open = false;
+    }
+  }
   const title = cameraDeckControls.querySelector(".subgroup-title");
   const modeBox = cameraDeckControls.querySelector(".camera-mode-box");
   const speedWrap = cameraDeckControls.querySelector("label.slider input#cameraMoveSpeed")?.closest("label.slider");
@@ -6919,13 +8723,23 @@ function resetAll() {
   if (liveParticlesCamY) liveParticlesCamY.value = "0";
   if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
   if (liveParticlesColorMode) liveParticlesColorMode.value = "source";
+  if (liveParticlesStructure) liveParticlesStructure.value = "cloud";
+  if (liveParticlesAudioSplit) liveParticlesAudioSplit.value = "basic";
   if (liveParticlesHue) liveParticlesHue.value = "0";
   if (liveParticlesAudio) liveParticlesAudio.checked = true;
   if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = "54";
+  if (liveParticlesOrder) liveParticlesOrder.value = "48";
   if (liveParticlesDamping) liveParticlesDamping.value = "18";
   if (liveParticlesVortex) liveParticlesVortex.value = "22";
   if (liveParticlesSpawn) liveParticlesSpawn.value = "68";
   if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = "32";
+  if (liveParticlesDrift) liveParticlesDrift.value = "34";
+  if (liveParticlesFocus) liveParticlesFocus.value = "38";
+  if (liveParticlesGradientMode) liveParticlesGradientMode.value = "radial";
+  if (liveParticlesColorMix) liveParticlesColorMix.value = "44";
+  if (liveParticlesGradientSpread) liveParticlesGradientSpread.value = "52";
+  if (liveParticlesGradientA) liveParticlesGradientA.value = "#00d8ff";
+  if (liveParticlesGradientB) liveParticlesGradientB.value = "#ff2ea6";
   particlesBufferN = 0;
   particlesX = null;
   particlesY = null;
@@ -6945,6 +8759,7 @@ function resetAll() {
   cameraKeyState.left = false;
   cameraKeyState.right = false;
   if (live3dAnaglyph) live3dAnaglyph.checked = false;
+  if (live3dAudioSync) live3dAudioSync.checked = false;
   if (live3dAnaglyphStrength) live3dAnaglyphStrength.value = "34";
   const none = modeInputs.find((m) => m.value === "none");
   if (none) none.checked = true;
@@ -7058,16 +8873,74 @@ async function exportAnimation(kind) {
   };
 }
 
+function getRecordQualityProfile() {
+  const key = recordQuality ? recordQuality.value : "medium";
+  if (key === "low") {
+    return { videoBitsPerSecond: 4_000_000, audioBitsPerSecond: 128_000 };
+  }
+  if (key === "high") {
+    return { videoBitsPerSecond: 16_000_000, audioBitsPerSecond: 256_000 };
+  }
+  return { videoBitsPerSecond: 8_000_000, audioBitsPerSecond: 192_000 };
+}
+
+function getRecordCanvasTargetSize() {
+  const sourceW = canvas.width || 1280;
+  const sourceH = canvas.height || 720;
+  const ratio = sourceW / Math.max(1, sourceH);
+  const targetH = Number(recordResolution ? recordResolution.value : "auto");
+  if (!Number.isFinite(targetH) || targetH <= 0) {
+    return { width: sourceW, height: sourceH };
+  }
+  let width = Math.round(targetH * ratio);
+  let height = Math.round(targetH);
+  // Keep dimensions even for better codec compatibility.
+  if (width % 2 !== 0) width += 1;
+  if (height % 2 !== 0) height += 1;
+  return { width: Math.max(2, width), height: Math.max(2, height) };
+}
+
+function stopLiveRecordBridge() {
+  if (liveRecordDrawTimer) {
+    clearInterval(liveRecordDrawTimer);
+    liveRecordDrawTimer = null;
+  }
+  liveRecordCanvas = null;
+  liveRecordCtx = null;
+}
+
+function startLiveRecordBridge() {
+  stopLiveRecordBridge();
+  const target = getRecordCanvasTargetSize();
+  liveRecordCanvas = document.createElement("canvas");
+  liveRecordCanvas.width = target.width;
+  liveRecordCanvas.height = target.height;
+  liveRecordCtx = liveRecordCanvas.getContext("2d", { alpha: false });
+  if (!liveRecordCtx) return null;
+  liveRecordCtx.imageSmoothingEnabled = true;
+  liveRecordCtx.clearRect(0, 0, target.width, target.height);
+  liveRecordCtx.drawImage(canvas, 0, 0, target.width, target.height);
+  const frameMs = 1000 / 24;
+  liveRecordDrawTimer = setInterval(() => {
+    if (!liveRecordCtx || !liveRecordCanvas) return;
+    liveRecordCtx.drawImage(canvas, 0, 0, liveRecordCanvas.width, liveRecordCanvas.height);
+  }, frameMs);
+  return liveRecordCanvas.captureStream(24);
+}
+
 function updateRecordingButtons() {
   if (!recordStartBtn || !recordSaveBtn) return;
   recordStartBtn.disabled = false;
   recordSaveBtn.disabled = liveRecordingState === "idle";
   if (liveRecordingState === "idle" || liveRecordingState === "stopped") {
-    recordStartBtn.textContent = t("record_start");
+    setButtonActionLabel(recordStartBtn, t("record_start"));
+    if (recordStartIcon) recordStartIcon.textContent = "REC";
   } else if (liveRecordingState === "recording") {
-    recordStartBtn.textContent = t("record_pause");
+    setButtonActionLabel(recordStartBtn, t("record_pause"));
+    if (recordStartIcon) recordStartIcon.textContent = "PAUSE";
   } else {
-    recordStartBtn.textContent = t("record_resume");
+    setButtonActionLabel(recordStartBtn, t("record_resume"));
+    if (recordStartIcon) recordStartIcon.textContent = "PLAY";
   }
   if (recordingIndicator && recordingStatusText) {
     recordingIndicator.classList.remove("recording", "paused");
@@ -7086,10 +8959,51 @@ function updateRecordingButtons() {
 function createLiveRecorder() {
   if (!liveRecordingStream || !liveRecordingMimeType) return null;
   try {
-    return new MediaRecorder(liveRecordingStream, { mimeType: liveRecordingMimeType });
+    return new MediaRecorder(liveRecordingStream, {
+      mimeType: liveRecordingMimeType,
+      videoBitsPerSecond: liveRecordingVideoBitrate,
+      audioBitsPerSecond: liveRecordingAudioBitrate,
+    });
   } catch {
     return null;
   }
+}
+
+function sanitizeFileBaseName(name, fallback) {
+  const base = (name || fallback || "clip")
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, "-")
+    .replace(/\s+/g, "_")
+    .replace(/_+/g, "_")
+    .slice(0, 140);
+  return base || fallback || "clip";
+}
+
+function applyClipBrandSuffix(name) {
+  const suffix = "B.ZU.AL_Studios_Clip";
+  const safe = sanitizeFileBaseName(name, "pixel-error-live");
+  const cleaned = safe.replace(/[-_ ]?B\.?ZU\.?AL[_ -]?Studios[_ -]?Clip$/i, "");
+  return `${sanitizeFileBaseName(cleaned, "pixel-error-live")}-` + suffix;
+}
+
+function closeRecordNameDialog(value) {
+  if (recordNameModal) recordNameModal.hidden = true;
+  const resolver = recordNameDialogResolve;
+  recordNameDialogResolve = null;
+  if (resolver) resolver(value);
+}
+
+function askRecordingFileName(defaultName) {
+  if (!recordNameModal || !recordNameInput) return Promise.resolve(defaultName);
+  recordNameModal.hidden = false;
+  recordNameInput.value = sanitizeFileBaseName(defaultName, "pixel-error-live");
+  setTimeout(() => {
+    recordNameInput.focus();
+    recordNameInput.select();
+  }, 0);
+  return new Promise((resolve) => {
+    recordNameDialogResolve = resolve;
+  });
 }
 
 function startRecorderSegment() {
@@ -7125,17 +9039,27 @@ function startRecorderSegment() {
   return true;
 }
 
-function finalizeLiveRecording() {
+async function finalizeLiveRecording() {
+  if (!liveRecordingChunks || liveRecordingChunks.length === 0) {
+    liveRecordingState = "idle";
+    updateRecordingButtons();
+    return;
+  }
   const type = liveRecordingMimeType || "video/mp4";
   const blob = new Blob(liveRecordingChunks, { type });
   const url = URL.createObjectURL(blob);
+  const defaultName = `pixel-error-live-${Date.now()}`;
+  const chosen = await askRecordingFileName(defaultName);
+  const branded = applyClipBrandSuffix(chosen || defaultName);
+  const safeBase = sanitizeFileBaseName(branded, applyClipBrandSuffix(defaultName));
   const a = document.createElement("a");
-  a.download = `pixel-error-live-${Date.now()}.${liveRecordingExt}`;
+  a.download = `${safeBase}.${liveRecordingExt}`;
   a.href = url;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 3000);
   if (liveRecordingStream) liveRecordingStream.getTracks().forEach((t) => t.stop());
   if (liveDisplayStream) liveDisplayStream.getTracks().forEach((t) => t.stop());
+  stopLiveRecordBridge();
   liveRecorder = null;
   liveRecordingStream = null;
   liveDisplayStream = null;
@@ -7156,6 +9080,9 @@ function startLiveRecording() {
 
   const start = async () => {
     const useScreen = recordSource && recordSource.value === "screen";
+    const profile = getRecordQualityProfile();
+    liveRecordingVideoBitrate = profile.videoBitsPerSecond;
+    liveRecordingAudioBitrate = profile.audioBitsPerSecond;
     let sourceStream = null;
 
     try {
@@ -7170,9 +9097,14 @@ function startLiveRecording() {
         });
         sourceStream = liveDisplayStream;
       } else {
-        sourceStream = canvas.captureStream(24);
+        sourceStream = startLiveRecordBridge();
+        if (!sourceStream) {
+          alert(t("recording_unsupported"));
+          return;
+        }
       }
     } catch {
+      stopLiveRecordBridge();
       alert(t("recording_screen_fail"));
       return;
     }
@@ -7196,6 +9128,7 @@ function startLiveRecording() {
         liveDisplayStream.getTracks().forEach((t) => t.stop());
         liveDisplayStream = null;
       }
+      stopLiveRecordBridge();
       merged.getTracks().forEach((t) => t.stop());
       alert(t("recording_mp4_required"));
       return;
@@ -7212,6 +9145,7 @@ function startLiveRecording() {
         liveDisplayStream.getTracks().forEach((t) => t.stop());
         liveDisplayStream = null;
       }
+      stopLiveRecordBridge();
       alert(t("recording_mp4_required"));
       return;
     }
@@ -7273,6 +9207,17 @@ if (canvasOverlayWebcamBtn) {
   });
 }
 
+if (moduleRouteButtons.length > 0) {
+  moduleRouteButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const route = btn.dataset.moduleRoute || "glitch";
+      setWorkspacePanel("live");
+      setLiveModeTab(route === "depth" || route === "particles" || route === "fractal" ? route : "glitch");
+      scheduleRender();
+    });
+  });
+}
+
 modeInputs.forEach((input) => {
   input.addEventListener("change", () => {
     if (input.checked) setMode(input.value);
@@ -7306,16 +9251,28 @@ if (fractalSource) {
   fractalSource.addEventListener("change", scheduleRender);
 }
 if (bgMode) {
-  bgMode.addEventListener("change", scheduleRender);
+  bgMode.addEventListener("change", () => {
+    syncLiveBackgroundQuickUi();
+    scheduleRender();
+  });
 }
 if (bgPalette) {
-  bgPalette.addEventListener("change", scheduleRender);
+  bgPalette.addEventListener("change", () => {
+    syncLiveBackgroundQuickUi();
+    scheduleRender();
+  });
 }
 if (bgColorA) {
-  bgColorA.addEventListener("input", scheduleRender);
+  bgColorA.addEventListener("input", () => {
+    syncLiveBackgroundQuickUi();
+    scheduleRender();
+  });
 }
 if (bgColorB) {
-  bgColorB.addEventListener("input", scheduleRender);
+  bgColorB.addEventListener("input", () => {
+    syncLiveBackgroundQuickUi();
+    scheduleRender();
+  });
 }
 if (aspectRatioSelect) {
   aspectRatioSelect.addEventListener("change", () => {
@@ -7617,8 +9574,15 @@ if (live3dColorPad) {
 }
 
 if (liveModeGlitchBtn) liveModeGlitchBtn.addEventListener("click", () => setLiveModeTab("glitch"));
+if (liveModeFractalBtn) liveModeFractalBtn.addEventListener("click", () => setLiveModeTab("fractal"));
 if (liveMode3dBtn) liveMode3dBtn.addEventListener("click", () => setLiveModeTab("depth"));
 if (liveModeParticlesBtn) liveModeParticlesBtn.addEventListener("click", () => setLiveModeTab("particles"));
+if (liveModeRandomBtn) {
+  liveModeRandomBtn.addEventListener("click", () => {
+    randomizeActiveMode();
+    scheduleRender();
+  });
+}
 if (liveGlitchIntensity) {
   liveGlitchIntensity.addEventListener("input", () => {
     applyLiveGlitchMacros();
@@ -7655,6 +9619,73 @@ if (liveGlitchAnim) {
     scheduleRender();
   });
 }
+if (liveFractalQuality) {
+  liveFractalQuality.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (liveFractalPreset) {
+  liveFractalPreset.addEventListener("change", () => {
+    applyFractalPreset(liveFractalPreset.value);
+  });
+}
+if (liveFractalDomeMode) {
+  liveFractalDomeMode.addEventListener("change", () => {
+    const v = liveFractalDomeMode.value;
+    if (!liveOutputView || !domeSourceMap) return;
+    if (v === "off") {
+      liveOutputView.value = "normal";
+    } else if (v === "dome-equirect") {
+      liveOutputView.value = "dome";
+      domeSourceMap.value = "equirect";
+    } else {
+      liveOutputView.value = "dome";
+      domeSourceMap.value = "standard";
+    }
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (liveFractalAudio) {
+  liveFractalAudio.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+[
+  liveFractalCameraMode,
+  liveFractalShape,
+  liveFractalTexture,
+  liveFractalTexture2,
+  liveFractalRenderMode,
+  liveFractalStyle,
+  liveFractalBackground,
+  liveFractalFlatColor,
+].forEach((control) => {
+  if (!control) return;
+  control.addEventListener("change", () => {
+    scheduleRender();
+  });
+});
+[
+  liveFractalCamSpeed,
+  liveFractalDistance,
+  liveFractalTextureMix,
+  liveFractalSymmetry,
+  liveFractalPower,
+  liveFractalFog,
+  liveFractalGlow,
+  liveFractalLight,
+  liveFractalSpin,
+  liveFractalBreath,
+  liveFractalWarmth,
+  liveFractalAudioGain,
+].forEach((control) => {
+  if (!control) return;
+  control.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+});
 if (live3dPoints) {
   live3dPoints.addEventListener("input", () => {
     applyLive3dMacros();
@@ -7710,6 +9741,11 @@ if (live3dFxAmount) {
     scheduleRender();
   });
 }
+if (live3dAudioSync) {
+  live3dAudioSync.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
 if (live3dAnaglyph) {
   live3dAnaglyph.addEventListener("change", () => {
     scheduleRender();
@@ -7719,6 +9755,46 @@ if (live3dAnaglyphStrength) {
   live3dAnaglyphStrength.addEventListener("input", () => {
     updateLiveQuickOutputs();
     scheduleRender();
+  });
+}
+if (live3dBgMode) {
+  live3dBgMode.addEventListener("change", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: live3dBgMode,
+      palette: live3dBgPalette,
+      colorA: live3dBgColorA,
+      colorB: live3dBgColorB,
+    });
+  });
+}
+if (live3dBgPalette) {
+  live3dBgPalette.addEventListener("change", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: live3dBgMode,
+      palette: live3dBgPalette,
+      colorA: live3dBgColorA,
+      colorB: live3dBgColorB,
+    });
+  });
+}
+if (live3dBgColorA) {
+  live3dBgColorA.addEventListener("input", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: live3dBgMode,
+      palette: live3dBgPalette,
+      colorA: live3dBgColorA,
+      colorB: live3dBgColorB,
+    });
+  });
+}
+if (live3dBgColorB) {
+  live3dBgColorB.addEventListener("input", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: live3dBgMode,
+      palette: live3dBgPalette,
+      colorA: live3dBgColorA,
+      colorB: live3dBgColorB,
+    });
   });
 }
 if (liveParticlesCount) {
@@ -7738,9 +9814,75 @@ if (liveParticlesColorMode) {
     scheduleRender();
   });
 }
+if (liveParticlesStructure) {
+  liveParticlesStructure.addEventListener("change", () => {
+    particlesBufferN = 0;
+    scheduleRender();
+  });
+}
+if (liveParticlesAudioSplit) {
+  liveParticlesAudioSplit.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (liveParticlesGradientMode) {
+  liveParticlesGradientMode.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
 if (liveParticlesAudio) {
   liveParticlesAudio.addEventListener("change", () => {
     scheduleRender();
+  });
+}
+if (liveParticlesGradientA) {
+  liveParticlesGradientA.addEventListener("input", () => {
+    scheduleRender();
+  });
+}
+if (liveParticlesGradientB) {
+  liveParticlesGradientB.addEventListener("input", () => {
+    scheduleRender();
+  });
+}
+if (liveParticlesBgMode) {
+  liveParticlesBgMode.addEventListener("change", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: liveParticlesBgMode,
+      palette: liveParticlesBgPalette,
+      colorA: liveParticlesBgColorA,
+      colorB: liveParticlesBgColorB,
+    });
+  });
+}
+if (liveParticlesBgPalette) {
+  liveParticlesBgPalette.addEventListener("change", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: liveParticlesBgMode,
+      palette: liveParticlesBgPalette,
+      colorA: liveParticlesBgColorA,
+      colorB: liveParticlesBgColorB,
+    });
+  });
+}
+if (liveParticlesBgColorA) {
+  liveParticlesBgColorA.addEventListener("input", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: liveParticlesBgMode,
+      palette: liveParticlesBgPalette,
+      colorA: liveParticlesBgColorA,
+      colorB: liveParticlesBgColorB,
+    });
+  });
+}
+if (liveParticlesBgColorB) {
+  liveParticlesBgColorB.addEventListener("input", () => {
+    applyLiveBackgroundQuickFrom({
+      mode: liveParticlesBgMode,
+      palette: liveParticlesBgPalette,
+      colorA: liveParticlesBgColorA,
+      colorB: liveParticlesBgColorB,
+    });
   });
 }
 [
@@ -7754,10 +9896,15 @@ if (liveParticlesAudio) {
   liveParticlesCamZ,
   liveParticlesHue,
   liveParticlesAudioAmount,
+  liveParticlesOrder,
   liveParticlesDamping,
   liveParticlesVortex,
   liveParticlesSpawn,
   liveParticlesMotionThreshold,
+  liveParticlesDrift,
+  liveParticlesFocus,
+  liveParticlesColorMix,
+  liveParticlesGradientSpread,
 ].forEach((control) => {
   if (!control) return;
   control.addEventListener("input", () => {
@@ -7769,6 +9916,11 @@ if (liveOutputView) {
   liveOutputView.addEventListener("change", () => {
     if (loadedImage) renderLoadedImageToCanvas();
     scheduleRender();
+  });
+}
+if (recordSource) {
+  recordSource.addEventListener("change", () => {
+    updateRecordSettingsUi();
   });
 }
 if (domeSourceMap) {
@@ -7832,15 +9984,20 @@ canvas.addEventListener("mousemove", (e) => {
     scheduleRender();
     return;
   }
-  if (mode !== "depth" && mode !== "particles") return;
+  if (mode !== "depth" && mode !== "particles" && mode !== "fractal") return;
   if (isDragging3D) {
     const dx = e.clientX - lastDragX;
     const dy = e.clientY - lastDragY;
     lastDragX = e.clientX;
     lastDragY = e.clientY;
-    dragRotateY += dx * 0.18;
-    dragRotateX += dy * 0.18;
-    dragRotateX = clamp(dragRotateX, -179, 179);
+    if (mode === "fractal") {
+      fractalCamYawTarget += dx * 0.0065;
+      fractalCamPitchTarget = clamp(fractalCamPitchTarget + dy * 0.0055, -1.2, 1.2);
+    } else {
+      dragRotateY += dx * 0.18;
+      dragRotateX += dy * 0.18;
+      dragRotateX = clamp(dragRotateX, -179, 179);
+    }
     scheduleRender();
     return;
   }
@@ -7849,8 +10006,15 @@ canvas.addEventListener("mousemove", (e) => {
 canvas.addEventListener(
   "wheel",
   (e) => {
-    if (mode !== "depth" && mode !== "mix" && mode !== "particles") return;
+    if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal") return;
     e.preventDefault();
+    if (mode === "fractal") {
+      const next = clamp((liveFractalDistance ? Number(liveFractalDistance.value) : 76) - e.deltaY * 0.03, 20, 180);
+      if (liveFractalDistance) liveFractalDistance.value = String(Math.round(next));
+      updateLiveQuickOutputs();
+      scheduleRender();
+      return;
+    }
     const speed = e.ctrlKey ? 0.06 : 0.025;
     adjustCanvasZoom(-e.deltaY, speed);
   },
@@ -7858,14 +10022,27 @@ canvas.addEventListener(
 );
 
 canvas.addEventListener("gesturestart", (e) => {
-  if (mode !== "depth" && mode !== "mix" && mode !== "particles") return;
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal") return;
   e.preventDefault();
+  if (mode === "fractal") {
+    gestureBaseZoom = liveFractalDistance ? Number(liveFractalDistance.value) : 76;
+    return;
+  }
   gestureBaseZoom = Number(controls.cameraZoom ? controls.cameraZoom.value : 86);
 });
 
 canvas.addEventListener("gesturechange", (e) => {
-  if (mode !== "depth" && mode !== "mix" && mode !== "particles") return;
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal") return;
   e.preventDefault();
+  if (mode === "fractal") {
+    if (gestureBaseZoom === null) gestureBaseZoom = liveFractalDistance ? Number(liveFractalDistance.value) : 76;
+    const scale = clamp(Number(e.scale || 1), 0.3, 4);
+    const next = clamp(gestureBaseZoom * scale, 20, 180);
+    if (liveFractalDistance) liveFractalDistance.value = String(Math.round(next));
+    updateLiveQuickOutputs();
+    scheduleRender();
+    return;
+  }
   if (!controls.cameraZoom) return;
   if (gestureBaseZoom === null) gestureBaseZoom = Number(controls.cameraZoom.value);
   const scale = clamp(Number(e.scale || 1), 0.3, 4);
@@ -7928,7 +10105,7 @@ canvas.addEventListener("mousedown", (e) => {
     canvas.classList.add("dragging");
     return;
   }
-  if ((mode !== "depth" && mode !== "particles") || (!originalImageData && !webcamActive)) return;
+  if ((mode !== "depth" && mode !== "particles" && mode !== "fractal") || (!originalImageData && !webcamActive)) return;
   isDragging3D = true;
   lastDragX = e.clientX;
   lastDragY = e.clientY;
@@ -7966,12 +10143,158 @@ if (cameraDeviceSelect) {
   });
 }
 micBtn.addEventListener("click", toggleMic);
+if (audioFileInput) {
+  audioFileInput.addEventListener("change", (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    loadAudioFile(file);
+  });
+}
+if (audioFilePlayer) {
+  audioFilePlayer.addEventListener("play", () => {
+    if (!audioFilePlayer.src) return;
+    activateAudioFileSource();
+    updateLiveAudioFileMini();
+    scheduleRender();
+  });
+  audioFilePlayer.addEventListener("pause", () => {
+    audioFileActive = false;
+    teardownAudioPipeline();
+    updateLiveAudioFileMini();
+    updateDynamicUiTexts();
+    scheduleRender();
+  });
+  audioFilePlayer.addEventListener("ended", () => {
+    audioFileActive = false;
+    teardownAudioPipeline();
+    updateLiveAudioFileMini();
+    updateDynamicUiTexts();
+    scheduleRender();
+  });
+  audioFilePlayer.addEventListener("canplay", () => {
+    if (!audioFilePlayer.src) return;
+    if (!audioFilePlayer.paused && audioInputSource && audioInputSource.value === "file" && !audioFileActive) {
+      activateAudioFileSource();
+    }
+  });
+  audioFilePlayer.addEventListener("timeupdate", () => {
+    updateLiveAudioFileMini();
+    if (audioInputSource && audioInputSource.value === "file") {
+      if (!audioFilePlayer.paused && !hasAudioReactiveInput()) activateAudioFileSource();
+      scheduleRender();
+    }
+  });
+  audioFilePlayer.addEventListener("loadedmetadata", updateLiveAudioFileMini);
+}
+if (audioFileClearBtn) {
+  audioFileClearBtn.addEventListener("click", () => {
+    stopAudioFileInput();
+    if (audioFileInput) audioFileInput.value = "";
+    if (audioInputSource && audioInputSource.value === "file") {
+      audioInputSource.value = "mic";
+    }
+    updateDynamicUiTexts();
+  });
+}
+if (liveAudioPlayPauseBtn) {
+  liveAudioPlayPauseBtn.addEventListener("click", () => {
+    if (!audioFilePlayer || !audioFilePlayer.src) return;
+    if (audioFilePlayer.paused) audioFilePlayer.play().catch(() => {});
+    else audioFilePlayer.pause();
+    updateLiveAudioFileMini();
+  });
+}
+if (liveAudioSeek) {
+  liveAudioSeek.addEventListener("input", () => {
+    if (!audioFilePlayer || !Number.isFinite(audioFilePlayer.duration) || audioFilePlayer.duration <= 0) return;
+    const r = clamp(Number(liveAudioSeek.value) / 1000, 0, 1);
+    audioFilePlayer.currentTime = audioFilePlayer.duration * r;
+    updateLiveAudioFileMini();
+  });
+}
+if (liveAudioClearBtn) {
+  liveAudioClearBtn.addEventListener("click", () => {
+    stopAudioFileInput();
+    if (audioFileInput) audioFileInput.value = "";
+    if (audioInputSource && audioInputSource.value === "file") {
+      audioInputSource.value = "mic";
+    }
+    updateDynamicUiTexts();
+  });
+}
+if (liveAudioLoadBtn) {
+  liveAudioLoadBtn.addEventListener("click", () => {
+    if (audioFileInput) audioFileInput.click();
+  });
+}
+if (liveAudioToggleBtn) {
+  liveAudioToggleBtn.addEventListener("click", () => {
+    if (audioInputSource && audioInputSource.value === "file") {
+      if (audioFilePlayer && audioFilePlayer.src) {
+        if (audioFilePlayer.paused) audioFilePlayer.play().catch(() => {});
+        else audioFilePlayer.pause();
+      } else if (audioFileInput) {
+        audioFileInput.click();
+      }
+      return;
+    }
+    toggleMic();
+  });
+}
+if (liveAudioInputQuick) {
+  liveAudioInputQuick.addEventListener("change", () => {
+    if (!audioInputSource) return;
+    audioInputSource.value = liveAudioInputQuick.value;
+    audioInputSource.dispatchEvent(new Event("change"));
+    syncLiveAudioQuickUi();
+  });
+}
+if (liveAudioTargetQuick) {
+  liveAudioTargetQuick.addEventListener("change", () => {
+    if (!audioTarget) return;
+    audioTarget.value = liveAudioTargetQuick.value;
+    audioTarget.dispatchEvent(new Event("change"));
+    syncLiveAudioQuickUi();
+  });
+}
+if (liveAudioSensitivityQuick) {
+  liveAudioSensitivityQuick.addEventListener("input", () => {
+    if (!controls.audioSensitivity) return;
+    controls.audioSensitivity.value = liveAudioSensitivityQuick.value;
+    const out = liveAudioSensitivityQuick.parentElement?.querySelector("output");
+    if (out) out.textContent = String(liveAudioSensitivityQuick.value);
+    updateOutputs();
+    scheduleRender();
+  });
+}
 exportVideoBtn.addEventListener("click", () => exportAnimation("video"));
 exportGifBtn.addEventListener("click", () => exportAnimation("gif"));
 if (exportPhotoBtn) exportPhotoBtn.addEventListener("click", exportPhotoHQ);
 recordStartBtn.addEventListener("click", toggleLiveRecording);
 if (recordPauseBtn) recordPauseBtn.addEventListener("click", pauseOrResumeLiveRecording);
 recordSaveBtn.addEventListener("click", saveLiveRecording);
+if (recordNameCancelBtn) {
+  recordNameCancelBtn.addEventListener("click", () => closeRecordNameDialog(""));
+}
+if (recordNameSaveBtn) {
+  recordNameSaveBtn.addEventListener("click", () => closeRecordNameDialog(recordNameInput ? recordNameInput.value : ""));
+}
+if (recordNameInput) {
+  recordNameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      closeRecordNameDialog(recordNameInput.value);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      closeRecordNameDialog("");
+    }
+  });
+}
+if (recordNameModal) {
+  recordNameModal.addEventListener("click", (e) => {
+    if (e.target === recordNameModal) closeRecordNameDialog("");
+  });
+}
 openCleanOutputBtn.addEventListener("click", openCleanOutput);
 closeCleanOutputBtn.addEventListener("click", closeCleanOutput);
 camStaticBtn.addEventListener("click", () => setCameraMode("static"));
@@ -7989,11 +10312,30 @@ if (cameraMoveSpeed) {
   });
 }
 
-audioInputSource.addEventListener("change", () => {
+audioInputSource.addEventListener("change", async () => {
   updateAudioRoutingUi();
-  if (micActive) {
-    toggleMic().then(() => toggleMic());
+  if (audioInputSource.value === "file") {
+    if (audioFilePlayer && audioFilePlayer.src) {
+      activateAudioFileSource();
+      audioFilePlayer.play().catch(() => {});
+    } else {
+      stopMicInput();
+      teardownAudioPipeline();
+      updateDynamicUiTexts();
+    }
+    return;
   }
+  if (audioFileActive) {
+    deactivateAudioFileSource();
+  }
+  if (micActive) {
+    await toggleMic();
+  }
+  if (audioInputSource.value === "mic" || audioInputSource.value === "system") {
+    await toggleMic();
+  }
+  syncLiveAudioQuickUi();
+  scheduleRender();
 });
 audioTarget.addEventListener("change", scheduleRender);
 audioAnimation.addEventListener("change", scheduleRender);
@@ -8007,7 +10349,10 @@ workflowTabs.forEach((tab) => {
 });
 
 if (studioModeGlitchBtn) studioModeGlitchBtn.addEventListener("click", () => setStudioTab("glitch"));
+if (studioModeFractalBtn) studioModeFractalBtn.addEventListener("click", () => setStudioTab("fractal"));
 if (studioMode3dBtn) studioMode3dBtn.addEventListener("click", () => setStudioTab("depth"));
+if (studioModeParticlesBtn) studioModeParticlesBtn.addEventListener("click", () => setStudioTab("particles"));
+particleStudioControlPairs.forEach(([studioControl, liveControl]) => applyStudioParticlesControl(studioControl, liveControl));
 
 if (languageSelect) {
   languageSelect.addEventListener("change", () => {
@@ -8030,33 +10375,45 @@ if (panicBtn) panicBtn.addEventListener("click", panicReset);
 if (snapshotSaveBtn) {
   snapshotSaveBtn.addEventListener("click", () => captureSnapshot(currentSnapshotSlot));
 }
+if (snapshotLoadBtn) {
+  snapshotLoadBtn.addEventListener("click", () => applySnapshot(currentSnapshotSlot));
+}
+if (snapshotClearBtn) {
+  snapshotClearBtn.addEventListener("click", () => clearSnapshot(currentSnapshotSlot));
+}
 snapshotSlots.forEach((btn) => {
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", (ev) => {
     const slot = Number(btn.dataset.slot);
     currentSnapshotSlot = slot;
     refreshSnapshotUi();
-    if (snapshots[slot - 1]) applySnapshot(slot);
+    if (ev.detail >= 2 && snapshots[slot - 1]) applySnapshot(slot);
   });
 });
 
-randomBtn.addEventListener("click", () => {
-  randomizeActiveMode();
-  scheduleRender();
-});
+if (randomBtn) {
+  randomBtn.addEventListener("click", () => {
+    randomizeActiveMode();
+    scheduleRender();
+  });
+}
 
-reseedBtn.addEventListener("click", () => {
-  randomSeed = Math.floor(Math.random() * 100000);
-  scheduleRender();
-});
+if (reseedBtn) {
+  reseedBtn.addEventListener("click", () => {
+    randomSeed = Math.floor(Math.random() * 100000);
+    scheduleRender();
+  });
+}
 
-resetBtn.addEventListener("click", resetAll);
-downloadBtn.addEventListener("click", downloadCurrentImage);
+if (resetBtn) resetBtn.addEventListener("click", resetAll);
+if (downloadBtn) downloadBtn.addEventListener("click", downloadCurrentImage);
 
 window.addEventListener("beforeunload", () => {
   closeCleanOutput();
   if (webcamStream) webcamStream.getTracks().forEach((t) => t.stop());
   if (micStream) micStream.getTracks().forEach((t) => t.stop());
   if (liveDisplayStream) liveDisplayStream.getTracks().forEach((t) => t.stop());
+  stopAudioFileInput();
+  teardownAudioPipeline();
 });
 
 window.addEventListener("resize", () => {
@@ -8177,7 +10534,9 @@ window.addEventListener("keydown", (e) => {
   }
   if (/^[1-8]$/.test(e.key)) {
     e.preventDefault();
-    applySnapshot(Number(e.key));
+    const slot = Number(e.key);
+    if (e.shiftKey) captureSnapshot(slot);
+    else applySnapshot(slot);
   }
 });
 
@@ -8192,7 +10551,7 @@ locale = languageSelect && languageSelect.value === "en" ? "en" : "es";
 populateModTargets();
 setValues(defaults);
 syncModeUi();
-setWorkspacePanel("setup");
+setWorkspacePanel("live");
 setUiMode("live");
 setCameraMode("cursor");
 updateCameraDeckVisibility();
