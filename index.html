@@ -183,11 +183,12 @@
                     <span id="liveAudioFileName" class="live-audio-file-name" data-text="">-</span>
                   </div>
                   <div class="live-audio-file-controls">
-                    <button id="liveAudioPlayPauseBtn" class="btn mini" data-i18n="play">Play</button>
+                    <button id="liveAudioPlayPauseBtn" class="btn mini live-audio-play-btn" data-i18n="play">Play</button>
                     <input type="range" id="liveAudioSeek" min="0" max="1000" value="0" />
                     <span id="liveAudioTime">00:00 / 00:00</span>
                     <button id="liveAudioClearBtn" class="btn mini" data-i18n="clear_audio">Clear Audio</button>
                   </div>
+                  <canvas id="liveAudioWaveform" class="live-audio-waveform" width="520" height="36" aria-label="Audio waveform mini"></canvas>
                 </div>
                 <p class="status-line" id="liveAudioStatusQuick">Audio: idle</p>
               </div>
@@ -370,7 +371,7 @@
                     <option value="none">None</option>
                     <option value="delay">Delay</option>
                     <option value="echo">Visual Echo</option>
-                    <option value="colortrail">Color Trail</option>
+                    <option value="colortrail">Trail (Accented)</option>
                     <option value="prism">Prism Drift</option>
                   </select>
                 </label>
@@ -435,7 +436,7 @@
                 </label>
                 <button id="quick3dBtn" class="btn" data-i18n="quick3d">3D Starter</button>
                 <button id="quick3dCleanBtn" class="btn" data-i18n="quick3d_clean">3D Clean Front (M)</button>
-                <p class="micro-tip">Tip: usa WASD/flechas para paneo 3D y arrastra para orbitar.</p>
+                <p class="micro-tip">Tip: usa WASD para paneo 3D, arrastra para orbitar, ←/→ para módulo y ↑/↓ para FX.</p>
               </div>
               <div id="livePaneParticles" class="group live-pane" hidden>
                 <h2>Particles Essentials</h2>
@@ -902,6 +903,10 @@
             </div>
 
             <div class="deck-controls" id="cameraDeckControls">
+              <div class="canvas-mini-meta" id="canvasMiniMeta">
+                <span id="canvasMiniResolution">Canvas 0x0</span>
+                <span id="canvasMiniFps">0 FPS</span>
+              </div>
               <label class="inline-select canvas-aspect-control">
                 <span data-i18n="aspect_ratio">Aspect Ratio</span>
                 <select id="aspectRatioSelect">
@@ -913,6 +918,78 @@
                   <option value="21:9" selected>21:9</option>
                 </select>
               </label>
+              <details id="masterFxDetails" class="master-fx-details">
+                <summary>Master FX (Global)</summary>
+                <label class="inline-select">
+                  <span>Master FX</span>
+                  <select id="masterFxMode">
+                    <option value="none">None</option>
+                    <option value="bloom">Bloom</option>
+                    <option value="chromatic">Chromatic</option>
+                    <option value="trail">Trail (Accented)</option>
+                    <option value="crt">CRT</option>
+                    <option value="psychedelic">Psychedelic</option>
+                    <option value="flatfx">Flat FX</option>
+                    <option value="neon">Neon Glow</option>
+                  </select>
+                </label>
+                <label class="slider">
+                  <span>Master FX Amount</span>
+                  <input type="range" id="masterFxAmount" min="0" max="100" value="28" />
+                  <output for="masterFxAmount">28</output>
+                </label>
+                <label class="slider">
+                  <span>Master FX Speed</span>
+                  <input type="range" id="masterFxSpeed" min="0" max="100" value="42" />
+                  <output for="masterFxSpeed">42</output>
+                </label>
+                <label class="slider">
+                  <span>Master FX Color</span>
+                  <input type="range" id="masterFxColor" min="0" max="100" value="52" />
+                  <output for="masterFxColor">52</output>
+                </label>
+                <div class="pad-label"><span class="pad-icon">MFX</span><span>Master Pad (X=Amount / Y=Color)</span></div>
+                <div id="masterFxPad" class="depth-pad live-fx-pad">
+                  <div id="masterFxPadDot" class="depth-pad-dot"></div>
+                </div>
+              </details>
+              <details id="kaleidoFxDetails" class="master-fx-details">
+                <summary>Kaleidoscope</summary>
+                <label class="toggle"><input type="checkbox" id="kaleidoFxEnabled" /><span>Enable Kaleidoscope</span></label>
+                <label class="inline-select">
+                  <span>Kaleido Type</span>
+                  <select id="kaleidoFxType">
+                    <option value="mirror">Mirror</option>
+                    <option value="tunnel">Tunnel</option>
+                    <option value="radial">Radial</option>
+                    <option value="spiral">Spiral</option>
+                  </select>
+                </label>
+                <label class="slider">
+                  <span>Kaleido Amount</span>
+                  <input type="range" id="kaleidoFxAmount" min="0" max="100" value="38" />
+                  <output for="kaleidoFxAmount">38</output>
+                </label>
+                <label class="slider">
+                  <span>Kaleido Speed</span>
+                  <input type="range" id="kaleidoFxSpeed" min="0" max="100" value="35" />
+                  <output for="kaleidoFxSpeed">35</output>
+                </label>
+                <label class="slider">
+                  <span>Kaleido Smooth</span>
+                  <input type="range" id="kaleidoFxSmooth" min="0" max="100" value="44" />
+                  <output for="kaleidoFxSmooth">44</output>
+                </label>
+                <label class="slider">
+                  <span>Kaleido Segments</span>
+                  <input type="range" id="kaleidoFxSegments" min="4" max="28" value="12" />
+                  <output for="kaleidoFxSegments">12</output>
+                </label>
+                <div class="pad-label"><span class="pad-icon">KAL</span><span>Kaleido Pad (X=Amount / Y=Smooth)</span></div>
+                <div id="kaleidoFxPad" class="depth-pad live-fx-pad">
+                  <div id="kaleidoFxPadDot" class="depth-pad-dot"></div>
+                </div>
+              </details>
               <details id="cameraControlsDetails" class="camera-controls-details">
                 <summary data-i18n="camera_controls">Camera Controls</summary>
                 <p class="subgroup-title" data-i18n="camera_modes">Camera Modes</p>
@@ -978,14 +1055,15 @@
               </div>
               <p class="subgroup-title" data-i18n="exports">Exports</p>
               <div class="audio-reactive-box">
-                <button id="exportVideoBtn" class="btn" data-i18n="export_video">Export 5s Video</button>
-                <button id="exportGifBtn" class="btn" data-i18n="export_gif">Export 5s GIF*</button>
                 <button id="exportPhotoBtn" class="btn btn-photo-main">
                   <span class="action-icon action-icon-photo">IMG</span>
                   <span class="action-label" data-i18n="export_photo">Photo HQ</span>
                 </button>
               </div>
               <p class="subgroup-title" data-i18n="clean_output">Clean Output</p>
+              <p class="clean-output-note" data-i18n="clean_output_note">
+                LIVE signal, optimized for maximum clean projection quality.
+              </p>
               <div class="audio-reactive-box">
                 <button id="openCleanOutputBtn" class="btn" data-i18n="open_clean_output">Open Clean Output</button>
                 <button id="closeCleanOutputBtn" class="btn" data-i18n="close_clean_output">Close Clean Output</button>

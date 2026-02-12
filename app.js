@@ -76,6 +76,8 @@ const modAmount = document.getElementById("modAmount");
 const modSmoothing = document.getElementById("modSmoothing");
 const modClamp = document.getElementById("modClamp");
 const performanceStatus = document.getElementById("performanceStatus");
+const canvasMiniResolution = document.getElementById("canvasMiniResolution");
+const canvasMiniFps = document.getElementById("canvasMiniFps");
 const performanceHint = document.getElementById("performanceHint");
 const freezeBtn = document.getElementById("freezeBtn");
 const panicBtn = document.getElementById("panicBtn");
@@ -101,6 +103,8 @@ const liveAudioPlayPauseBtn = document.getElementById("liveAudioPlayPauseBtn");
 const liveAudioSeek = document.getElementById("liveAudioSeek");
 const liveAudioTime = document.getElementById("liveAudioTime");
 const liveAudioClearBtn = document.getElementById("liveAudioClearBtn");
+const liveAudioWaveform = document.getElementById("liveAudioWaveform");
+const liveAudioWaveCtx = liveAudioWaveform ? liveAudioWaveform.getContext("2d") : null;
 const livePaneGlitch = document.getElementById("livePaneGlitch");
 const livePaneFractal = document.getElementById("livePaneFractal");
 const livePane3d = document.getElementById("livePane3d");
@@ -148,6 +152,22 @@ const live3dAudioSync = document.getElementById("live3dAudioSync");
 const live3dAnaglyph = document.getElementById("live3dAnaglyph");
 const live3dAnaglyphStrength = document.getElementById("live3dAnaglyphStrength");
 const liveModeRandomBtn = document.getElementById("liveModeRandomBtn");
+const masterFxDetails = document.getElementById("masterFxDetails");
+const masterFxMode = document.getElementById("masterFxMode");
+const masterFxAmount = document.getElementById("masterFxAmount");
+const masterFxSpeed = document.getElementById("masterFxSpeed");
+const masterFxColor = document.getElementById("masterFxColor");
+const masterFxPad = document.getElementById("masterFxPad");
+const masterFxPadDot = document.getElementById("masterFxPadDot");
+const kaleidoFxDetails = document.getElementById("kaleidoFxDetails");
+const kaleidoFxEnabled = document.getElementById("kaleidoFxEnabled");
+const kaleidoFxType = document.getElementById("kaleidoFxType");
+const kaleidoFxAmount = document.getElementById("kaleidoFxAmount");
+const kaleidoFxSpeed = document.getElementById("kaleidoFxSpeed");
+const kaleidoFxSmooth = document.getElementById("kaleidoFxSmooth");
+const kaleidoFxSegments = document.getElementById("kaleidoFxSegments");
+const kaleidoFxPad = document.getElementById("kaleidoFxPad");
+const kaleidoFxPadDot = document.getElementById("kaleidoFxPadDot");
 const liveCameraMode = document.getElementById("liveCameraMode");
 const liveGlitchPad = document.getElementById("liveGlitchPad");
 const liveGlitchPadDot = document.getElementById("liveGlitchPadDot");
@@ -767,8 +787,13 @@ let particlesCamModePrev = "orbit";
 let particlesCamModeBlendStart = 0;
 let particlesCamSpeedSmooth = 0.34;
 let particlesRandomTween = null;
+let particlesCameraTween = null;
+let particlesWarmupUntil = 0;
 let depthMorphTween = null;
 let fractalMorphTween = null;
+let fractalCameraTween = null;
+let kaleidoMorphTween = null;
+let kaleidoSegSmooth = 12;
 let particlesGpuReady = false;
 let particlesGpuTriedInit = false;
 let particlesGpu = null;
@@ -856,11 +881,14 @@ let lastFpsTs = performance.now();
 let fpsFrames = 0;
 let lastRenderTs = performance.now();
 let perfScale = 1;
+let adaptivePostFxScale = 1;
 let modSignalSmoothed = 0;
 let transientEnergy = 0;
 let lastBandEnergy = 0;
 let audioNoiseFloor = 0.02;
 let audioReactiveEnv = 0;
+let liveAudioWaveLevels = new Float32Array(32);
+let liveAudioWaveLastDrawMs = 0;
 let currentSnapshotSlot = 1;
 let bgSyncMode = false;
 const snapshots = new Array(8).fill(null);
@@ -1039,9 +1067,10 @@ const i18n = {
     export_video: "Exportar Video 5s",
     export_gif: "Exportar GIF 5s*",
     export_photo: "Foto HQ",
-    clean_output: "Salida Limpia",
-    open_clean_output: "Abrir Salida Limpia",
-    close_clean_output: "Cerrar Salida Limpia",
+    clean_output: "Salida Limpia LIVE HQ",
+    clean_output_note: "Señal LIVE optimizada para proyección limpia en máxima calidad.",
+    open_clean_output: "Abrir Salida Limpia LIVE",
+    close_clean_output: "Cerrar Salida Limpia LIVE",
     footer_mouse: "Mouse: inclinación 3D + arrastre orbital",
     footer_engine: "Render Engine 2K",
     footer_legal_short: "Pixel Error Lab 2000 · Creación de B.ZU.AL Estudio",
@@ -1221,9 +1250,10 @@ const i18n = {
     export_video: "Export 5s Video",
     export_gif: "Export 5s GIF*",
     export_photo: "Photo HQ",
-    clean_output: "Clean Output",
-    open_clean_output: "Open Clean Output",
-    close_clean_output: "Close Clean Output",
+    clean_output: "Clean Output LIVE HQ",
+    clean_output_note: "LIVE signal optimized for maximum clean projection quality.",
+    open_clean_output: "Open Clean Output LIVE",
+    close_clean_output: "Close Clean Output LIVE",
     footer_mouse: "Mouse: 3D tilt + drag orbit",
     footer_engine: "Render Engine 2K",
     footer_legal_short: "Pixel Error Lab 2000 · Created by B.ZU.AL Estudio",
@@ -1283,6 +1313,14 @@ const stageFxCanvas = document.createElement("canvas");
 const stageFxCtx = stageFxCanvas.getContext("2d", { willReadFrequently: true });
 const stagePrevCanvas = document.createElement("canvas");
 const stagePrevCtx = stagePrevCanvas.getContext("2d", { willReadFrequently: true });
+const masterFxCanvas = document.createElement("canvas");
+const masterFxCtx = masterFxCanvas.getContext("2d", { willReadFrequently: true });
+const masterPrevCanvas = document.createElement("canvas");
+const masterPrevCtx = masterPrevCanvas.getContext("2d", { willReadFrequently: true });
+const kaleidoFxCanvas = document.createElement("canvas");
+const kaleidoFxCtx = kaleidoFxCanvas.getContext("2d", { willReadFrequently: true });
+const kaleidoPrevCanvas = document.createElement("canvas");
+const kaleidoPrevCtx = kaleidoPrevCanvas.getContext("2d", { willReadFrequently: true });
 const glitchTrailCanvas = document.createElement("canvas");
 const glitchTrailCtx = glitchTrailCanvas.getContext("2d", { willReadFrequently: true });
 const glitchTrailTempCanvas = document.createElement("canvas");
@@ -1321,7 +1359,7 @@ const extendedLocaleTexts = {
       "#livePaneFractal h2": "Esenciales Fractal",
       "#livePane3d h2": "Esenciales 3D",
       "#livePaneParticles h2": "Esenciales Partículas",
-      "#livePane3d .micro-tip": "Tip: usa WASD/flechas para paneo 3D y arrastra para orbitar.",
+      "#livePane3d .micro-tip": "Tip: usa WASD para paneo 3D, arrastra para orbitar, ←/→ para módulo y ↑/↓ para FX.",
       "#livePaneGlitch .micro-tip": "Tip: webcam + tracking FX da glitch facial/manos en tiempo real.",
       "#livePaneParticles .micro-tip": "Tip: módulo independiente con partículas XYZ audio-reactivas y auto performance.",
       "#liveOutputGroup h2": "Vista de salida",
@@ -1558,8 +1596,12 @@ const extendedLocaleTexts = {
         none: "Ninguno",
         delay: "Delay",
         echo: "Eco visual",
-        colortrail: "Estela de color",
+        colortrail: "Estela acentuada",
         prism: "Deriva prisma",
+        psychedelic: "Psicodélico",
+        kaleido: "Caleidoscopio",
+        flatfx: "Plano",
+        neon: "Neón",
       },
       liveParticlesCount: {
         low: "Baja",
@@ -1706,7 +1748,7 @@ const extendedLocaleTexts = {
       "#livePaneFractal h2": "Fractal Essentials",
       "#livePane3d h2": "3D Essentials",
       "#livePaneParticles h2": "Particles Essentials",
-      "#livePane3d .micro-tip": "Tip: use WASD/arrows for 3D panning and drag to orbit.",
+      "#livePane3d .micro-tip": "Tip: use WASD for 3D panning, drag to orbit, ←/→ switch modules, and ↑/↓ cycle FX.",
       "#livePaneGlitch .micro-tip": "Tip: webcam + tracking FX gives real-time face/hand glitch.",
       "#livePaneParticles .micro-tip": "Tip: independent module with XYZ audio-reactive particles and auto performance.",
       "#liveOutputGroup h2": "Output View",
@@ -1943,8 +1985,12 @@ const extendedLocaleTexts = {
         none: "None",
         delay: "Delay",
         echo: "Visual Echo",
-        colortrail: "Color Trail",
+        colortrail: "Accented Trail",
         prism: "Prism Drift",
+        psychedelic: "Psychedelic",
+        kaleido: "Kaleidoscope",
+        flatfx: "Flat",
+        neon: "Neon",
       },
       liveParticlesCount: {
         low: "Low",
@@ -2249,6 +2295,7 @@ function deactivateAudioFileSource() {
   audioFileActive = false;
   teardownAudioPipeline();
   audioLevel = 0;
+  liveAudioWaveLevels.fill(0);
   if (audioFilePlayer) audioFilePlayer.pause();
   updateLiveAudioFileMini();
 }
@@ -2270,6 +2317,7 @@ function stopAudioFileInput() {
   }
   if (liveAudioTime) liveAudioTime.textContent = "00:00 / 00:00";
   if (liveAudioSeek) liveAudioSeek.value = "0";
+  drawLiveAudioWaveform();
 }
 
 function updateDynamicUiTexts() {
@@ -2320,6 +2368,10 @@ function syncLiveAudioQuickUi() {
     liveAudioPlayPauseBtn.textContent = audioFilePlayer.paused ? t("play") : t("pause");
   }
   if (showFileMini) updateLiveAudioFileMini();
+  else {
+    updateLiveAudioPlayPausePulse();
+    drawLiveAudioWaveform();
+  }
 }
 
 function syncLiveBackgroundQuickUi() {
@@ -2356,6 +2408,66 @@ function formatMediaTime(sec) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+function updateLiveAudioPlayPausePulse() {
+  if (!liveAudioPlayPauseBtn || !audioFilePlayer || !audioFilePlayer.src) {
+    if (liveAudioPlayPauseBtn) {
+      liveAudioPlayPauseBtn.classList.remove("audio-rhythm-active");
+      liveAudioPlayPauseBtn.style.setProperty("--audio-pulse", "0");
+    }
+    return;
+  }
+  const active = !audioFilePlayer.paused;
+  liveAudioPlayPauseBtn.classList.toggle("audio-rhythm-active", active);
+  const energy = active ? clamp(audioFeatures.rms * 0.8 + audioFeatures.bands[1] * 0.4 + audioFeatures.transient * 0.25, 0, 1.2) : 0;
+  liveAudioPlayPauseBtn.style.setProperty("--audio-pulse", String(energy));
+}
+
+function drawLiveAudioWaveform(force = false) {
+  if (!liveAudioWaveform || !liveAudioWaveCtx) return;
+  if (!force && liveAudioFileMini && liveAudioFileMini.hidden) return;
+  const now = performance.now();
+  if (!force && now - liveAudioWaveLastDrawMs < 33) return;
+  liveAudioWaveLastDrawMs = now;
+  const ctxWave = liveAudioWaveCtx;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const cssW = Math.max(120, Math.floor(liveAudioWaveform.clientWidth || 520));
+  const cssH = Math.max(24, Math.floor(liveAudioWaveform.clientHeight || 34));
+  const rw = Math.floor(cssW * dpr);
+  const rh = Math.floor(cssH * dpr);
+  if (liveAudioWaveform.width !== rw || liveAudioWaveform.height !== rh) {
+    liveAudioWaveform.width = rw;
+    liveAudioWaveform.height = rh;
+  }
+  ctxWave.setTransform(1, 0, 0, 1, 0, 0);
+  ctxWave.clearRect(0, 0, rw, rh);
+  ctxWave.scale(dpr, dpr);
+  ctxWave.fillStyle = "rgba(8, 12, 24, 0.78)";
+  ctxWave.fillRect(0, 0, cssW, cssH);
+
+  const bars = liveAudioWaveLevels.length;
+  const gap = 2;
+  const barW = Math.max(2, Math.floor((cssW - gap * (bars - 1)) / bars));
+  const hasData = Boolean(audioData && audioData.length && hasAudioReactiveInput());
+
+  for (let i = 0; i < bars; i += 1) {
+    let vTarget = 0;
+    if (hasData) {
+      const idx = Math.floor((i / bars) * (audioData.length - 1));
+      vTarget = clamp((audioData[idx] / 255) * 1.25, 0, 1);
+    }
+    liveAudioWaveLevels[i] = liveAudioWaveLevels[i] * 0.82 + vTarget * 0.18;
+    const v = liveAudioWaveLevels[i];
+    const h = Math.max(1, Math.round((cssH - 6) * (0.08 + v * 0.92)));
+    const x = i * (barW + gap);
+    const y = cssH - h - 3;
+    const grad = ctxWave.createLinearGradient(x, y, x, cssH);
+    grad.addColorStop(0, "rgba(115, 244, 255, 0.92)");
+    grad.addColorStop(1, "rgba(169, 255, 67, 0.9)");
+    ctxWave.fillStyle = grad;
+    ctxWave.fillRect(x, y, barW, h);
+  }
+}
+
 function updateLiveAudioFileMini() {
   if (!audioFilePlayer) return;
   if (liveAudioPlayPauseBtn) {
@@ -2372,6 +2484,8 @@ function updateLiveAudioFileMini() {
     const dur = Number.isFinite(audioFilePlayer.duration) ? audioFilePlayer.duration : 0;
     liveAudioTime.textContent = `${formatMediaTime(curr)} / ${formatMediaTime(dur)}`;
   }
+  updateLiveAudioPlayPausePulse();
+  drawLiveAudioWaveform(true);
 }
 
 function updateInputSpecs() {
@@ -2494,12 +2608,36 @@ function populateModTargets() {
 function updatePerformanceUI() {
   if (performanceStatus) performanceStatus.textContent = `FPS: ${fps.toFixed(1)}`;
   if (performanceHint) performanceHint.textContent = `${t("auto_performance")}: ${perfScale < 0.99 ? "ON" : "OFF"}`;
+  if (canvasMiniResolution) {
+    const w = canvas && canvas.width ? canvas.width : 0;
+    const h = canvas && canvas.height ? canvas.height : 0;
+    canvasMiniResolution.textContent = `Canvas ${w}x${h}`;
+  }
+  if (canvasMiniFps) {
+    canvasMiniFps.textContent = `${fps.toFixed(1)} FPS`;
+  }
 }
 
 function updatePerfScale() {
   if (fps < 25) perfScale = Math.max(0.45, perfScale - 0.06);
   else if (fps < 30) perfScale = Math.max(0.6, perfScale - 0.03);
   else if (fps > 48) perfScale = Math.min(1, perfScale + 0.03);
+}
+
+function updateAdaptivePostFxScale() {
+  let target = 1;
+  if (fps < 28) target = 0.56;
+  else if (fps < 34) target = 0.66;
+  else if (fps < 40) target = 0.76;
+  else if (fps < 48) target = 0.88;
+  const heavyStack = isKaleidoFxActive() && masterFxMode && (masterFxMode.value || "none") !== "none";
+  if (heavyStack) target = Math.min(target, 0.72);
+  adaptivePostFxScale += (target - adaptivePostFxScale) * 0.18;
+  adaptivePostFxScale = clamp(adaptivePostFxScale, 0.52, 1);
+}
+
+function getAdaptivePostFxScale() {
+  return adaptivePostFxScale;
 }
 
 function updateAudioAnalysis() {
@@ -2652,6 +2790,22 @@ function updateLiveModPadDot() {
   liveModPadDot.style.top = `${y * 100}%`;
 }
 
+function updateMasterFxPadDot() {
+  if (!masterFxPad || !masterFxPadDot || !masterFxAmount || !masterFxColor) return;
+  const x = clamp(Number(masterFxAmount.value) / 100, 0, 1);
+  const y = clamp(1 - Number(masterFxColor.value) / 100, 0, 1);
+  masterFxPadDot.style.left = `${x * 100}%`;
+  masterFxPadDot.style.top = `${y * 100}%`;
+}
+
+function updateKaleidoFxPadDot() {
+  if (!kaleidoFxPad || !kaleidoFxPadDot || !kaleidoFxAmount || !kaleidoFxSmooth) return;
+  const x = clamp(Number(kaleidoFxAmount.value) / 100, 0, 1);
+  const y = clamp(1 - Number(kaleidoFxSmooth.value) / 100, 0, 1);
+  kaleidoFxPadDot.style.left = `${x * 100}%`;
+  kaleidoFxPadDot.style.top = `${y * 100}%`;
+}
+
 function applyDepthPadFromPointer(clientX, clientY) {
   if (!depthPad) return;
   const rect = depthPad.getBoundingClientRect();
@@ -2675,6 +2829,32 @@ function applyLiveModPadFromPointer(clientX, clientY) {
   modSmoothing.value = String(Math.round((1 - ny) * 100));
   modClamp.value = String(Math.round(45 + ny * 55));
   updateOutputs();
+  scheduleRender();
+}
+
+function applyMasterFxPadFromPointer(clientX, clientY) {
+  if (!masterFxPad || !masterFxAmount || !masterFxColor || !masterFxSpeed) return;
+  const rect = masterFxPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  masterFxAmount.value = String(Math.round(nx * 100));
+  masterFxColor.value = String(Math.round((1 - ny) * 100));
+  masterFxSpeed.value = String(Math.round(12 + nx * 68 + (1 - ny) * 20));
+  updateMasterFxPadDot();
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function applyKaleidoFxPadFromPointer(clientX, clientY) {
+  if (!kaleidoFxPad || !kaleidoFxAmount || !kaleidoFxSmooth || !kaleidoFxSpeed) return;
+  const rect = kaleidoFxPad.getBoundingClientRect();
+  const nx = clamp((clientX - rect.left) / rect.width, 0, 1);
+  const ny = clamp((clientY - rect.top) / rect.height, 0, 1);
+  kaleidoFxAmount.value = String(Math.round(nx * 100));
+  kaleidoFxSmooth.value = String(Math.round((1 - ny) * 100));
+  kaleidoFxSpeed.value = String(Math.round(10 + nx * 58 + (1 - ny) * 30));
+  updateKaleidoFxPadDot();
+  updateLiveQuickOutputs();
   scheduleRender();
 }
 
@@ -2710,6 +2890,13 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("live3dOrganic", live3dOrganic ? live3dOrganic.value : 0);
   updateQuickOutputById("live3dLight", live3dLight ? live3dLight.value : 0);
   updateQuickOutputById("live3dFxAmount", live3dFxAmount ? live3dFxAmount.value : 0);
+  updateQuickOutputById("masterFxAmount", masterFxAmount ? masterFxAmount.value : 0);
+  updateQuickOutputById("masterFxSpeed", masterFxSpeed ? masterFxSpeed.value : 0);
+  updateQuickOutputById("masterFxColor", masterFxColor ? masterFxColor.value : 0);
+  updateQuickOutputById("kaleidoFxAmount", kaleidoFxAmount ? kaleidoFxAmount.value : 0);
+  updateQuickOutputById("kaleidoFxSpeed", kaleidoFxSpeed ? kaleidoFxSpeed.value : 0);
+  updateQuickOutputById("kaleidoFxSmooth", kaleidoFxSmooth ? kaleidoFxSmooth.value : 0);
+  updateQuickOutputById("kaleidoFxSegments", kaleidoFxSegments ? kaleidoFxSegments.value : 0);
   updateQuickOutputById("live3dAnaglyphStrength", live3dAnaglyphStrength ? live3dAnaglyphStrength.value : 0);
   updateQuickOutputById("liveParticlesSize", liveParticlesSize ? liveParticlesSize.value : 0);
   updateQuickOutputById("liveParticlesDepth", liveParticlesDepth ? liveParticlesDepth.value : 0);
@@ -2803,6 +2990,8 @@ function updateLiveFxPadDots() {
     live3dColorPadDot.style.left = `${px * 100}%`;
     live3dColorPadDot.style.top = `${py * 100}%`;
   }
+  updateMasterFxPadDot();
+  updateKaleidoFxPadDot();
 }
 
 function applyLiveGlitchPadFromPointer(clientX, clientY) {
@@ -3363,6 +3552,15 @@ function setLiveModeTab(tabName) {
   }
 }
 
+function cycleLiveModeTab(direction) {
+  const order = ["glitch", "fractal", "depth", "particles"];
+  const current = liveActiveTab && order.includes(liveActiveTab) ? liveActiveTab : "glitch";
+  const idx = order.indexOf(current);
+  const step = direction >= 0 ? 1 : -1;
+  const next = order[(idx + step + order.length) % order.length];
+  setLiveModeTab(next);
+}
+
 function applyLive3dEntryDefaults() {
   if (!controls.flatIllustrated || !bgMode || !bgColorA || !bgColorB) return;
   controls.flatIllustrated.value = "100";
@@ -3645,10 +3843,14 @@ function openCleanOutput() {
     return;
   }
 
-  cleanOutputWindow.document.write(`<!doctype html><html><head><title>Clean Output</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}canvas{width:100vw;height:100vh;display:block;object-fit:contain;background:#000}</style></head><body><canvas id="out"></canvas></body></html>`);
+  cleanOutputWindow.document.write(`<!doctype html><html><head><title>B.ZU.AL Live Clean Output HQ</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}canvas{width:100vw;height:100vh;display:block;object-fit:contain;background:#000}</style></head><body><canvas id="out"></canvas></body></html>`);
   cleanOutputWindow.document.close();
   cleanOutputCanvas = cleanOutputWindow.document.getElementById("out");
   cleanOutputCtx = cleanOutputCanvas.getContext("2d");
+  if (cleanOutputCtx) {
+    cleanOutputCtx.imageSmoothingEnabled = true;
+    cleanOutputCtx.imageSmoothingQuality = "high";
+  }
   syncCleanOutput();
 }
 
@@ -4726,7 +4928,32 @@ function panicReset() {
   cameraKeyState.down = false;
   cameraKeyState.left = false;
   cameraKeyState.right = false;
+  particlesRandomTween = null;
+  particlesCameraTween = null;
+  depthMorphTween = null;
+  fractalMorphTween = null;
+  fractalCameraTween = null;
+  kaleidoMorphTween = null;
   if (freezeBtn) freezeBtn.classList.remove("active");
+  if (masterFxMode) masterFxMode.value = "none";
+  if (masterFxAmount) masterFxAmount.value = "28";
+  if (masterFxSpeed) masterFxSpeed.value = "42";
+  if (masterFxColor) masterFxColor.value = "52";
+  if (kaleidoFxEnabled) kaleidoFxEnabled.checked = false;
+  if (kaleidoFxType) kaleidoFxType.value = "mirror";
+  if (kaleidoFxAmount) kaleidoFxAmount.value = "38";
+  if (kaleidoFxSpeed) kaleidoFxSpeed.value = "35";
+  if (kaleidoFxSmooth) kaleidoFxSmooth.value = "44";
+  if (kaleidoFxSegments) kaleidoFxSegments.value = "12";
+  kaleidoSegSmooth = 12;
+  if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
+    masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
+  }
+  if (kaleidoPrevCanvas.width > 0 && kaleidoPrevCanvas.height > 0) {
+    kaleidoPrevCtx.clearRect(0, 0, kaleidoPrevCanvas.width, kaleidoPrevCanvas.height);
+  }
+  updateMasterFxPadDot();
+  updateKaleidoFxPadDot();
   syncModeUi();
   scheduleRender();
 }
@@ -4840,10 +5067,19 @@ function shouldRunTracking(settings) {
   return settings.subjectGhost > 0 || settings.polygonTrack > 0;
 }
 
+function isMasterFxAnimated() {
+  if (!masterFxMode) return false;
+  const v = masterFxMode.value || "none";
+  return v === "trail" || v === "chromatic" || v === "psychedelic" || v === "neon";
+}
+
 function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
   return (
     mode === "particles" ||
     mode === "fractal" ||
+    isMasterFxAnimated() ||
+    isKaleidoFxActive() ||
+    Boolean(kaleidoMorphTween) ||
     Boolean(depthMorphTween) ||
     Boolean(fractalMorphTween) ||
     webcamActive ||
@@ -6493,20 +6729,29 @@ function apply3dStageFilter(tSec) {
     const cd = cur.data;
     const pd = prev.data;
     const od = out.data;
-    const shift = Math.max(1, Math.round(2 + amount * 28));
-    const blend = clamp(0.22 + amount * 0.58, 0, 0.86);
+    const shift = Math.max(1, Math.round(4 + amount * 36));
+    const shift2 = Math.max(1, Math.round(2 + amount * 20));
+    const blend = clamp(0.3 + amount * 0.62, 0.3, 0.92);
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const i = (y * w + x) * 4;
         const iR = (y * w + clamp(x - shift, 0, w - 1)) * 4;
         const iB = (y * w + clamp(x + shift, 0, w - 1)) * 4;
-        od[i] = clamp(cd[i] * (1 - blend) + pd[iR] * blend, 0, 255);
-        od[i + 1] = clamp(cd[i + 1] * (1 - blend * 0.75) + pd[i + 1] * (blend * 0.75), 0, 255);
-        od[i + 2] = clamp(cd[i + 2] * (1 - blend) + pd[iB + 2] * blend, 0, 255);
+        const iR2 = (y * w + clamp(x - shift2, 0, w - 1)) * 4;
+        const iB2 = (y * w + clamp(x + shift2, 0, w - 1)) * 4;
+        od[i] = clamp(cd[i] * (1 - blend) + pd[iR] * blend * 0.7 + pd[iR2] * blend * 0.28, 0, 255);
+        od[i + 1] = clamp(cd[i + 1] * (1 - blend * 0.9) + pd[i + 1] * (blend * 0.9), 0, 255);
+        od[i + 2] = clamp(cd[i + 2] * (1 - blend) + pd[iB + 2] * blend * 0.7 + pd[iB2 + 2] * blend * 0.28, 0, 255);
         od[i + 3] = 255;
       }
     }
     stageFxCtx.putImageData(out, 0, 0);
+    stageFxCtx.save();
+    stageFxCtx.globalCompositeOperation = "screen";
+    stageFxCtx.globalAlpha = clamp(0.12 + amount * 0.32, 0.12, 0.46);
+    stageFxCtx.filter = `blur(${1 + amount * 3.8}px)`;
+    stageFxCtx.drawImage(stagePrevCanvas, 0, 0, w, h);
+    stageFxCtx.restore();
   } else if (fxMode === "prism" && amount > 0.001) {
     const src = stageFxCtx.getImageData(0, 0, w, h);
     const out = stageFxCtx.createImageData(w, h);
@@ -6532,11 +6777,398 @@ function apply3dStageFilter(tSec) {
       }
     }
     stageFxCtx.putImageData(out, 0, 0);
+  } else if (fxMode === "psychedelic" && amount > 0.001) {
+    const src = stageFxCtx.getImageData(0, 0, w, h);
+    const out = stageFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const amp = 0.5 + amount * 2.8;
+    for (let y = 0; y < h; y++) {
+      const yy = y / Math.max(1, h - 1);
+      for (let x = 0; x < w; x++) {
+        const xx = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const r = sd[i];
+        const g = sd[i + 1];
+        const b = sd[i + 2];
+        const waveA = 0.5 + 0.5 * Math.sin(tSec * 2.2 + xx * 11.5 + yy * 7.2);
+        const waveB = 0.5 + 0.5 * Math.cos(tSec * 1.8 + xx * 9.1 - yy * 8.6);
+        od[i] = clamp(r * (0.52 + waveA * amp) + b * 0.28 * waveB, 0, 255);
+        od[i + 1] = clamp(g * (0.48 + waveB * amp) + r * 0.22 * waveA, 0, 255);
+        od[i + 2] = clamp(b * (0.5 + (1 - waveA) * amp) + g * 0.26 * waveB, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    stageFxCtx.putImageData(out, 0, 0);
+  } else if (fxMode === "kaleido" && amount > 0.001) {
+    const src = stageFxCtx.getImageData(0, 0, w, h);
+    const out = stageFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const cx = w * 0.5;
+    const cy = h * 0.5;
+    const sectors = Math.max(4, Math.round(4 + amount * 12));
+    const sector = (Math.PI * 2) / sectors;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const dx = x - cx;
+        const dy = y - cy;
+        const r = Math.hypot(dx, dy);
+        let a = Math.atan2(dy, dx) + tSec * (0.08 + amount * 0.24);
+        a = ((a % sector) + sector) % sector;
+        a = Math.abs(a - sector * 0.5);
+        const sx = cx + Math.cos(a) * r;
+        const sy = cy + Math.sin(a) * r;
+        const s = sampleClampNearest(sd, w, h, sx, sy);
+        const i = (y * w + x) * 4;
+        od[i] = s[0];
+        od[i + 1] = s[1];
+        od[i + 2] = s[2];
+        od[i + 3] = 255;
+      }
+    }
+    stageFxCtx.putImageData(out, 0, 0);
+  } else if (fxMode === "flatfx" && amount > 0.001) {
+    const src = stageFxCtx.getImageData(0, 0, w, h);
+    const sd = src.data;
+    const levels = Math.max(3, Math.round(8 - amount * 5));
+    const step = 255 / levels;
+    for (let i = 0; i < sd.length; i += 4) {
+      const lum = sd[i] * 0.299 + sd[i + 1] * 0.587 + sd[i + 2] * 0.114;
+      const q = Math.round(lum / step) * step;
+      const sat = clamp(0.65 - amount * 0.42, 0.2, 0.7);
+      sd[i] = clamp(q + (sd[i] - q) * sat, 0, 255);
+      sd[i + 1] = clamp(q + (sd[i + 1] - q) * sat, 0, 255);
+      sd[i + 2] = clamp(q + (sd[i + 2] - q) * sat, 0, 255);
+    }
+    stageFxCtx.putImageData(src, 0, 0);
+  } else if (fxMode === "neon" && amount > 0.001) {
+    const src = stageFxCtx.getImageData(0, 0, w, h);
+    const out = stageFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const edgeGain = 0.9 + amount * 2.1;
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        const i = (y * w + x) * 4;
+        const l = (sd[((y * w + (x - 1)) * 4)] + sd[((y * w + (x - 1)) * 4) + 1] + sd[((y * w + (x - 1)) * 4) + 2]) / 3;
+        const r = (sd[((y * w + (x + 1)) * 4)] + sd[((y * w + (x + 1)) * 4) + 1] + sd[((y * w + (x + 1)) * 4) + 2]) / 3;
+        const u = (sd[(((y - 1) * w + x) * 4)] + sd[(((y - 1) * w + x) * 4) + 1] + sd[(((y - 1) * w + x) * 4) + 2]) / 3;
+        const d2 = (sd[(((y + 1) * w + x) * 4)] + sd[(((y + 1) * w + x) * 4) + 1] + sd[(((y + 1) * w + x) * 4) + 2]) / 3;
+        const edge = clamp((Math.abs(r - l) + Math.abs(d2 - u)) * edgeGain, 0, 255);
+        const base = 0.22;
+        od[i] = clamp(sd[i] * base + edge * 0.15, 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * base + edge * 0.78, 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * base + edge * 1.06, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    stageFxCtx.putImageData(out, 0, 0);
+    stageFxCtx.save();
+    stageFxCtx.globalCompositeOperation = "screen";
+    stageFxCtx.globalAlpha = clamp(0.18 + amount * 0.44, 0.18, 0.62);
+    stageFxCtx.filter = `blur(${1 + amount * 5}px)`;
+    stageFxCtx.drawImage(stageFxCanvas, 0, 0, w, h);
+    stageFxCtx.restore();
   }
 
   ctx.drawImage(stageFxCanvas, 0, 0, w, h);
   stagePrevCtx.clearRect(0, 0, w, h);
   stagePrevCtx.drawImage(canvas, 0, 0, w, h);
+}
+
+function applyMasterFxGlobal(tSec) {
+  if (!masterFxMode || !masterFxAmount) return;
+  const fxMode = masterFxMode.value || "none";
+  if (fxMode === "none") {
+    if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
+      masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
+    }
+    return;
+  }
+  const outW = canvas.width;
+  const outH = canvas.height;
+  if (outW <= 2 || outH <= 2) return;
+  const fxScale = getAdaptivePostFxScale();
+  const w = Math.max(2, Math.round(outW * fxScale));
+  const h = Math.max(2, Math.round(outH * fxScale));
+  const amount = clamp(Number(masterFxAmount.value) / 100, 0, 1);
+  const speed = clamp(Number(masterFxSpeed ? masterFxSpeed.value : 42) / 100, 0, 1);
+  const colorDrive = clamp(Number(masterFxColor ? masterFxColor.value : 52) / 100, 0, 1);
+  if (masterFxCanvas.width !== w || masterFxCanvas.height !== h) {
+    masterFxCanvas.width = w;
+    masterFxCanvas.height = h;
+  }
+  if (masterPrevCanvas.width !== w || masterPrevCanvas.height !== h) {
+    masterPrevCanvas.width = w;
+    masterPrevCanvas.height = h;
+    masterPrevCtx.clearRect(0, 0, w, h);
+  }
+
+  masterFxCtx.clearRect(0, 0, w, h);
+  masterFxCtx.drawImage(canvas, 0, 0, w, h);
+
+  if (fxMode === "bloom" && amount > 0.001) {
+    const passes = 1 + Math.round(amount * 2);
+    for (let i = 0; i < passes; i += 1) {
+      const k = (i + 1) / passes;
+      masterFxCtx.save();
+      masterFxCtx.globalCompositeOperation = "screen";
+      masterFxCtx.globalAlpha = clamp(0.08 + amount * 0.16 * (1 - k * 0.35), 0.05, 0.34);
+      masterFxCtx.filter = `blur(${(1.4 + amount * 12) * k}px) saturate(${1 + amount * 0.32})`;
+      masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+      masterFxCtx.restore();
+    }
+  } else if (fxMode === "chromatic" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const amp = 1 + amount * (3 + Math.min(w, h) * 0.008);
+    const wave = Math.sin(tSec * 1.1) * amp;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const ri = (y * w + clamp(Math.round(x - wave), 0, w - 1)) * 4;
+        const bi = (y * w + clamp(Math.round(x + wave), 0, w - 1)) * 4;
+        od[i] = sd[ri];
+        od[i + 1] = sd[i + 1];
+        od[i + 2] = sd[bi + 2];
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+  } else if (fxMode === "trail" && amount > 0.001) {
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.2 + amount * 0.62, 0.2, 0.9);
+    masterFxCtx.filter = `blur(${1 + amount * 4.4}px)`;
+    masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "lighter";
+    masterFxCtx.globalAlpha = clamp(0.1 + amount * 0.3, 0.1, 0.38);
+    masterFxCtx.filter = `blur(${amount * 2.2}px)`;
+    masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "crt" && amount > 0.001) {
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "multiply";
+    masterFxCtx.fillStyle = `rgba(0,0,0,${clamp(0.05 + amount * 0.24, 0.05, 0.28)})`;
+    const lineStep = 2;
+    for (let y = 0; y < h; y += lineStep) {
+      masterFxCtx.fillRect(0, y, w, 1);
+    }
+    masterFxCtx.restore();
+    const vignette = masterFxCtx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.2, w * 0.5, h * 0.5, Math.max(w, h) * 0.72);
+    vignette.addColorStop(0, "rgba(0,0,0,0)");
+    vignette.addColorStop(1, `rgba(0,0,0,${clamp(0.16 + amount * 0.42, 0.16, 0.54)})`);
+    masterFxCtx.fillStyle = vignette;
+    masterFxCtx.fillRect(0, 0, w, h);
+  } else if (fxMode === "psychedelic" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const amp = 0.55 + amount * (2.2 + speed * 1.4);
+    const t = tSec * (1 + speed * 1.8);
+    for (let y = 0; y < h; y++) {
+      const yy = y / Math.max(1, h - 1);
+      for (let x = 0; x < w; x++) {
+        const xx = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const waveA = 0.5 + 0.5 * Math.sin(t * 1.9 + xx * 12.7 + yy * 8.4);
+        const waveB = 0.5 + 0.5 * Math.cos(t * 2.3 + xx * 7.5 - yy * 10.2);
+        const colorMix = 0.08 + colorDrive * 0.34;
+        od[i] = clamp(sd[i] * (0.56 + waveA * amp) + sd[i + 2] * (0.12 + waveB * colorMix), 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * (0.5 + waveB * amp) + sd[i] * (0.08 + waveA * colorMix), 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * (0.52 + (1 - waveA) * amp) + sd[i + 1] * (0.1 + waveB * colorMix), 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.16 + amount * 0.4, 0.16, 0.62);
+    masterFxCtx.filter = `blur(${1 + amount * 3 + speed * 2.2}px)`;
+    masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "flatfx" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const sd = src.data;
+    const levels = Math.max(3, Math.round(9 - amount * 6));
+    const step = 255 / levels;
+    for (let i = 0; i < sd.length; i += 4) {
+      const lum = sd[i] * 0.299 + sd[i + 1] * 0.587 + sd[i + 2] * 0.114;
+      const q = Math.round(lum / step) * step;
+      const sat = clamp(0.68 - amount * 0.44, 0.18, 0.68);
+      sd[i] = clamp(q + (sd[i] - q) * sat, 0, 255);
+      sd[i + 1] = clamp(q + (sd[i + 1] - q) * sat, 0, 255);
+      sd[i + 2] = clamp(q + (sd[i + 2] - q) * sat, 0, 255);
+    }
+    masterFxCtx.putImageData(src, 0, 0);
+  } else if (fxMode === "neon" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const edgeGain = 1 + amount * 2.6 + speed * 1.3;
+    const neonHue = (0.45 + colorDrive * 0.35 + Math.sin(tSec * (0.5 + speed * 1.2)) * 0.06 + 1) % 1;
+    const [nhR, nhG, nhB] = hslToRgb(neonHue, 0.92, 0.58);
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        const i = (y * w + x) * 4;
+        const l = (sd[((y * w + (x - 1)) * 4)] + sd[((y * w + (x - 1)) * 4) + 1] + sd[((y * w + (x - 1)) * 4) + 2]) / 3;
+        const r = (sd[((y * w + (x + 1)) * 4)] + sd[((y * w + (x + 1)) * 4) + 1] + sd[((y * w + (x + 1)) * 4) + 2]) / 3;
+        const u = (sd[(((y - 1) * w + x) * 4)] + sd[(((y - 1) * w + x) * 4) + 1] + sd[(((y - 1) * w + x) * 4) + 2]) / 3;
+        const d2 = (sd[(((y + 1) * w + x) * 4)] + sd[(((y + 1) * w + x) * 4) + 1] + sd[(((y + 1) * w + x) * 4) + 2]) / 3;
+        const edge = clamp((Math.abs(r - l) + Math.abs(d2 - u)) * edgeGain, 0, 255);
+        const glow = edge / 255;
+        od[i] = clamp(sd[i] * 0.18 + nhR * glow * (0.5 + amount * 0.9), 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * 0.18 + nhG * glow * (0.7 + amount * 1.1), 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * 0.18 + nhB * glow * (0.8 + amount * 1.25), 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.22 + amount * 0.46, 0.22, 0.74);
+    masterFxCtx.filter = `blur(${1 + amount * 6.4 + speed * 3.2}px)`;
+    masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(masterFxCanvas, 0, 0, w, h, 0, 0, outW, outH);
+  ctx.restore();
+  masterPrevCtx.clearRect(0, 0, w, h);
+  masterPrevCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+}
+
+function isKaleidoFxActive() {
+  return Boolean(kaleidoFxEnabled && kaleidoFxEnabled.checked && kaleidoFxAmount && Number(kaleidoFxAmount.value) > 0);
+}
+
+function applyKaleidoFxGlobal(tSec) {
+  if (!isKaleidoFxActive()) {
+    if (kaleidoPrevCanvas.width > 0 && kaleidoPrevCanvas.height > 0) {
+      kaleidoPrevCtx.clearRect(0, 0, kaleidoPrevCanvas.width, kaleidoPrevCanvas.height);
+    }
+    return;
+  }
+  const outW = canvas.width;
+  const outH = canvas.height;
+  if (outW <= 2 || outH <= 2) return;
+  const fxScale = clamp(getAdaptivePostFxScale() * 0.92, 0.48, 1);
+  const w = Math.max(2, Math.round(outW * fxScale));
+  const h = Math.max(2, Math.round(outH * fxScale));
+
+  const amount = clamp(Number(kaleidoFxAmount ? kaleidoFxAmount.value : 38) / 100, 0, 1);
+  const speed = clamp(Number(kaleidoFxSpeed ? kaleidoFxSpeed.value : 35) / 100, 0, 1);
+  const smooth = clamp(Number(kaleidoFxSmooth ? kaleidoFxSmooth.value : 44) / 100, 0, 1);
+  const segBase = Math.max(4, Number(kaleidoFxSegments ? kaleidoFxSegments.value : 12));
+  kaleidoSegSmooth += (segBase - kaleidoSegSmooth) * 0.06;
+  const seg = Math.max(4, Math.round(kaleidoSegSmooth));
+  const baseType = kaleidoFxType ? kaleidoFxType.value : "mirror";
+  const morphBlend = clamp(kaleidoMorphTween ? Number(kaleidoMorphTween.typeBlend || 0) : 0, 0, 1);
+  const morphFromType = kaleidoMorphTween && kaleidoMorphTween.fromType ? kaleidoMorphTween.fromType : baseType;
+  const morphToType = kaleidoMorphTween && kaleidoMorphTween.toType ? kaleidoMorphTween.toType : baseType;
+
+  if (kaleidoFxCanvas.width !== w || kaleidoFxCanvas.height !== h) {
+    kaleidoFxCanvas.width = w;
+    kaleidoFxCanvas.height = h;
+  }
+  if (kaleidoPrevCanvas.width !== w || kaleidoPrevCanvas.height !== h) {
+    kaleidoPrevCanvas.width = w;
+    kaleidoPrevCanvas.height = h;
+    kaleidoPrevCtx.clearRect(0, 0, w, h);
+  }
+
+  kaleidoFxCtx.clearRect(0, 0, w, h);
+  kaleidoFxCtx.drawImage(canvas, 0, 0, w, h);
+  const src = kaleidoFxCtx.getImageData(0, 0, w, h);
+  const out = kaleidoFxCtx.createImageData(w, h);
+  const sd = src.data;
+  const od = out.data;
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const sector = (Math.PI * 2) / seg;
+  const spin = tSec * (0.06 + speed * 0.42);
+  const maxR = Math.max(1, Math.min(w, h) * 0.5);
+  const smoothBlend = clamp(0.08 + smooth * 0.34, 0.08, 0.44);
+  const smoothAngle = smooth * 0.1;
+  const sourceAspect =
+    loadedImage && loadedImage.width && loadedImage.height ? loadedImage.width / Math.max(1, loadedImage.height) : outW / Math.max(1, outH);
+  const useSeamStitch = sourceAspect >= 1.95;
+  if (useSeamStitch) updateDomeAutoSeamFromImageData(src);
+  const seamShiftPx = useSeamStitch ? domeAutoSeamU * w : 0;
+
+  const mapAngleByType = (typeName, aFold, a0, rrLocal, rnLocal) => {
+    let aa = aFold + Math.sin(rnLocal * Math.PI * 2 + tSec * (0.3 + speed * 1.4)) * smoothAngle;
+    if (typeName === "spiral") aa += rrLocal * (0.0016 + amount * 0.0068);
+    if (typeName === "radial") aa *= 0.74 + amount * 0.72;
+    if (typeName === "mirror") aa = aa * (1 - smooth * 0.06) + a0 * (smooth * 0.06);
+    return aa;
+  };
+
+  const mapRadiusByType = (typeName, rLocal, rnLocal) => {
+    if (typeName === "tunnel") return Math.pow(clamp(rnLocal, 0, 1), 0.72 + amount * 0.36) * rLocal;
+    if (typeName === "spiral") return rLocal * (0.98 + Math.sin(rnLocal * 7 + tSec * 0.7) * 0.02 * smooth);
+    return rLocal;
+  };
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const r = Math.hypot(dx, dy);
+      const rn = r / maxR;
+      const a0 = Math.atan2(dy, dx) + spin;
+      let aFold = ((a0 % sector) + sector) % sector;
+      aFold = Math.abs(aFold - sector * 0.5);
+      const aA = mapAngleByType(morphFromType, aFold, a0, r, rn);
+      const aB = mapAngleByType(morphToType, aFold, a0, r, rn);
+      const a = aA * (1 - morphBlend) + aB * morphBlend;
+      const rrA = mapRadiusByType(morphFromType, r, rn);
+      const rrB = mapRadiusByType(morphToType, r, rn);
+      const rr = rrA * (1 - morphBlend) + rrB * morphBlend;
+
+      const sx = cx + Math.cos(a) * rr + seamShiftPx;
+      const sy = cy + Math.sin(a) * rr;
+      const s = sampleWrappedBilinear(sd, w, h, sx, sy);
+
+      // Blend a second nearby wrapped sample to soften harsh kaleido edges.
+      const sx2 = cx + Math.cos(a + sector * 0.08) * rr + seamShiftPx;
+      const sy2 = cy + Math.sin(a + sector * 0.08) * rr;
+      const s2 = sampleWrappedBilinear(sd, w, h, sx2, sy2);
+      const i = (y * w + x) * 4;
+      od[i] = clamp(s[0] * (1 - smoothBlend) + s2[0] * smoothBlend, 0, 255);
+      od[i + 1] = clamp(s[1] * (1 - smoothBlend) + s2[1] * smoothBlend, 0, 255);
+      od[i + 2] = clamp(s[2] * (1 - smoothBlend) + s2[2] * smoothBlend, 0, 255);
+      od[i + 3] = 255;
+    }
+  }
+
+  kaleidoFxCtx.putImageData(out, 0, 0);
+  if (smooth > 0.03) {
+    kaleidoFxCtx.save();
+    kaleidoFxCtx.globalCompositeOperation = "screen";
+    kaleidoFxCtx.globalAlpha = clamp(0.06 + smooth * 0.28, 0.06, 0.34);
+    kaleidoFxCtx.filter = `blur(${0.6 + smooth * 2.8}px)`;
+    kaleidoFxCtx.drawImage(kaleidoPrevCanvas, 0, 0, w, h);
+    kaleidoFxCtx.restore();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(kaleidoFxCanvas, 0, 0, w, h, 0, 0, outW, outH);
+  ctx.restore();
+  kaleidoPrevCtx.clearRect(0, 0, w, h);
+  kaleidoPrevCtx.drawImage(kaleidoFxCanvas, 0, 0, w, h);
 }
 
 function apply3dAnaglyphStereo() {
@@ -8212,15 +8844,34 @@ function renderParticlesMode(baseImageData, tSec, settings) {
   const forceCpuStructured = ps.structure && ps.structure !== "cloud";
   const forceCpuSplit = ps.audioSplit === "zones";
   const forceCpuTrail = (ps.trail || 0) > 0;
-  const shouldForceCpu = forceCpuStructured || forceCpuSplit || forceCpuTrail;
+  const forceCpuWarmup = performance.now() < particlesWarmupUntil;
+  const shouldForceCpu = forceCpuStructured || forceCpuSplit || forceCpuTrail || forceCpuWarmup;
   if (!shouldForceCpu && !particlesGpuForcedOff && renderParticlesModeGpu(baseImageData, tSec, settings)) return;
   renderParticlesModeCpu(baseImageData, tSec, settings);
 }
 
+function finalizeFrameStats() {
+  updateLiveAudioPlayPausePulse();
+  drawLiveAudioWaveform();
+  fpsFrames += 1;
+  const now = performance.now();
+  if (now - lastFpsTs > 600) {
+    fps = (fpsFrames * 1000) / (now - lastFpsTs);
+    fpsFrames = 0;
+    lastFpsTs = now;
+    updatePerfScale();
+    updateAdaptivePostFxScale();
+    updatePerformanceUI();
+  }
+}
+
 function renderFrame() {
   applyParticlesRandomTween();
+  applyParticlesCameraTween();
   applyDepthMorphTween();
   applyFractalMorphTween();
+  applyFractalCameraTween();
+  applyKaleidoMorphTween();
   const keyPanMoved = applyCameraKeyPanning();
   const smoothCameraMoved = applySmoothCameraTargets();
   const sourceImage = getSourceImageData();
@@ -8241,10 +8892,14 @@ function renderFrame() {
   }
 
   if (mode === "none") {
+    updateAudioAnalysis();
     ctx.putImageData(sourceImage, 0, 0);
     applyOutputViewWarp();
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
     syncCleanOutput();
-    if (webcamActive || isDomeAutoRotateActive()) scheduleRender();
+    finalizeFrameStats();
+    if (webcamActive || isDomeAutoRotateActive() || isMasterFxAnimated() || Boolean(kaleidoMorphTween)) scheduleRender();
     return;
   }
 
@@ -8258,18 +8913,24 @@ function renderFrame() {
     ctx.putImageData(base, 0, 0);
     drawTrackingOverlay(s);
     applyOutputViewWarp();
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
     syncCleanOutput();
-    if (webcamActive || hasAudioReactiveInput() || isAudioPlaybackActive() || recordingActive || s.animDistort > 0 || s.motionTrail > 0 || isDomeAutoRotateActive()) scheduleRender();
+    finalizeFrameStats();
+    if (webcamActive || hasAudioReactiveInput() || isAudioPlaybackActive() || recordingActive || s.animDistort > 0 || s.motionTrail > 0 || isDomeAutoRotateActive() || isMasterFxAnimated() || Boolean(kaleidoMorphTween)) scheduleRender();
     return;
   }
 
-    if (mode === "particles") {
-      const lightDir = getLightDirection(s);
-      drawSceneBackground(base.width, base.height, lightDir, s, tSec);
-      renderParticlesMode(base, tSec, s);
+  if (mode === "particles") {
+    const lightDir = getLightDirection(s);
+    drawSceneBackground(base.width, base.height, lightDir, s, tSec);
+    renderParticlesMode(base, tSec, s);
     applyOutputViewWarp();
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
     syncCleanOutput();
-    if (webcamActive || hasAudioReactiveInput() || isAudioPlaybackActive() || recordingActive || isDomeAutoRotateActive() || mode === "particles") scheduleRender();
+    finalizeFrameStats();
+    if (webcamActive || hasAudioReactiveInput() || isAudioPlaybackActive() || recordingActive || isDomeAutoRotateActive() || mode === "particles" || isMasterFxAnimated() || Boolean(kaleidoMorphTween)) scheduleRender();
     return;
   }
 
@@ -8291,7 +8952,10 @@ function renderFrame() {
       }
     }
     applyOutputViewWarp();
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
     syncCleanOutput();
+    finalizeFrameStats();
     scheduleRender();
     return;
   }
@@ -8309,20 +8973,14 @@ function renderFrame() {
   }
 
   applyOutputViewWarp();
+  applyMasterFxGlobal(tSec);
+  applyKaleidoFxGlobal(tSec);
 
   if (shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved)) {
     scheduleRender();
   }
 
-  fpsFrames += 1;
-  const now = performance.now();
-  if (now - lastFpsTs > 600) {
-    fps = (fpsFrames * 1000) / (now - lastFpsTs);
-    fpsFrames = 0;
-    lastFpsTs = now;
-    updatePerfScale();
-    updatePerformanceUI();
-  }
+  finalizeFrameStats();
 
   syncCleanOutput();
 }
@@ -8632,6 +9290,170 @@ function randomizeActiveMode() {
   updateOutputs();
 }
 
+function cancelMorphTweensForCurrentMode() {
+  kaleidoMorphTween = null;
+  if (mode === "particles") {
+    particlesRandomTween = null;
+    particlesCameraTween = null;
+    return;
+  }
+  if (mode === "fractal") {
+    fractalMorphTween = null;
+    fractalCameraTween = null;
+    return;
+  }
+  if (mode === "depth" || mode === "mix") {
+    depthMorphTween = null;
+  }
+}
+
+function triggerKaleidoMorphTween(forceEnable = true) {
+  if (!kaleidoFxEnabled || !kaleidoFxType || !kaleidoFxAmount || !kaleidoFxSpeed || !kaleidoFxSmooth || !kaleidoFxSegments) return;
+  if (forceEnable && !kaleidoFxEnabled.checked) kaleidoFxEnabled.checked = true;
+  if (kaleidoFxDetails) kaleidoFxDetails.open = true;
+  const types = ["mirror", "tunnel", "radial", "spiral"];
+  const current = kaleidoFxType.value || "mirror";
+  const pool = types.filter((t) => t !== current);
+  const nextType = pool[Math.floor(Math.random() * pool.length)] || types[0];
+
+  const entries = [];
+  const pushEntry = (el, min, max, integer = false) => {
+    const from = Number(el.value);
+    const span = max - min;
+    const center = min + span * 0.5;
+    // Favor near targets so morph feels continuous, not jumpy.
+    const tight = from * 0.64 + center * 0.36 + (Math.random() * 2 - 1) * span * 0.16;
+    const to = clamp(tight, min, max);
+    entries.push({ el, from, to, integer });
+  };
+  pushEntry(kaleidoFxAmount, 20, 96, false);
+  pushEntry(kaleidoFxSpeed, 8, 92, false);
+  pushEntry(kaleidoFxSmooth, 16, 96, false);
+  pushEntry(kaleidoFxSegments, 6, 24, false);
+  kaleidoMorphTween = {
+    startMs: performance.now(),
+    durationMs: 5600 + Math.random() * 2800,
+    entries,
+    fromType: current,
+    toType: nextType,
+    typeBlend: 0,
+  };
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function applyKaleidoMorphTween() {
+  if (!kaleidoMorphTween) return false;
+  if (!kaleidoFxAmount || !kaleidoFxSpeed || !kaleidoFxSmooth || !kaleidoFxSegments) {
+    kaleidoMorphTween = null;
+    return false;
+  }
+  const now = performance.now();
+  const kRaw = clamp((now - kaleidoMorphTween.startMs) / kaleidoMorphTween.durationMs, 0, 1);
+  const k = kRaw * kRaw * kRaw * (kRaw * (kRaw * 6 - 15) + 10); // smootherstep
+  kaleidoMorphTween.entries.forEach(({ el, from, to, integer }) => {
+    const v = from + (to - from) * k;
+    el.value = integer ? String(Math.round(v)) : String(v.toFixed(2));
+  });
+  if (kaleidoFxSegments) kaleidoFxSegments.value = String(clamp(Number(kaleidoFxSegments.value), 4, 28).toFixed(2));
+  if (kaleidoFxType && kaleidoMorphTween.fromType && kaleidoMorphTween.toType) {
+    // Delay type morph start so first half feels ultra smooth.
+    const t = clamp((kRaw - 0.3) / 0.7, 0, 1);
+    kaleidoMorphTween.typeBlend = t * t * (3 - 2 * t);
+    kaleidoFxType.value = kaleidoMorphTween.typeBlend >= 0.999 ? kaleidoMorphTween.toType : kaleidoMorphTween.fromType;
+  }
+  updateKaleidoFxPadDot();
+  updateLiveQuickOutputs();
+  if (kRaw >= 1) kaleidoMorphTween = null;
+  return true;
+}
+
+function triggerParticlesCameraTween() {
+  if (mode !== "particles") return;
+  const entries = [];
+  const pushEntry = (el, min, max) => {
+    if (!el) return;
+    const from = Number(el.value);
+    const to = min + Math.random() * (max - min);
+    entries.push({ el, from, to });
+  };
+  if (liveParticlesCamMode) {
+    const opts = ["orbit", "sweep", "helix", "inside"];
+    liveParticlesCamMode.value = opts[Math.floor(Math.random() * opts.length)];
+  }
+  pushEntry(liveParticlesCamSpeed, 24, 78);
+  pushEntry(liveParticlesCamX, -36, 36);
+  pushEntry(liveParticlesCamY, -68, 68);
+  pushEntry(liveParticlesCamZ, -48, 48);
+  particlesCameraTween = {
+    startMs: performance.now(),
+    durationMs: 2200 + Math.random() * 1400,
+    entries,
+  };
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function applyParticlesCameraTween() {
+  if (!particlesCameraTween) return false;
+  if (mode !== "particles") {
+    particlesCameraTween = null;
+    return false;
+  }
+  const now = performance.now();
+  const kRaw = clamp((now - particlesCameraTween.startMs) / particlesCameraTween.durationMs, 0, 1);
+  const k = kRaw * kRaw * (3 - 2 * kRaw);
+  particlesCameraTween.entries.forEach(({ el, from, to }) => {
+    el.value = String(Math.round(from + (to - from) * k));
+  });
+  updateLiveQuickOutputs();
+  if (kRaw >= 1) particlesCameraTween = null;
+  return true;
+}
+
+function triggerFractalCameraTween() {
+  if (mode !== "fractal") return;
+  const entries = [];
+  const pushEntry = (el, min, max) => {
+    if (!el) return;
+    const from = Number(el.value);
+    const to = min + Math.random() * (max - min);
+    entries.push({ el, from, to });
+  };
+  if (liveFractalCameraMode) {
+    const opts = ["orbit", "inside"];
+    liveFractalCameraMode.value = opts[Math.floor(Math.random() * opts.length)];
+  }
+  pushEntry(liveFractalCamSpeed, 8, 68);
+  pushEntry(liveFractalDistance, 20, 156);
+  fractalCamYawTarget += (Math.random() * 2 - 1) * 1.25;
+  fractalCamPitchTarget = clamp(fractalCamPitchTarget + (Math.random() * 2 - 1) * 0.58, -1.2, 1.2);
+  fractalCameraTween = {
+    startMs: performance.now(),
+    durationMs: 2200 + Math.random() * 1800,
+    entries,
+  };
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function applyFractalCameraTween() {
+  if (!fractalCameraTween) return false;
+  if (mode !== "fractal") {
+    fractalCameraTween = null;
+    return false;
+  }
+  const now = performance.now();
+  const kRaw = clamp((now - fractalCameraTween.startMs) / fractalCameraTween.durationMs, 0, 1);
+  const k = kRaw * kRaw * (3 - 2 * kRaw);
+  fractalCameraTween.entries.forEach(({ el, from, to }) => {
+    el.value = String(Math.round(from + (to - from) * k));
+  });
+  updateLiveQuickOutputs();
+  if (kRaw >= 1) fractalCameraTween = null;
+  return true;
+}
+
 function triggerParticlesDynamicRandomTween() {
   if (mode !== "particles") return;
   const entries = [];
@@ -8925,12 +9747,32 @@ function randomizeCurrentBackgroundColorsSmooth() {
   scheduleRender();
 }
 
-function cycle3dFxMode() {
+function cycle3dFxMode(step = 1) {
   if (mode !== "depth" && mode !== "mix") return;
   if (!live3dFxMode) return;
   const cycle = ["none", "delay", "echo", "colortrail", "prism"];
   const idx = cycle.indexOf(live3dFxMode.value);
-  live3dFxMode.value = cycle[(idx + 1 + cycle.length) % cycle.length];
+  live3dFxMode.value = cycle[(idx + (step >= 0 ? 1 : -1) + cycle.length) % cycle.length];
+  scheduleRender();
+}
+
+function cycleMasterFxMode(step = 1) {
+  if (!masterFxMode) return;
+  const cycle = ["none", "bloom", "chromatic", "trail", "crt", "psychedelic", "flatfx", "neon"];
+  const idx = cycle.indexOf(masterFxMode.value);
+  masterFxMode.value = cycle[(idx + (step >= 0 ? 1 : -1) + cycle.length) % cycle.length];
+  if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
+    masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
+  }
+  updateMasterFxPadDot();
+  scheduleRender();
+}
+
+function cycleKaleidoFxType(step = 1) {
+  if (!kaleidoFxType) return;
+  const types = ["mirror", "tunnel", "radial", "spiral"];
+  const idx = types.indexOf(kaleidoFxType.value);
+  kaleidoFxType.value = types[(idx + (step >= 0 ? 1 : -1) + types.length) % types.length];
   scheduleRender();
 }
 
@@ -9067,6 +9909,7 @@ function setMode(newMode) {
     particlesCamModePrev = liveParticlesCamMode ? liveParticlesCamMode.value : "orbit";
     particlesCamModeBlendStart = 0;
     particlesCamSpeedSmooth = 0.34;
+    particlesWarmupUntil = performance.now() + 1200;
     if (liveParticlesCamX) liveParticlesCamX.value = "0";
     if (liveParticlesCamY) liveParticlesCamY.value = "0";
     if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
@@ -9131,6 +9974,12 @@ function ensureDomeRotationControls() {
 
 function resetAll() {
   setValues(defaults);
+  particlesRandomTween = null;
+  particlesCameraTween = null;
+  depthMorphTween = null;
+  fractalMorphTween = null;
+  fractalCameraTween = null;
+  kaleidoMorphTween = null;
   cleanFront3dActive = false;
   cleanFront3dSnapshot = null;
   if (cameraMoveSpeed) {
@@ -9222,6 +10071,25 @@ function resetAll() {
   if (live3dAnaglyph) live3dAnaglyph.checked = false;
   if (live3dAudioSync) live3dAudioSync.checked = false;
   if (live3dAnaglyphStrength) live3dAnaglyphStrength.value = "34";
+  if (masterFxMode) masterFxMode.value = "none";
+  if (masterFxAmount) masterFxAmount.value = "28";
+  if (masterFxSpeed) masterFxSpeed.value = "42";
+  if (masterFxColor) masterFxColor.value = "52";
+  if (kaleidoFxEnabled) kaleidoFxEnabled.checked = false;
+  if (kaleidoFxType) kaleidoFxType.value = "mirror";
+  if (kaleidoFxAmount) kaleidoFxAmount.value = "38";
+  if (kaleidoFxSpeed) kaleidoFxSpeed.value = "35";
+  if (kaleidoFxSmooth) kaleidoFxSmooth.value = "44";
+  if (kaleidoFxSegments) kaleidoFxSegments.value = "12";
+  kaleidoSegSmooth = 12;
+  if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
+    masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
+  }
+  if (kaleidoPrevCanvas.width > 0 && kaleidoPrevCanvas.height > 0) {
+    kaleidoPrevCtx.clearRect(0, 0, kaleidoPrevCanvas.width, kaleidoPrevCanvas.height);
+  }
+  updateMasterFxPadDot();
+  updateKaleidoFxPadDot();
   const none = modeInputs.find((m) => m.value === "none");
   if (none) none.checked = true;
   setCameraMode("cursor");
@@ -10040,6 +10908,7 @@ if (liveMode3dBtn) liveMode3dBtn.addEventListener("click", () => setLiveModeTab(
 if (liveModeParticlesBtn) liveModeParticlesBtn.addEventListener("click", () => setLiveModeTab("particles"));
 if (liveModeRandomBtn) {
   liveModeRandomBtn.addEventListener("click", () => {
+    cancelMorphTweensForCurrentMode();
     randomizeActiveMode();
     scheduleRender();
   });
@@ -10256,6 +11125,112 @@ if (live3dBgColorB) {
       colorA: live3dBgColorA,
       colorB: live3dBgColorB,
     });
+  });
+}
+if (masterFxMode) {
+  masterFxMode.addEventListener("change", () => {
+    if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
+      masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
+    }
+    updateMasterFxPadDot();
+    scheduleRender();
+  });
+}
+if (masterFxAmount) {
+  masterFxAmount.addEventListener("input", () => {
+    updateMasterFxPadDot();
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (masterFxSpeed) {
+  masterFxSpeed.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (masterFxColor) {
+  masterFxColor.addEventListener("input", () => {
+    updateMasterFxPadDot();
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (masterFxPad) {
+  let dragging = false;
+  masterFxPad.addEventListener("mousedown", (e) => {
+    dragging = true;
+    applyMasterFxPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!dragging) return;
+    applyMasterFxPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    dragging = false;
+  });
+  masterFxPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyMasterFxPadFromPointer(t.clientX, t.clientY);
+  });
+  masterFxPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    e.preventDefault();
+    applyMasterFxPadFromPointer(t.clientX, t.clientY);
+  });
+}
+if (kaleidoFxEnabled) {
+  kaleidoFxEnabled.addEventListener("change", () => {
+    if (kaleidoPrevCanvas.width > 0 && kaleidoPrevCanvas.height > 0) {
+      kaleidoPrevCtx.clearRect(0, 0, kaleidoPrevCanvas.width, kaleidoPrevCanvas.height);
+    }
+    scheduleRender();
+  });
+}
+if (kaleidoFxType) kaleidoFxType.addEventListener("change", scheduleRender);
+if (kaleidoFxAmount) kaleidoFxAmount.addEventListener("input", () => {
+  updateKaleidoFxPadDot();
+  updateLiveQuickOutputs();
+  scheduleRender();
+});
+if (kaleidoFxSpeed) kaleidoFxSpeed.addEventListener("input", () => {
+  updateLiveQuickOutputs();
+  scheduleRender();
+});
+if (kaleidoFxSmooth) kaleidoFxSmooth.addEventListener("input", () => {
+  updateKaleidoFxPadDot();
+  updateLiveQuickOutputs();
+  scheduleRender();
+});
+if (kaleidoFxSegments) kaleidoFxSegments.addEventListener("input", () => {
+  updateLiveQuickOutputs();
+  scheduleRender();
+});
+if (kaleidoFxPad) {
+  let dragging = false;
+  kaleidoFxPad.addEventListener("mousedown", (e) => {
+    dragging = true;
+    applyKaleidoFxPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!dragging) return;
+    applyKaleidoFxPadFromPointer(e.clientX, e.clientY);
+  });
+  window.addEventListener("mouseup", () => {
+    dragging = false;
+  });
+  kaleidoFxPad.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    applyKaleidoFxPadFromPointer(t.clientX, t.clientY);
+  });
+  kaleidoFxPad.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    e.preventDefault();
+    applyKaleidoFxPadFromPointer(t.clientX, t.clientY);
   });
 }
 if (liveParticlesCount) {
@@ -10736,8 +11711,8 @@ if (liveAudioSensitivityQuick) {
     scheduleRender();
   });
 }
-exportVideoBtn.addEventListener("click", () => exportAnimation("video"));
-exportGifBtn.addEventListener("click", () => exportAnimation("gif"));
+if (exportVideoBtn) exportVideoBtn.addEventListener("click", () => exportAnimation("video"));
+if (exportGifBtn) exportGifBtn.addEventListener("click", () => exportAnimation("gif"));
 if (exportPhotoBtn) exportPhotoBtn.addEventListener("click", exportPhotoHQ);
 recordStartBtn.addEventListener("click", toggleLiveRecording);
 if (recordPauseBtn) recordPauseBtn.addEventListener("click", pauseOrResumeLiveRecording);
@@ -10779,8 +11754,8 @@ if (infoLegalModal) {
     if (e.target === infoLegalModal) infoLegalModal.hidden = true;
   });
 }
-openCleanOutputBtn.addEventListener("click", openCleanOutput);
-closeCleanOutputBtn.addEventListener("click", closeCleanOutput);
+if (openCleanOutputBtn) openCleanOutputBtn.addEventListener("click", openCleanOutput);
+if (closeCleanOutputBtn) closeCleanOutputBtn.addEventListener("click", closeCleanOutput);
 camStaticBtn.addEventListener("click", () => setCameraMode("static"));
 camCursorBtn.addEventListener("click", () => setCameraMode("cursor"));
 camOrbitBtn.addEventListener("click", () => setCameraMode("orbit"));
@@ -10876,6 +11851,7 @@ snapshotSlots.forEach((btn) => {
 
 if (randomBtn) {
   randomBtn.addEventListener("click", () => {
+    cancelMorphTweensForCurrentMode();
     randomizeActiveMode();
     scheduleRender();
   });
@@ -10909,6 +11885,7 @@ window.addEventListener("keydown", (e) => {
   const tag = (active && active.tagName) || "";
   const inputType = active && active.tagName === "INPUT" ? (active.type || "").toLowerCase() : "";
   const isTextInput =
+    tag === "SELECT" ||
     tag === "TEXTAREA" ||
     (tag === "INPUT" &&
       !["range", "checkbox", "radio", "button", "color", "file", "submit", "reset"].includes(inputType)) ||
@@ -10919,32 +11896,57 @@ window.addEventListener("keydown", (e) => {
     toggleFreeze();
     return;
   }
-  if (e.code === "ArrowUp" || e.code === "KeyW") {
+  if (e.code === "KeyW") {
     e.preventDefault();
     cameraKeyState.up = true;
     scheduleRender();
     return;
   }
-  if (e.code === "ArrowDown" || e.code === "KeyS") {
+  if (e.code === "KeyS") {
     e.preventDefault();
     cameraKeyState.down = true;
     scheduleRender();
     return;
   }
-  if (e.code === "ArrowLeft" || e.code === "KeyA") {
+  if (e.code === "ArrowUp") {
+    e.preventDefault();
+    if (e.repeat) return;
+    cycleMasterFxMode(1);
+    return;
+  }
+  if (e.code === "ArrowDown") {
+    e.preventDefault();
+    if (e.repeat) return;
+    cycleMasterFxMode(-1);
+    return;
+  }
+  if (e.code === "KeyA") {
     e.preventDefault();
     cameraKeyState.left = true;
     scheduleRender();
     return;
   }
-  if (e.code === "ArrowRight" || e.code === "KeyD") {
+  if (e.code === "KeyD") {
     e.preventDefault();
     cameraKeyState.right = true;
     scheduleRender();
     return;
   }
+  if (e.code === "ArrowLeft") {
+    e.preventDefault();
+    if (e.repeat) return;
+    cycleLiveModeTab(-1);
+    return;
+  }
+  if (e.code === "ArrowRight") {
+    e.preventDefault();
+    if (e.repeat) return;
+    cycleLiveModeTab(1);
+    return;
+  }
   if (e.key === "r" || e.key === "R") {
     e.preventDefault();
+    cancelMorphTweensForCurrentMode();
     randomizeActiveMode();
     scheduleRender();
     return;
@@ -10957,7 +11959,28 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.code === "KeyC") {
     e.preventDefault();
-    cycle3dBackgroundMode();
+    if (e.repeat) return;
+    if (e.shiftKey) {
+      cycle3dBackgroundMode();
+      return;
+    }
+    triggerKaleidoMorphTween(true);
+    return;
+  }
+  if (e.code === "KeyK") {
+    e.preventDefault();
+    if (e.repeat) return;
+    if (!kaleidoFxEnabled) return;
+    kaleidoFxEnabled.checked = !kaleidoFxEnabled.checked;
+    if (kaleidoFxDetails) kaleidoFxDetails.open = true;
+    if (!kaleidoFxEnabled.checked) {
+      kaleidoMorphTween = null;
+    }
+    if (kaleidoPrevCanvas.width > 0 && kaleidoPrevCanvas.height > 0) {
+      kaleidoPrevCtx.clearRect(0, 0, kaleidoPrevCanvas.width, kaleidoPrevCanvas.height);
+    }
+    updateLiveQuickOutputs();
+    scheduleRender();
     return;
   }
   if (e.code === "KeyX") {
@@ -11001,7 +12024,9 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key === "t" || e.key === "T") {
     e.preventDefault();
-    randomize3dCameraView();
+    if (mode === "particles") triggerParticlesCameraTween();
+    else if (mode === "fractal") triggerFractalCameraTween();
+    else randomize3dCameraViewSmooth();
     return;
   }
   if (e.key === "g" || e.key === "G") {
@@ -11033,10 +12058,10 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("keyup", (e) => {
-  if (e.code === "ArrowUp" || e.code === "KeyW") cameraKeyState.up = false;
-  if (e.code === "ArrowDown" || e.code === "KeyS") cameraKeyState.down = false;
-  if (e.code === "ArrowLeft" || e.code === "KeyA") cameraKeyState.left = false;
-  if (e.code === "ArrowRight" || e.code === "KeyD") cameraKeyState.right = false;
+  if (e.code === "KeyW") cameraKeyState.up = false;
+  if (e.code === "KeyS") cameraKeyState.down = false;
+  if (e.code === "KeyA") cameraKeyState.left = false;
+  if (e.code === "KeyD") cameraKeyState.right = false;
 });
 
 locale = languageSelect && languageSelect.value === "en" ? "en" : "es";
@@ -11046,6 +12071,10 @@ syncModeUi();
 setWorkspacePanel("live");
 setUiMode("live");
 setCameraMode("cursor");
+if (masterFxDetails) masterFxDetails.open = false;
+if (kaleidoFxDetails) kaleidoFxDetails.open = false;
+updateMasterFxPadDot();
+updateKaleidoFxPadDot();
 updateCameraDeckVisibility();
 updateDomeControlsVisibility();
 {
@@ -11062,6 +12091,8 @@ applyLocaleTexts();
 ensureDomeRotationControls();
 captureSnapshot(1);
 updatePerformanceUI();
+updateLiveAudioPlayPausePulse();
+drawLiveAudioWaveform();
 drawPlaceholder();
 updateCanvasDisplaySize();
 updateInputSpecs();
