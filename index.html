@@ -16,9 +16,10 @@
     <main class="app-shell">
       <section class="winamp-frame">
         <header class="topbar">
-          <span data-i18n="brand_left">PIXEL ERROR LAB 2000</span>
+          <span class="topbar-brand topbar-brand-left" data-i18n="brand_left">PIXEL ERROR LAB 2000</span>
           <div class="topbar-right">
-            <span data-i18n="brand_right">B.ZU.AL Studios</span>
+            <span class="topbar-brand topbar-brand-right" data-i18n="brand_right">B.ZU.AL Studios</span>
+            <button id="infoLegalBtn" class="btn mini top-info-btn" data-i18n="info_btn">Info</button>
             <label class="lang-picker">
               <span data-i18n="language">Language</span>
               <select id="languageSelect">
@@ -460,6 +461,17 @@
                 <label class="slider"><span>Noise</span><input type="range" id="liveParticlesNoise" min="0" max="100" value="34" /><output for="liveParticlesNoise">34</output></label>
                 <label class="slider"><span>Attractor</span><input type="range" id="liveParticlesAttractor" min="0" max="100" value="26" /><output for="liveParticlesAttractor">26</output></label>
                 <label class="slider"><span>Flow</span><input type="range" id="liveParticlesFlow" min="0" max="100" value="30" /><output for="liveParticlesFlow">30</output></label>
+                <label class="inline-select">
+                  <span>Camera Mode</span>
+                  <select id="liveParticlesCamMode">
+                    <option value="static">Static</option>
+                    <option value="orbit" selected>Orbit</option>
+                    <option value="sweep">Sweep</option>
+                    <option value="helix">Helix</option>
+                    <option value="inside">Inside</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Camera Anim Speed</span><input type="range" id="liveParticlesCamSpeed" min="0" max="100" value="34" /><output for="liveParticlesCamSpeed">34</output></label>
                 <label class="slider"><span>Camera X</span><input type="range" id="liveParticlesCamX" min="-90" max="90" value="0" /><output for="liveParticlesCamX">0</output></label>
                 <label class="slider"><span>Camera Y</span><input type="range" id="liveParticlesCamY" min="-180" max="180" value="0" /><output for="liveParticlesCamY">0</output></label>
                 <label class="slider"><span>Camera Z</span><input type="range" id="liveParticlesCamZ" min="-180" max="180" value="0" /><output for="liveParticlesCamZ">0</output></label>
@@ -474,6 +486,7 @@
                 <label class="slider"><span>Hue Shift</span><input type="range" id="liveParticlesHue" min="0" max="360" value="0" /><output for="liveParticlesHue">0</output></label>
                 <label class="toggle"><input type="checkbox" id="liveParticlesAudio" checked /><span>Audio React</span></label>
                 <label class="slider"><span>Audio Amount</span><input type="range" id="liveParticlesAudioAmount" min="0" max="100" value="54" /><output for="liveParticlesAudioAmount">54</output></label>
+                <label class="slider"><span>Light Trail</span><input type="range" id="liveParticlesTrail" min="0" max="100" value="0" /><output for="liveParticlesTrail">0</output></label>
                 <label class="inline-select">
                   <span>Structure</span>
                   <select id="liveParticlesStructure">
@@ -1002,6 +1015,7 @@
             <div class="deck-footer">
               <span data-i18n="footer_mouse">Mouse: 3D tilt + drag orbit</span>
               <span data-i18n="footer_engine">Render Engine 2K</span>
+              <span data-i18n="footer_legal_short">Pixel Error Lab 2000 · Creación de B.ZU.AL Estudio</span>
             </div>
           </section>
         </div>
@@ -1017,6 +1031,26 @@
         <div class="record-name-actions">
           <button id="recordNameCancelBtn" class="btn mini" data-i18n="record_name_cancel">Cancelar</button>
           <button id="recordNameSaveBtn" class="btn mini" data-i18n="record_name_save">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="infoLegalModal" class="record-name-modal" hidden>
+      <div class="record-name-panel info-legal-panel">
+        <h3 data-i18n="info_title">B.ZU.AL Studios · Info legal</h3>
+        <p data-i18n="info_subtitle">Términos y avisos clave para uso de la app en visuales en vivo.</p>
+        <div class="info-legal-content">
+          <p data-i18n="info_identity"><strong>Identidad del proyecto:</strong> Pixel Error Lab 2000 es creación de B.ZU.AL Estudio (B.ZU.AL Studios).</p>
+          <p data-i18n="info_author"><strong>Autoría:</strong> B.ZU.AL Studios. Todos los derechos reservados sobre marca, diseño y código no licenciado explícitamente.</p>
+          <p data-i18n="info_use"><strong>Uso:</strong> Permitido para pruebas, rehearsals y shows. No redistribuir ni revender esta versión sin autorización escrita.</p>
+          <p data-i18n="info_privacy"><strong>Privacidad:</strong> Cámara/micrófono/audio se procesan localmente en el navegador; no se suben por defecto a servidores de la app.</p>
+          <p data-i18n="info_media"><strong>Contenido:</strong> El usuario es responsable de derechos de imagen, audio, video y material importado.</p>
+          <p data-i18n="info_health"><strong>Salud visual:</strong> Algunos modos pueden incluir destellos/contraste alto. Úsalo con precaución en personas fotosensibles.</p>
+          <p data-i18n="info_thirdparty"><strong>Terceros:</strong> La app puede usar APIs/librerías del navegador y servicios externos de hosting/deploy.</p>
+          <p data-i18n="info_version"><strong>Estado:</strong> Versión beta en evolución continua para performance visual en vivo.</p>
+        </div>
+        <div class="record-name-actions">
+          <button id="infoLegalCloseBtn" class="btn mini" data-i18n="info_close">Cerrar</button>
         </div>
       </div>
     </div>

@@ -56,10 +56,45 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
+.topbar-brand {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform, text-shadow, opacity, filter;
+}
+
+.topbar-brand-left {
+  font-size: clamp(0.95rem, 1vw + 0.42rem, 1.42rem);
+  letter-spacing: 0.075em;
+  font-weight: 700;
+  color: #ebf2ff;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 10px rgba(130, 195, 255, 0.12);
+  animation: topbar-glitch-subtle 7.4s steps(1, end) infinite;
+}
+
+.topbar-brand-right {
+  font-size: clamp(0.92rem, 0.68vw + 0.52rem, 1.3rem);
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: #f4fbff;
+  text-shadow:
+    0 0 0 rgba(0, 0, 0, 0),
+    0 0 8px rgba(115, 246, 255, 0.22);
+  animation: topbar-glitch-active 2.25s steps(1, end) infinite;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.top-info-btn {
+  min-height: 28px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
 }
 
 .ui-mode-toggle {
@@ -80,6 +115,70 @@ body {
   border-radius: 4px;
   padding: 3px 6px;
   font-family: "Share Tech Mono", monospace;
+}
+
+@keyframes topbar-glitch-subtle {
+  0%, 86%, 100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 10px rgba(130, 195, 255, 0.12);
+    filter: saturate(1);
+  }
+  87% {
+    transform: translate3d(-0.5px, 0, 0);
+    opacity: 0.98;
+    text-shadow:
+      -1px 0 rgba(106, 247, 255, 0.22),
+      1px 0 rgba(255, 108, 198, 0.15);
+  }
+  88% {
+    transform: translate3d(0.7px, 0, 0);
+    opacity: 0.96;
+  }
+  89% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes topbar-glitch-active {
+  0%, 70%, 100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    text-shadow:
+      0 0 8px rgba(115, 246, 255, 0.2),
+      0 0 0 rgba(255, 105, 190, 0);
+    filter: saturate(1);
+  }
+  71% {
+    transform: translate3d(-1px, 0, 0);
+    text-shadow:
+      -2px 0 rgba(111, 248, 255, 0.62),
+      2px 0 rgba(255, 95, 183, 0.42);
+    filter: saturate(1.12);
+  }
+  72% {
+    transform: translate3d(1.2px, -0.2px, 0);
+    opacity: 0.92;
+  }
+  73% {
+    transform: translate3d(-0.8px, 0.2px, 0);
+  }
+  74% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  90% {
+    transform: translate3d(0.8px, 0, 0);
+    text-shadow:
+      1px 0 rgba(111, 248, 255, 0.4),
+      -1px 0 rgba(255, 95, 183, 0.22);
+  }
+  91% {
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .main-layout {
@@ -1186,6 +1285,26 @@ body {
   margin-top: 8px;
   font-size: 0.7rem;
   color: #9dc0e6;
+}
+
+.info-legal-panel {
+  width: min(680px, calc(100vw - 28px));
+}
+
+.info-legal-content {
+  max-height: min(56vh, 420px);
+  overflow: auto;
+  border: 1px solid rgba(147, 168, 210, 0.22);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(6, 11, 24, 0.52);
+}
+
+.info-legal-content p {
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  line-height: 1.42;
+  color: #cfe0ff;
 }
 
 .record-name-actions {

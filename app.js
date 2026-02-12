@@ -60,6 +60,10 @@ const recordNameInput = document.getElementById("recordNameInput");
 const recordNameCancelBtn = document.getElementById("recordNameCancelBtn");
 const recordNameSaveBtn = document.getElementById("recordNameSaveBtn");
 if (recordNameModal) recordNameModal.hidden = true;
+const infoLegalBtn = document.getElementById("infoLegalBtn");
+const infoLegalModal = document.getElementById("infoLegalModal");
+const infoLegalCloseBtn = document.getElementById("infoLegalCloseBtn");
+if (infoLegalModal) infoLegalModal.hidden = true;
 const aspectRatioSelect = document.getElementById("aspectRatioSelect");
 const cameraDeckControls = document.getElementById("cameraDeckControls");
 const openCleanOutputBtn = document.getElementById("openCleanOutputBtn");
@@ -174,6 +178,8 @@ const liveParticlesDepth = document.getElementById("liveParticlesDepth");
 const liveParticlesNoise = document.getElementById("liveParticlesNoise");
 const liveParticlesAttractor = document.getElementById("liveParticlesAttractor");
 const liveParticlesFlow = document.getElementById("liveParticlesFlow");
+const liveParticlesCamMode = document.getElementById("liveParticlesCamMode");
+const liveParticlesCamSpeed = document.getElementById("liveParticlesCamSpeed");
 const liveParticlesCamX = document.getElementById("liveParticlesCamX");
 const liveParticlesCamY = document.getElementById("liveParticlesCamY");
 const liveParticlesCamZ = document.getElementById("liveParticlesCamZ");
@@ -181,6 +187,7 @@ const liveParticlesColorMode = document.getElementById("liveParticlesColorMode")
 const liveParticlesHue = document.getElementById("liveParticlesHue");
 const liveParticlesAudio = document.getElementById("liveParticlesAudio");
 const liveParticlesAudioAmount = document.getElementById("liveParticlesAudioAmount");
+const liveParticlesTrail = document.getElementById("liveParticlesTrail");
 const liveParticlesStructure = document.getElementById("liveParticlesStructure");
 const liveParticlesAudioSplit = document.getElementById("liveParticlesAudioSplit");
 const liveParticlesOrder = document.getElementById("liveParticlesOrder");
@@ -754,10 +761,18 @@ let particlesPerfStreak = 0;
 let particlesCamXSmooth = 0;
 let particlesCamYSmooth = 0;
 let particlesCamZSmooth = 0;
+let particlesCamAnimTime = 0;
+let particlesCamLastTs = performance.now();
+let particlesCamModePrev = "orbit";
+let particlesCamModeBlendStart = 0;
+let particlesCamSpeedSmooth = 0.34;
+let particlesRandomTween = null;
+let depthMorphTween = null;
+let fractalMorphTween = null;
 let particlesGpuReady = false;
 let particlesGpuTriedInit = false;
 let particlesGpu = null;
-let particlesGpuForcedOff = true;
+let particlesGpuForcedOff = false;
 const fractalGlCanvas = document.createElement("canvas");
 let fractalGl = null;
 let smoothCamFollow = null;
@@ -894,6 +909,18 @@ const i18n = {
   es: {
     brand_left: "PIXEL ERROR LAB 2000",
     brand_right: "B.ZU.AL Studios",
+    info_btn: "Info",
+    info_title: "B.ZU.AL Studios · Info legal",
+    info_subtitle: "Términos y avisos clave para uso de la app en visuales en vivo.",
+    info_identity: "Identidad del proyecto: Pixel Error Lab 2000 es creación de B.ZU.AL Estudio (B.ZU.AL Studios).",
+    info_author: "Autoría: B.ZU.AL Studios. Todos los derechos reservados sobre marca, diseño y código no licenciado explícitamente.",
+    info_use: "Uso: Permitido para pruebas, rehearsals y shows. No redistribuir ni revender esta versión sin autorización escrita.",
+    info_privacy: "Privacidad: Cámara/micrófono/audio se procesan localmente en el navegador; no se suben por defecto a servidores de la app.",
+    info_media: "Contenido: El usuario es responsable de derechos de imagen, audio, video y material importado.",
+    info_health: "Salud visual: Algunos modos pueden incluir destellos/contraste alto. Úsalo con precaución en personas fotosensibles.",
+    info_thirdparty: "Terceros: La app puede usar APIs/librerías del navegador y servicios externos de hosting/deploy.",
+    info_version: "Estado: Versión beta en evolución continua para performance visual en vivo.",
+    info_close: "Cerrar",
     aspect_ratio: "Relación de aspecto",
     language: "Idioma",
     ui_live: "Live",
@@ -1017,6 +1044,7 @@ const i18n = {
     close_clean_output: "Cerrar Salida Limpia",
     footer_mouse: "Mouse: inclinación 3D + arrastre orbital",
     footer_engine: "Render Engine 2K",
+    footer_legal_short: "Pixel Error Lab 2000 · Creación de B.ZU.AL Estudio",
     pause: "Pausar",
     webcam_enable: "Activar webcam",
     webcam_disable: "Desactivar webcam",
@@ -1064,6 +1092,18 @@ const i18n = {
   en: {
     brand_left: "PIXEL ERROR LAB 2000",
     brand_right: "B.ZU.AL Studios",
+    info_btn: "Info",
+    info_title: "B.ZU.AL Studios · Legal Info",
+    info_subtitle: "Key terms and notices for using the app in live visuals.",
+    info_identity: "Project identity: Pixel Error Lab 2000 is a creation by B.ZU.AL Estudio (B.ZU.AL Studios).",
+    info_author: "Authorship: B.ZU.AL Studios. All rights reserved on brand, design, and code not explicitly licensed.",
+    info_use: "Use: Allowed for tests, rehearsals, and shows. Do not redistribute or resell this version without written authorization.",
+    info_privacy: "Privacy: Camera/microphone/audio are processed locally in the browser; they are not uploaded to app servers by default.",
+    info_media: "Content: The user is responsible for image, audio, video, and imported media rights.",
+    info_health: "Visual health: Some modes may include flashes/high contrast. Use with caution for photosensitive audiences.",
+    info_thirdparty: "Third parties: The app may rely on browser APIs/libraries and external hosting/deploy services.",
+    info_version: "Status: Beta version in continuous evolution for live visual performance.",
+    info_close: "Close",
     aspect_ratio: "Aspect Ratio",
     language: "Language",
     ui_live: "Live",
@@ -1186,6 +1226,7 @@ const i18n = {
     close_clean_output: "Close Clean Output",
     footer_mouse: "Mouse: 3D tilt + drag orbit",
     footer_engine: "Render Engine 2K",
+    footer_legal_short: "Pixel Error Lab 2000 · Created by B.ZU.AL Estudio",
     pause: "Pause",
     webcam_enable: "Enable Webcam",
     webcam_disable: "Disable Webcam",
@@ -1370,6 +1411,8 @@ const extendedLocaleTexts = {
       liveParticlesNoise: "Ruido",
       liveParticlesAttractor: "Atracción",
       liveParticlesFlow: "Flujo",
+      liveParticlesCamMode: "Modo de cámara",
+      liveParticlesCamSpeed: "Velocidad de cámara",
       liveParticlesCamX: "Cámara X",
       liveParticlesCamY: "Cámara Y",
       liveParticlesCamZ: "Cámara Z",
@@ -1377,6 +1420,7 @@ const extendedLocaleTexts = {
       liveParticlesHue: "Desfase de tono",
       liveParticlesAudio: "Audio reactivo",
       liveParticlesAudioAmount: "Cantidad de audio",
+      liveParticlesTrail: "Estela de luz",
       liveParticlesDamping: "Damping",
       liveParticlesVortex: "Vórtice",
       liveParticlesSpawn: "Tasa de spawn",
@@ -1582,6 +1626,13 @@ const extendedLocaleTexts = {
         volume: "Volumen",
         motion: "Movimiento",
       },
+      liveParticlesCamMode: {
+        static: "Estática",
+        orbit: "Órbita",
+        sweep: "Barrido",
+        helix: "Hélice",
+        inside: "Interior",
+      },
       liveParticlesColorMode: {
         source: "Desde fuente",
         palette: "Paleta",
@@ -1745,6 +1796,8 @@ const extendedLocaleTexts = {
       liveParticlesNoise: "Noise",
       liveParticlesAttractor: "Attractor",
       liveParticlesFlow: "Flow",
+      liveParticlesCamMode: "Camera mode",
+      liveParticlesCamSpeed: "Camera speed",
       liveParticlesCamX: "Camera X",
       liveParticlesCamY: "Camera Y",
       liveParticlesCamZ: "Camera Z",
@@ -1752,6 +1805,7 @@ const extendedLocaleTexts = {
       liveParticlesHue: "Hue Shift",
       liveParticlesAudio: "Audio React",
       liveParticlesAudioAmount: "Audio Amount",
+      liveParticlesTrail: "Light Trail",
       liveParticlesDamping: "Damping",
       liveParticlesVortex: "Vortex",
       liveParticlesSpawn: "Spawn Rate",
@@ -1956,6 +2010,13 @@ const extendedLocaleTexts = {
         grid: "Grid",
         volume: "Volume",
         motion: "Motion",
+      },
+      liveParticlesCamMode: {
+        static: "Static",
+        orbit: "Orbit",
+        sweep: "Sweep",
+        helix: "Helix",
+        inside: "Inside",
       },
       liveParticlesColorMode: {
         source: "From Source",
@@ -2655,11 +2716,13 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveParticlesNoise", liveParticlesNoise ? liveParticlesNoise.value : 0);
   updateQuickOutputById("liveParticlesAttractor", liveParticlesAttractor ? liveParticlesAttractor.value : 0);
   updateQuickOutputById("liveParticlesFlow", liveParticlesFlow ? liveParticlesFlow.value : 0);
+  updateQuickOutputById("liveParticlesCamSpeed", liveParticlesCamSpeed ? liveParticlesCamSpeed.value : 0);
   updateQuickOutputById("liveParticlesCamX", liveParticlesCamX ? liveParticlesCamX.value : 0);
   updateQuickOutputById("liveParticlesCamY", liveParticlesCamY ? liveParticlesCamY.value : 0);
   updateQuickOutputById("liveParticlesCamZ", liveParticlesCamZ ? liveParticlesCamZ.value : 0);
   updateQuickOutputById("liveParticlesHue", liveParticlesHue ? liveParticlesHue.value : 0);
   updateQuickOutputById("liveParticlesAudioAmount", liveParticlesAudioAmount ? liveParticlesAudioAmount.value : 0);
+  updateQuickOutputById("liveParticlesTrail", liveParticlesTrail ? liveParticlesTrail.value : 0);
   updateQuickOutputById("liveParticlesOrder", liveParticlesOrder ? liveParticlesOrder.value : 0);
   updateQuickOutputById("liveParticlesDamping", liveParticlesDamping ? liveParticlesDamping.value : 0);
   updateQuickOutputById("liveParticlesVortex", liveParticlesVortex ? liveParticlesVortex.value : 0);
@@ -3629,6 +3692,8 @@ function getParticlesSettings() {
     noise: liveParticlesNoise ? Number(liveParticlesNoise.value) : 34,
     attractor: liveParticlesAttractor ? Number(liveParticlesAttractor.value) : 26,
     flow: liveParticlesFlow ? Number(liveParticlesFlow.value) : 30,
+    camMode: liveParticlesCamMode ? liveParticlesCamMode.value : "orbit",
+    camSpeed: liveParticlesCamSpeed ? Number(liveParticlesCamSpeed.value) : 34,
     camX: liveParticlesCamX ? Number(liveParticlesCamX.value) : 0,
     camY: liveParticlesCamY ? Number(liveParticlesCamY.value) : 0,
     camZ: liveParticlesCamZ ? Number(liveParticlesCamZ.value) : 0,
@@ -3636,6 +3701,7 @@ function getParticlesSettings() {
     hue: liveParticlesHue ? Number(liveParticlesHue.value) : 0,
     audioOn: liveParticlesAudio ? liveParticlesAudio.checked : true,
     audioAmount: liveParticlesAudioAmount ? Number(liveParticlesAudioAmount.value) : 54,
+    trail: liveParticlesTrail ? Number(liveParticlesTrail.value) : 0,
     structure: liveParticlesStructure ? liveParticlesStructure.value : "cloud",
     audioSplit: liveParticlesAudioSplit ? liveParticlesAudioSplit.value : "basic",
     order: liveParticlesOrder ? Number(liveParticlesOrder.value) : 48,
@@ -3650,6 +3716,86 @@ function getParticlesSettings() {
     gradientSpread: liveParticlesGradientSpread ? Number(liveParticlesGradientSpread.value) : 52,
     gradientA: liveParticlesGradientA ? liveParticlesGradientA.value : "#00d8ff",
     gradientB: liveParticlesGradientB ? liveParticlesGradientB.value : "#ff2ea6",
+  };
+}
+
+function getParticlesCameraMotion(ps, settings, tSec) {
+  const base = getCameraMotion(settings, tSec);
+  const mode = ps.camMode || "orbit";
+  const nowMs = performance.now();
+  const dt = clamp((nowMs - particlesCamLastTs) / 1000, 0, 0.09);
+  particlesCamLastTs = nowMs;
+  const speedKnob = clamp((ps.camSpeed || 0) / 100, 0, 1);
+  const speedCurve = Math.pow(speedKnob, 2.1);
+  const targetSpeed = 0.12 + speedCurve * 1.35;
+  particlesCamSpeedSmooth += (targetSpeed - particlesCamSpeedSmooth) * 0.045;
+  particlesCamAnimTime += dt * particlesCamSpeedSmooth;
+  const phase = particlesCamAnimTime;
+
+  const build = (m) => {
+    if (m === "static") return { rx: 0, ry: 0, rz: 0, zoom: 1, panX: 0, panY: 0 };
+    if (m === "sweep") {
+      return {
+        rx: Math.sin(phase * 0.55) * 8,
+        ry: Math.sin(phase * 0.82) * 46,
+        rz: Math.sin(phase * 0.31) * 7,
+        zoom: 1 + Math.sin(phase * 0.63) * 0.08,
+        panX: Math.sin(phase * 0.44) * 0.15,
+        panY: Math.cos(phase * 0.38) * 0.12,
+      };
+    }
+    if (m === "helix") {
+      return {
+        rx: Math.sin(phase * 0.94) * 15,
+        ry: (phase * 36) % 360,
+        rz: Math.cos(phase * 0.46) * 13,
+        zoom: 1 + Math.sin(phase * 0.9) * 0.12,
+        panX: Math.sin(phase * 0.52) * 0.2,
+        panY: Math.cos(phase * 0.59) * 0.16,
+      };
+    }
+    if (m === "inside") {
+      return {
+        rx: Math.sin(phase * 0.46) * 9,
+        ry: (phase * 24) % 360,
+        rz: Math.sin(phase * 0.26) * 6,
+        zoom: 1.08 + Math.sin(phase * 0.44) * 0.16,
+        panX: 0,
+        panY: 0,
+      };
+    }
+    return {
+      rx: Math.sin(phase * 0.58) * 11,
+      ry: (phase * 42) % 360,
+      rz: Math.sin(phase * 0.34) * 4,
+      zoom: 1 + Math.sin(phase * 0.68) * 0.07,
+      panX: 0,
+      panY: 0,
+    };
+  };
+
+  if (particlesCamModePrev !== mode && particlesCamModeBlendStart === 0) {
+    particlesCamModeBlendStart = nowMs;
+  }
+  let k = 1;
+  if (particlesCamModeBlendStart > 0) {
+    k = clamp((nowMs - particlesCamModeBlendStart) / 680, 0, 1);
+    k = k * k * (3 - 2 * k);
+    if (k >= 1) {
+      particlesCamModePrev = mode;
+      particlesCamModeBlendStart = 0;
+    }
+  }
+  const prev = build(particlesCamModePrev);
+  const curr = build(mode);
+  const mix = (a, b) => a * (1 - k) + b * k;
+  return {
+    rxDeg: base.rxDeg + mix(prev.rx, curr.rx),
+    ryDeg: base.ryDeg + mix(prev.ry, curr.ry),
+    rzDeg: base.rzDeg + mix(prev.rz, curr.rz),
+    zoomMul: base.zoomMul * mix(prev.zoom, curr.zoom),
+    panX: base.panX + mix(prev.panX, curr.panX),
+    panY: base.panY + mix(prev.panY, curr.panY),
   };
 }
 
@@ -3699,6 +3845,58 @@ function getFractalLiveSettings() {
     iter: qualityIter,
     maxDist: quality === "low" ? 18 : quality === "high" ? 30 : 24,
     epsilon: quality === "high" ? 0.0011 : 0.0017,
+  };
+}
+
+function getFractalInputReactiveState(imageData) {
+  const fallback = {
+    luma: clamp(visualFeatures.luma, 0, 1),
+    motion: clamp(visualFeatures.motion, 0, 1.2),
+    contrast: 0.12,
+    color: [0.52, 0.46, 0.58],
+  };
+  if (!imageData || !imageData.data || imageData.width < 2 || imageData.height < 2) return fallback;
+  const { width, height, data } = imageData;
+  const picks = [
+    [0.5, 0.5],
+    [0.28, 0.32],
+    [0.72, 0.32],
+    [0.32, 0.72],
+    [0.68, 0.72],
+    [0.5, 0.18],
+    [0.5, 0.82],
+    [0.18, 0.5],
+    [0.82, 0.5],
+  ];
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let l = 0;
+  let l2 = 0;
+  for (let i = 0; i < picks.length; i++) {
+    const px = clamp(Math.floor(picks[i][0] * (width - 1)), 0, width - 1);
+    const py = clamp(Math.floor(picks[i][1] * (height - 1)), 0, height - 1);
+    const idx = (py * width + px) * 4;
+    const rr = data[idx] / 255;
+    const gg = data[idx + 1] / 255;
+    const bb = data[idx + 2] / 255;
+    const lum = rr * 0.2126 + gg * 0.7152 + bb * 0.0722;
+    r += rr;
+    g += gg;
+    b += bb;
+    l += lum;
+    l2 += lum * lum;
+  }
+  const n = picks.length || 1;
+  const avgLuma = l / n;
+  const variance = Math.max(0, l2 / n - avgLuma * avgLuma);
+  const contrastNow = clamp(Math.sqrt(variance) * 2.3, 0, 1);
+  const lumaMix = clamp(avgLuma * 0.65 + visualFeatures.luma * 0.35, 0, 1);
+  return {
+    luma: lumaMix,
+    motion: clamp(visualFeatures.motion, 0, 1.2),
+    contrast: contrastNow,
+    color: [r / n, g / n, b / n],
   };
 }
 
@@ -3752,6 +3950,10 @@ function ensureFractalRenderer() {
     uniform float uMid;
     uniform float uHigh;
     uniform float uEnergy;
+    uniform float uVisualLuma;
+    uniform float uVisualMotion;
+    uniform float uVisualContrast;
+    uniform vec3 uInputColor;
     uniform float uSymmetry;
     uniform float uFractalPower;
     uniform float uIter;
@@ -3796,7 +3998,15 @@ function ensureFractalRenderer() {
       vec3 z = p;
       float dr = 1.0;
       float r = 0.0;
-      float power = clamp(uFractalPower + 0.6 * (uEnergy - 0.5) * uBreath, 6.0, 12.0);
+      float power = clamp(
+          uFractalPower +
+          0.6 * (uEnergy - 0.5) * uBreath +
+          (uVisualLuma - 0.5) * 1.1 +
+          uVisualMotion * 0.5 +
+          uVisualContrast * 0.8,
+        6.0,
+        12.0
+      );
       int iterMax = 12;
       for (int i = 0; i < 12; i++) {
         if (i >= int(clamp(uIter, 1.0, 12.0))) break;
@@ -3816,7 +4026,7 @@ function ensureFractalRenderer() {
 
     float mapScene(vec3 p) {
       float breath = 0.5 + 0.5 * sin(uTime * (0.22 + 0.18 * max(uBreath, 0.2)));
-      float spin = uTime * (0.08 + 0.25 * uSpin * (0.2 + uBass));
+      float spin = uTime * (0.08 + 0.25 * uSpin * (0.2 + uBass) + uVisualMotion * 0.22);
       p.xz *= rot(spin);
       p.xy *= rot(spin * 0.7);
       p *= 0.92 + breath * 0.16;
@@ -3826,7 +4036,8 @@ function ensureFractalRenderer() {
         float warp = sin(p.x * 2.7 + uTime * 0.25) * cos(p.y * 3.4 - uTime * 0.22) * 0.04;
         if (texMode > 1.5) warp += sin((p.x + p.z) * 9.0) * 0.02;
         if (texMode > 2.5) warp += cos((p.y - p.z) * 13.0) * 0.01;
-        p += normalize(vec3(p.z, p.x, p.y) + 0.0001) * warp;
+        warp += sin((p.x * 5.1 - p.z * 4.2) + uTime * 0.18) * 0.008;
+        p += normalize(vec3(p.z, p.x, p.y) + 0.0001) * warp * (1.0 + uVisualContrast * 0.55);
       }
       float dBulb = deMandelbulb(p);
       float shapeMode = floor(uShapeMode + 0.5);
@@ -3858,7 +4069,12 @@ function ensureFractalRenderer() {
     vec3 palette(float t) {
       vec3 warmA = mix(vec3(0.94,0.58,0.42), vec3(0.90,0.35,0.58), 0.5 + 0.5 * sin(t + uTime * 0.04));
       vec3 warmB = mix(vec3(0.84,0.76,0.42), vec3(0.52,0.72,0.98), 0.5 + 0.5 * cos(t * 0.8 + uTime * 0.03));
-      return mix(warmB, warmA, clamp(uColorWarmth, 0.0, 1.0));
+      vec3 warmC = mix(vec3(0.76,0.48,0.95), vec3(0.33,0.89,0.83), 0.5 + 0.5 * sin(t * 0.6 - uTime * 0.028));
+      vec3 srcTint = mix(vec3(0.5), uInputColor, 0.72);
+      float imgMix = clamp(uVisualLuma * 0.52 + uVisualMotion * 0.2 + uVisualContrast * 0.42, 0.0, 0.86);
+      float k = 0.5 + 0.5 * sin(uTime * 0.06 + t * 0.37);
+      vec3 base = mix(mix(warmB, warmA, clamp(uColorWarmth, 0.0, 1.0)), warmC, k * 0.34);
+      return mix(base, srcTint, imgMix);
     }
 
     void main() {
@@ -3904,7 +4120,7 @@ function ensureFractalRenderer() {
         float diff2 = max(dot(n, l2), 0.0) * 0.45;
         float fres = pow(1.0 - max(dot(n, -rd), 0.0), 2.5);
         vec3 base = palette(length(p) * 1.3 + atan(p.z, p.x) * 0.6);
-        float light = (diff1 + diff2 + 0.25 + fres * 0.35) * (uLightIntensity * (0.8 + 0.4 * uHigh));
+        float light = (diff1 + diff2 + 0.25 + fres * 0.35) * (uLightIntensity * (0.8 + 0.4 * uHigh + uVisualContrast * 0.2));
         float texMode = floor(uTextureMode + 0.5);
         if (texMode > 0.5) {
           float grain = sin((p.x + p.y + p.z) * 20.0 + uTime * 0.8) * 0.07;
@@ -3928,6 +4144,8 @@ function ensureFractalRenderer() {
           vec3 cp = abs(fract(p * 5.0) - 0.5);
           tex2 = 1.0 - smoothstep(0.06, 0.28, min(min(cp.x, cp.y), cp.z));
         }
+        float geoFlat = 0.5 + 0.5 * sin((atan(p.y, p.x) * 12.0 + length(p.xz) * 8.0) - uTime * 0.25);
+        tex2 = mix(tex2, geoFlat, 0.22);
         if (tex2Mode > 0.5) {
           float mixK = clamp(uTexture2Mix, 0.0, 1.0);
           base = mix(base, base.zyx, tex2 * mixK * 0.45);
@@ -3980,7 +4198,7 @@ function ensureFractalRenderer() {
       if (uFlatMode < 0.5) {
         col = mix(col, fogCol, clamp(fog, 0.0, 1.0));
       }
-      col += glowAcc * 0.004 * uGlow * palette(uTime * 0.06 + uv.x + uv.y) * (uFlatMode > 0.5 ? 0.45 : 1.0);
+      col += glowAcc * 0.004 * uGlow * (1.0 + uVisualContrast * 0.35) * palette(uTime * 0.06 + uv.x + uv.y) * (uFlatMode > 0.5 ? 0.45 : 1.0);
       col = clamp(col, 0.0, 1.0);
       gl_FragColor = vec4(col, 1.0);
     }
@@ -4004,6 +4222,10 @@ function ensureFractalRenderer() {
     uMid: gl.getUniformLocation(program, "uMid"),
     uHigh: gl.getUniformLocation(program, "uHigh"),
     uEnergy: gl.getUniformLocation(program, "uEnergy"),
+    uVisualLuma: gl.getUniformLocation(program, "uVisualLuma"),
+    uVisualMotion: gl.getUniformLocation(program, "uVisualMotion"),
+    uVisualContrast: gl.getUniformLocation(program, "uVisualContrast"),
+    uInputColor: gl.getUniformLocation(program, "uInputColor"),
     uSymmetry: gl.getUniformLocation(program, "uSymmetry"),
     uFractalPower: gl.getUniformLocation(program, "uFractalPower"),
     uIter: gl.getUniformLocation(program, "uIter"),
@@ -4035,7 +4257,7 @@ function ensureFractalRenderer() {
   return fractalGl;
 }
 
-function renderFractalLive(tSec) {
+function renderFractalLive(tSec, sourceImageData = null) {
   const renderer = ensureFractalRenderer();
   if (!renderer) return false;
   const { gl, program, posBuffer, aPos, uniforms } = renderer;
@@ -4052,6 +4274,7 @@ function renderFractalLive(tSec) {
   const mid = fs.useAudio ? clamp((audioFeatures.bands[1] * 0.4 + audioFeatures.bands[2] * 0.7) * fs.audioGain, 0, 1) : 0;
   const high = fs.useAudio ? clamp((audioFeatures.bands[3] * 0.9 + audioFeatures.transient * 0.35) * fs.audioGain, 0, 1) : 0;
   const energy = fs.useAudio ? clamp((audioLevel * 0.8 + audioFeatures.transient * 0.28) * fs.audioGain, 0, 1) : 0;
+  const visualState = getFractalInputReactiveState(sourceImageData);
 
   gl.viewport(0, 0, fractalGlCanvas.width, fractalGlCanvas.height);
   gl.useProgram(program);
@@ -4065,6 +4288,10 @@ function renderFractalLive(tSec) {
   gl.uniform1f(uniforms.uMid, mid);
   gl.uniform1f(uniforms.uHigh, high);
   gl.uniform1f(uniforms.uEnergy, energy);
+  gl.uniform1f(uniforms.uVisualLuma, visualState.luma);
+  gl.uniform1f(uniforms.uVisualMotion, visualState.motion);
+  gl.uniform1f(uniforms.uVisualContrast, visualState.contrast);
+  gl.uniform3f(uniforms.uInputColor, visualState.color[0], visualState.color[1], visualState.color[2]);
   gl.uniform1f(uniforms.uSymmetry, fs.symmetry);
   gl.uniform1f(uniforms.uFractalPower, fs.power);
   gl.uniform1f(uniforms.uIter, fs.iter);
@@ -4617,6 +4844,8 @@ function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
   return (
     mode === "particles" ||
     mode === "fractal" ||
+    Boolean(depthMorphTween) ||
+    Boolean(fractalMorphTween) ||
     webcamActive ||
     recordingActive ||
     hasAudioReactiveInput() ||
@@ -6469,7 +6698,7 @@ function updateDomeAutoSeamFromImageData(imageData) {
 function isGlitchDomePanMode() {
   if (!liveOutputView || liveOutputView.value !== "dome") return false;
   if (!domeSourceMap || domeSourceMap.value !== "equirect") return false;
-  if (mode !== "glitch" && mode !== "fractal") return false;
+  if (mode !== "glitch" && mode !== "fractal" && mode !== "particles") return false;
   return Boolean(loadedImage || originalImageData);
 }
 
@@ -7414,6 +7643,8 @@ function ensureParticlesGpu() {
       uniform float uHue;
       uniform int uColorMode;
       uniform float uAudio;
+      uniform float uTransient;
+      uniform float uTime;
       out vec4 vColor;
       vec3 h2r(float h, float s, float l){
         vec3 c = vec3(h, s, l);
@@ -7444,10 +7675,19 @@ function ensureParticlesGpu() {
         gl_Position = vec4(ndc, 0.0, 1.0);
         gl_PointSize = max(1.0, uPointSize * (0.65 + pScale * 1.1));
         vec3 col;
-        if (uColorMode == 0) col = texture(uSource, a4.xy).rgb;
+        if (uColorMode == 0) {
+          vec3 srcCol = texture(uSource, a4.xy).rgb;
+          float lum = dot(srcCol, vec3(0.299, 0.587, 0.114));
+          vec3 fallbackCol = h2r(fract(a4.z * 0.85 + uHue / 360.0), 0.82, 0.52 + uAudio * 0.07);
+          float visMix = clamp(0.2 + (1.0 - lum) * 0.5, 0.16, 0.72);
+          col = mix(srcCol, fallbackCol, visMix);
+        }
         else if (uColorMode == 1) col = h2r(fract(a4.z * 0.9 + uHue / 360.0), 0.78, 0.52 + uAudio * 0.08);
         else col = h2r(fract(0.67 - uAudio*0.62 + uHue/360.0), 0.85, clamp(0.4 + uAudio*0.35, 0.0, 1.0));
-        vColor = vec4(col, clamp(0.45 + p4.w * 0.55 + uAudio * 0.2, 0.0, 1.0));
+        float pulse = 0.5 + 0.5 * sin(uTime * 2.2 + a4.z * 17.0);
+        vec3 transCol = h2r(fract((uHue / 360.0) + uTime * 0.03 + a4.z * 0.2 + uTransient * 0.35), 0.84, 0.56 + uTransient * 0.2);
+        col = mix(col, transCol, clamp(0.14 + uAudio * 0.22 + uTransient * 0.34 + pulse * 0.08, 0.0, 0.68));
+        vColor = vec4(col, clamp(0.45 + p4.w * 0.55 + uAudio * 0.2 + uTransient * 0.12, 0.0, 1.0));
       }`;
     const drawFs = `#version 300 es
       precision highp float;
@@ -7607,7 +7847,7 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   particlesCamXSmooth += (ps.camX - particlesCamXSmooth) * 0.08;
   particlesCamYSmooth += (ps.camY - particlesCamYSmooth) * 0.08;
   particlesCamZSmooth += (ps.camZ - particlesCamZSmooth) * 0.08;
-  const motion = getCameraMotion(settings || getSettings(), tSec);
+  const motion = getParticlesCameraMotion(ps, settings || getSettings(), tSec);
   const camX = particlesCamXSmooth + motion.rxDeg;
   const camY = particlesCamYSmooth + motion.ryDeg;
   const camZ = particlesCamZSmooth + motion.rzDeg;
@@ -7678,6 +7918,8 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   gl.uniform1f(gl.getUniformLocation(g.drawProg, "uHue"), ps.hue);
   gl.uniform1i(gl.getUniformLocation(g.drawProg, "uColorMode"), colorMode);
   gl.uniform1f(gl.getUniformLocation(g.drawProg, "uAudio"), audioDrive);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uTransient"), audioFeatures.transient);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uTime"), tSec);
   gl.drawArrays(gl.POINTS, 0, g.drawN);
   gl.disable(gl.BLEND);
   gl.bindVertexArray(null);
@@ -7739,7 +7981,7 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
   particlesCamXSmooth += (ps.camX - particlesCamXSmooth) * 0.08;
   particlesCamYSmooth += (ps.camY - particlesCamYSmooth) * 0.08;
   particlesCamZSmooth += (ps.camZ - particlesCamZSmooth) * 0.08;
-  const motion = getCameraMotion(settings || getSettings(), tSec);
+  const motion = getParticlesCameraMotion(ps, settings || getSettings(), tSec);
   const rx = (particlesCamXSmooth + motion.rxDeg) * (Math.PI / 180);
   const ry = (particlesCamYSmooth + motion.ryDeg) * (Math.PI / 180);
   const rz = (particlesCamZSmooth + motion.rzDeg) * (Math.PI / 180);
@@ -7749,6 +7991,8 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
   const panY = motion.panY * 120;
   const worldScale = 170;
   const sizePx = 0.8 + (ps.size / 100) * 2.2;
+  const trailA = clamp((ps.trail || 0) / 100, 0, 1);
+  const trailLen = Math.round(trailA * 10);
   const thr = ps.motionThreshold / 100;
   const splitMode = ps.audioSplit || "basic";
   const structureMode = ps.structure || "cloud";
@@ -7879,6 +8123,13 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
     let b = 255;
     if (ps.colorMode === "source") {
       [r, g, b] = sampleSourceColor(baseImageData, particlesU[i], particlesV[i]);
+      const lum = r * 0.299 + g * 0.587 + b * 0.114;
+      const ph = ((particlesSeed[i] * 0.9 + tSec * 0.04 + ps.hue / 360) + 1) % 1;
+      const [pr, pg, pb] = hslToRgb(ph, 0.8, 0.54 + audioDrive * 0.08);
+      const visMix = clamp(0.2 + (1 - lum / 255) * 0.5, 0.16, 0.72);
+      r = Math.round(r * (1 - visMix) + pr * visMix);
+      g = Math.round(g * (1 - visMix) + pg * visMix);
+      b = Math.round(b * (1 - visMix) + pb * visMix);
     } else if (ps.colorMode === "audio") {
       const heat = clamp(bands[0] * 0.7 + bands[1] * 0.6 + bands[3] * 0.35 + audioDrive * 0.4, 0, 1);
       const hue = ((0.67 - heat * 0.62 + ps.hue / 360) + 1) % 1;
@@ -7887,6 +8138,12 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
       const hue = ((particlesSeed[i] * 0.9 + tSec * 0.03 + ps.hue / 360) + 1) % 1;
       [r, g, b] = hslToRgb(hue, 0.78, 0.52 + audioDrive * 0.08);
     }
+    const transHue = ((ps.hue / 360) + tSec * 0.04 + split.transient * 0.18 + audioDrive * 0.08 + particlesSeed[i] * 0.1) % 1;
+    const [trR, trG, trB] = hslToRgb(transHue, 0.84, clamp(0.5 + split.transient * 0.18 + audioDrive * 0.12, 0, 1));
+    const transMix = clamp(0.12 + audioDrive * 0.26 + split.transient * 0.32, 0, 0.72);
+    r = Math.round(r * (1 - transMix) + trR * transMix);
+    g = Math.round(g * (1 - transMix) + trG * transMix);
+    b = Math.round(b * (1 - transMix) + trB * transMix);
 
     const gx = x / gradientSpread;
     const gy = y / gradientSpread;
@@ -7936,6 +8193,16 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
       drawPx(sx, sy - 2, 0.26);
       drawPx(sx, sy + 2, 0.26);
     }
+    if (trailLen > 0) {
+      const pxStep = vx * worldScale * 0.28;
+      const pyStep = vy * worldScale * 0.28;
+      for (let ti = 1; ti <= trailLen; ti++) {
+        const f = 1 - ti / (trailLen + 1);
+        const tx = Math.round(sx - pxStep * ti);
+        const ty = Math.round(sy - pyStep * ti);
+        drawPx(tx, ty, (0.18 + f * 0.3) * trailA);
+      }
+    }
   }
   ctx.putImageData(out, 0, 0);
 }
@@ -7944,12 +8211,16 @@ function renderParticlesMode(baseImageData, tSec, settings) {
   const ps = getParticlesSettings();
   const forceCpuStructured = ps.structure && ps.structure !== "cloud";
   const forceCpuSplit = ps.audioSplit === "zones";
-  const shouldForceCpu = forceCpuStructured || forceCpuSplit;
+  const forceCpuTrail = (ps.trail || 0) > 0;
+  const shouldForceCpu = forceCpuStructured || forceCpuSplit || forceCpuTrail;
   if (!shouldForceCpu && !particlesGpuForcedOff && renderParticlesModeGpu(baseImageData, tSec, settings)) return;
   renderParticlesModeCpu(baseImageData, tSec, settings);
 }
 
 function renderFrame() {
+  applyParticlesRandomTween();
+  applyDepthMorphTween();
+  applyFractalMorphTween();
   const keyPanMoved = applyCameraKeyPanning();
   const smoothCameraMoved = applySmoothCameraTargets();
   const sourceImage = getSourceImageData();
@@ -8005,7 +8276,7 @@ function renderFrame() {
   if (mode === "fractal") {
     let rendered = false;
     try {
-      rendered = renderFractalLive(tSec);
+      rendered = renderFractalLive(tSec, sourceImage);
     } catch {
       rendered = false;
     }
@@ -8268,10 +8539,8 @@ function randomizeActiveMode() {
     return;
   }
   if (mode === "particles") {
-    if (liveParticlesCount) {
-      const opts = ["low", "med", "high", "ultra"];
-      liveParticlesCount.value = opts[Math.floor(Math.random() * opts.length)];
-    }
+    // Keep particle count stable on random to avoid performance spikes.
+    const keepParticlesCount = liveParticlesCount ? liveParticlesCount.value : null;
     if (liveParticlesEmitter) {
       const opts = ["grid", "volume", "motion"];
       liveParticlesEmitter.value = opts[Math.floor(Math.random() * opts.length)];
@@ -8293,11 +8562,18 @@ function randomizeActiveMode() {
     if (liveParticlesNoise) liveParticlesNoise.value = String(Math.round(Math.random() * 100));
     if (liveParticlesAttractor) liveParticlesAttractor.value = String(Math.round(Math.random() * 100));
     if (liveParticlesFlow) liveParticlesFlow.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesCamX) liveParticlesCamX.value = String(Math.round(-60 + Math.random() * 120));
-    if (liveParticlesCamY) liveParticlesCamY.value = String(Math.round(-150 + Math.random() * 300));
-    if (liveParticlesCamZ) liveParticlesCamZ.value = String(Math.round(-90 + Math.random() * 180));
+    if (liveParticlesCamMode) {
+      // Bias towards camera motion inside/through the field.
+      const opts = ["orbit", "sweep", "helix", "inside", "inside"];
+      liveParticlesCamMode.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = String(Math.round(28 + Math.random() * 57));
+    if (liveParticlesCamX) liveParticlesCamX.value = String(Math.round(-24 + Math.random() * 48));
+    if (liveParticlesCamY) liveParticlesCamY.value = String(Math.round(-50 + Math.random() * 100));
+    if (liveParticlesCamZ) liveParticlesCamZ.value = String(Math.round(-35 + Math.random() * 70));
     if (liveParticlesHue) liveParticlesHue.value = String(Math.round(Math.random() * 360));
     if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = String(Math.round(Math.random() * 100));
+    if (liveParticlesTrail) liveParticlesTrail.value = String(Math.round(Math.random() * 100));
     if (liveParticlesOrder) liveParticlesOrder.value = String(Math.round(30 + Math.random() * 70));
     if (liveParticlesAudio) liveParticlesAudio.checked = Math.random() > 0.2;
     if (liveParticlesDamping) liveParticlesDamping.value = String(Math.round(Math.random() * 100));
@@ -8312,6 +8588,7 @@ function randomizeActiveMode() {
     }
     if (liveParticlesColorMix) liveParticlesColorMix.value = String(Math.round(20 + Math.random() * 75));
     if (liveParticlesGradientSpread) liveParticlesGradientSpread.value = String(Math.round(20 + Math.random() * 80));
+    if (liveParticlesCount && keepParticlesCount) liveParticlesCount.value = keepParticlesCount;
     particlesBufferN = 0;
     updateOutputs();
     scheduleRender();
@@ -8353,6 +8630,182 @@ function randomizeActiveMode() {
   }
 
   updateOutputs();
+}
+
+function triggerParticlesDynamicRandomTween() {
+  if (mode !== "particles") return;
+  const entries = [];
+  const pushEntry = (el, min, max) => {
+    if (!el) return;
+    const from = Number(el.value);
+    const to = min + Math.random() * (max - min);
+    entries.push({ el, from, to });
+  };
+
+  // Keep current camera mode to avoid abrupt camera jumps during morph.
+  particlesCamModeBlendStart = 0;
+
+  pushEntry(liveParticlesCamSpeed, 24, 72);
+  pushEntry(liveParticlesCamX, -24, 24);
+  pushEntry(liveParticlesCamY, -65, 65);
+  pushEntry(liveParticlesCamZ, -42, 42);
+  pushEntry(liveParticlesNoise, 8, 78);
+  pushEntry(liveParticlesAttractor, 8, 80);
+  pushEntry(liveParticlesFlow, 10, 88);
+  pushEntry(liveParticlesVortex, 4, 82);
+  pushEntry(liveParticlesDrift, 10, 70);
+  pushEntry(liveParticlesFocus, 10, 82);
+  pushEntry(liveParticlesHue, 0, 360);
+  pushEntry(liveParticlesAudioAmount, 28, 100);
+  pushEntry(liveParticlesTrail, 0, 64);
+  pushEntry(liveParticlesColorMix, 18, 92);
+  pushEntry(liveParticlesGradientSpread, 20, 95);
+  pushEntry(liveParticlesOrder, 28, 88);
+
+  particlesRandomTween = {
+    startMs: performance.now(),
+    durationMs: 2800 + Math.random() * 2200,
+    entries,
+  };
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function applyParticlesRandomTween() {
+  if (!particlesRandomTween) return false;
+  if (mode !== "particles") {
+    particlesRandomTween = null;
+    return false;
+  }
+  const now = performance.now();
+  const kRaw = clamp((now - particlesRandomTween.startMs) / particlesRandomTween.durationMs, 0, 1);
+  const k = kRaw * kRaw * (3 - 2 * kRaw);
+  particlesRandomTween.entries.forEach(({ el, from, to }) => {
+    el.value = String(Math.round(from + (to - from) * k));
+  });
+  updateLiveQuickOutputs();
+  if (kRaw >= 1) particlesRandomTween = null;
+  return true;
+}
+
+function triggerDepthMorphTween() {
+  if (mode !== "depth" && mode !== "mix") return;
+  const entries = [];
+  const pushId = (id, min, max) => {
+    const el = controls[id];
+    if (!el) return;
+    const from = Number(el.value);
+    const to = min + Math.random() * (max - min);
+    entries.push({ el, from, to });
+  };
+  pushId("pointMap", 28, 100);
+  pushId("meshMap", 18, 96);
+  pushId("pointDensity", 18, 82);
+  pushId("meshDensity", 10, 74);
+  pushId("pointSize", 1, 22);
+  pushId("pointLift", 10, 90);
+  pushId("meshLift", 8, 88);
+  pushId("depthStrength", 28, 98);
+  pushId("depthExaggeration", 62, 150);
+  pushId("pointSpread", 2, 170);
+  pushId("pointRotateX", -38, 38);
+  pushId("pointRotateY", -85, 85);
+  pushId("pointRotateZ", -50, 50);
+  pushId("cameraZoom", 72, 118);
+  pushId("cameraFollow", 0, 75);
+  pushId("autoRotate", 0, 86);
+  pushId("ambientLight", 12, 88);
+  pushId("lightIntensity", 32, 170);
+  pushId("sceneExposure", 85, 182);
+  pushId("pointColorShift", 0, 360);
+  pushId("meshColorShift", 0, 360);
+  pushId("pointColorPulse", 0, 100);
+  pushId("depthColorWave", 0, 100);
+  pushId("bgMotion", 0, 92);
+
+  if (live3dFxAmount) {
+    entries.push({
+      el: live3dFxAmount,
+      from: Number(live3dFxAmount.value),
+      to: 12 + Math.random() * 78,
+    });
+  }
+
+  // Keep current camera mode; morph only parameters for smooth transitions.
+
+  depthMorphTween = {
+    startMs: performance.now(),
+    durationMs: 3200 + Math.random() * 2400,
+    entries,
+  };
+  updateOutputs();
+  scheduleRender();
+}
+
+function applyDepthMorphTween() {
+  if (!depthMorphTween) return false;
+  if (mode !== "depth" && mode !== "mix") {
+    depthMorphTween = null;
+    return false;
+  }
+  const now = performance.now();
+  const kRaw = clamp((now - depthMorphTween.startMs) / depthMorphTween.durationMs, 0, 1);
+  const k = kRaw * kRaw * (3 - 2 * kRaw);
+  depthMorphTween.entries.forEach(({ el, from, to }) => {
+    el.value = String(Math.round(from + (to - from) * k));
+  });
+  updateOutputs();
+  if (kRaw >= 1) depthMorphTween = null;
+  return true;
+}
+
+function triggerFractalMorphTween() {
+  if (mode !== "fractal") return;
+  const entries = [];
+  const pushEntry = (el, min, max) => {
+    if (!el) return;
+    const from = Number(el.value);
+    const to = min + Math.random() * (max - min);
+    entries.push({ el, from, to });
+  };
+
+  pushEntry(liveFractalCamSpeed, 8, 62);
+  pushEntry(liveFractalDistance, 24, 142);
+  pushEntry(liveFractalSymmetry, 8, 24);
+  pushEntry(liveFractalPower, 64, 114);
+  pushEntry(liveFractalFog, 0, 66);
+  pushEntry(liveFractalGlow, 10, 92);
+  pushEntry(liveFractalLight, 38, 240);
+  pushEntry(liveFractalSpin, 0, 86);
+  pushEntry(liveFractalBreath, 10, 95);
+  pushEntry(liveFractalWarmth, 8, 100);
+  pushEntry(liveFractalTextureMix, 0, 92);
+  pushEntry(liveFractalAudioGain, 24, 180);
+
+  fractalMorphTween = {
+    startMs: performance.now(),
+    durationMs: 3000 + Math.random() * 2600,
+    entries,
+  };
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function applyFractalMorphTween() {
+  if (!fractalMorphTween) return false;
+  if (mode !== "fractal") {
+    fractalMorphTween = null;
+    return false;
+  }
+  const now = performance.now();
+  const kRaw = clamp((now - fractalMorphTween.startMs) / fractalMorphTween.durationMs, 0, 1);
+  const k = kRaw * kRaw * (3 - 2 * kRaw);
+  fractalMorphTween.entries.forEach(({ el, from, to }) => {
+    el.value = String(Math.round(from + (to - from) * k));
+  });
+  updateLiveQuickOutputs();
+  if (kRaw >= 1) fractalMorphTween = null;
+  return true;
 }
 
 function randomizeBackground() {
@@ -8609,6 +9062,11 @@ function setMode(newMode) {
     particlesCamXSmooth = 0;
     particlesCamYSmooth = 0;
     particlesCamZSmooth = 0;
+    particlesCamAnimTime = 0;
+    particlesCamLastTs = performance.now();
+    particlesCamModePrev = liveParticlesCamMode ? liveParticlesCamMode.value : "orbit";
+    particlesCamModeBlendStart = 0;
+    particlesCamSpeedSmooth = 0.34;
     if (liveParticlesCamX) liveParticlesCamX.value = "0";
     if (liveParticlesCamY) liveParticlesCamY.value = "0";
     if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
@@ -8719,6 +9177,8 @@ function resetAll() {
   if (liveParticlesNoise) liveParticlesNoise.value = "34";
   if (liveParticlesAttractor) liveParticlesAttractor.value = "26";
   if (liveParticlesFlow) liveParticlesFlow.value = "30";
+  if (liveParticlesCamMode) liveParticlesCamMode.value = "orbit";
+  if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = "34";
   if (liveParticlesCamX) liveParticlesCamX.value = "0";
   if (liveParticlesCamY) liveParticlesCamY.value = "0";
   if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
@@ -8728,6 +9188,7 @@ function resetAll() {
   if (liveParticlesHue) liveParticlesHue.value = "0";
   if (liveParticlesAudio) liveParticlesAudio.checked = true;
   if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = "54";
+  if (liveParticlesTrail) liveParticlesTrail.value = "0";
   if (liveParticlesOrder) liveParticlesOrder.value = "48";
   if (liveParticlesDamping) liveParticlesDamping.value = "18";
   if (liveParticlesVortex) liveParticlesVortex.value = "22";
@@ -9835,6 +10296,12 @@ if (liveParticlesAudio) {
     scheduleRender();
   });
 }
+if (liveParticlesCamMode) {
+  liveParticlesCamMode.addEventListener("change", () => {
+    particlesCamModeBlendStart = 0;
+    scheduleRender();
+  });
+}
 if (liveParticlesGradientA) {
   liveParticlesGradientA.addEventListener("input", () => {
     scheduleRender();
@@ -9891,11 +10358,13 @@ if (liveParticlesBgColorB) {
   liveParticlesNoise,
   liveParticlesAttractor,
   liveParticlesFlow,
+  liveParticlesCamSpeed,
   liveParticlesCamX,
   liveParticlesCamY,
   liveParticlesCamZ,
   liveParticlesHue,
   liveParticlesAudioAmount,
+  liveParticlesTrail,
   liveParticlesOrder,
   liveParticlesDamping,
   liveParticlesVortex,
@@ -10295,6 +10764,21 @@ if (recordNameModal) {
     if (e.target === recordNameModal) closeRecordNameDialog("");
   });
 }
+if (infoLegalBtn && infoLegalModal) {
+  infoLegalBtn.addEventListener("click", () => {
+    infoLegalModal.hidden = false;
+  });
+}
+if (infoLegalCloseBtn && infoLegalModal) {
+  infoLegalCloseBtn.addEventListener("click", () => {
+    infoLegalModal.hidden = true;
+  });
+}
+if (infoLegalModal) {
+  infoLegalModal.addEventListener("click", (e) => {
+    if (e.target === infoLegalModal) infoLegalModal.hidden = true;
+  });
+}
 openCleanOutputBtn.addEventListener("click", openCleanOutput);
 closeCleanOutputBtn.addEventListener("click", closeCleanOutput);
 camStaticBtn.addEventListener("click", () => setCameraMode("static"));
@@ -10489,6 +10973,14 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "KeyQ") {
     e.preventDefault();
     cycle3dFxMode();
+    return;
+  }
+  if (e.code === "KeyO" && (mode === "depth" || mode === "mix" || mode === "particles" || mode === "fractal")) {
+    e.preventDefault();
+    if (e.repeat) return;
+    if (mode === "particles") triggerParticlesDynamicRandomTween();
+    else if (mode === "fractal") triggerFractalMorphTween();
+    else triggerDepthMorphTween();
     return;
   }
   if (e.code === "KeyU") {
