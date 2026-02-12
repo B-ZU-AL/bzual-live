@@ -266,7 +266,7 @@
                     <option value="dome-equirect">Dome Equirect</option>
                   </select>
                 </label>
-                <label class="slider"><span>Camera Speed</span><input type="range" id="liveFractalCamSpeed" min="0" max="100" value="28" /><output for="liveFractalCamSpeed">28</output></label>
+                <label class="slider"><span>Camera Speed</span><input type="range" id="liveFractalCamSpeed" min="0" max="100" value="0" /><output for="liveFractalCamSpeed">0</output></label>
                 <label class="slider"><span>Camera Distance</span><input type="range" id="liveFractalDistance" min="20" max="180" value="76" /><output for="liveFractalDistance">76</output></label>
                 <label class="inline-select">
                   <span>Math Shape</span>
@@ -282,8 +282,8 @@
                 <label class="slider"><span>Fog Density</span><input type="range" id="liveFractalFog" min="0" max="80" value="24" /><output for="liveFractalFog">24</output></label>
                 <label class="slider"><span>Glow</span><input type="range" id="liveFractalGlow" min="0" max="100" value="52" /><output for="liveFractalGlow">52</output></label>
                 <label class="slider"><span>Light Intensity</span><input type="range" id="liveFractalLight" min="20" max="300" value="120" /><output for="liveFractalLight">120</output></label>
-                <label class="slider"><span>Spin</span><input type="range" id="liveFractalSpin" min="0" max="100" value="36" /><output for="liveFractalSpin">36</output></label>
-                <label class="slider"><span>Breath</span><input type="range" id="liveFractalBreath" min="0" max="100" value="48" /><output for="liveFractalBreath">48</output></label>
+                <label class="slider"><span>Spin</span><input type="range" id="liveFractalSpin" min="0" max="100" value="0" /><output for="liveFractalSpin">0</output></label>
+                <label class="slider"><span>Breath</span><input type="range" id="liveFractalBreath" min="0" max="100" value="0" /><output for="liveFractalBreath">0</output></label>
                 <label class="slider"><span>Color Warmth</span><input type="range" id="liveFractalWarmth" min="0" max="100" value="66" /><output for="liveFractalWarmth">66</output></label>
                 <label class="inline-select">
                   <span>Fractal Texture</span>
@@ -333,7 +333,7 @@
                   <span>Flat Color</span>
                   <input type="color" id="liveFractalFlatColor" value="#000000" />
                 </label>
-                <label class="toggle"><input type="checkbox" id="liveFractalAudio" checked /><span>Use Audio</span></label>
+                <label class="toggle"><input type="checkbox" id="liveFractalAudio" /><span>Use Audio</span></label>
                 <label class="slider"><span>Audio Gain</span><input type="range" id="liveFractalAudioGain" min="0" max="200" value="100" /><output for="liveFractalAudioGain">100</output></label>
                 <p class="micro-tip">Tip: mandala fractal con respiración lenta + audio bandas suaves.</p>
               </div>
@@ -459,20 +459,20 @@
                 </label>
                 <label class="slider"><span>Size</span><input type="range" id="liveParticlesSize" min="0" max="100" value="42" /><output for="liveParticlesSize">42</output></label>
                 <label class="slider"><span>Depth / Z</span><input type="range" id="liveParticlesDepth" min="0" max="100" value="58" /><output for="liveParticlesDepth">58</output></label>
-                <label class="slider"><span>Noise</span><input type="range" id="liveParticlesNoise" min="0" max="100" value="34" /><output for="liveParticlesNoise">34</output></label>
+                <label class="slider"><span>Noise</span><input type="range" id="liveParticlesNoise" min="0" max="100" value="0" /><output for="liveParticlesNoise">0</output></label>
                 <label class="slider"><span>Attractor</span><input type="range" id="liveParticlesAttractor" min="0" max="100" value="26" /><output for="liveParticlesAttractor">26</output></label>
-                <label class="slider"><span>Flow</span><input type="range" id="liveParticlesFlow" min="0" max="100" value="30" /><output for="liveParticlesFlow">30</output></label>
+                <label class="slider"><span>Flow</span><input type="range" id="liveParticlesFlow" min="0" max="100" value="0" /><output for="liveParticlesFlow">0</output></label>
                 <label class="inline-select">
                   <span>Camera Mode</span>
                   <select id="liveParticlesCamMode">
-                    <option value="static">Static</option>
-                    <option value="orbit" selected>Orbit</option>
+                    <option value="static" selected>Static</option>
+                    <option value="orbit">Orbit</option>
                     <option value="sweep">Sweep</option>
                     <option value="helix">Helix</option>
                     <option value="inside">Inside</option>
                   </select>
                 </label>
-                <label class="slider"><span>Camera Anim Speed</span><input type="range" id="liveParticlesCamSpeed" min="0" max="100" value="34" /><output for="liveParticlesCamSpeed">34</output></label>
+                <label class="slider"><span>Camera Anim Speed</span><input type="range" id="liveParticlesCamSpeed" min="0" max="100" value="0" /><output for="liveParticlesCamSpeed">0</output></label>
                 <label class="slider"><span>Camera X</span><input type="range" id="liveParticlesCamX" min="-90" max="90" value="0" /><output for="liveParticlesCamX">0</output></label>
                 <label class="slider"><span>Camera Y</span><input type="range" id="liveParticlesCamY" min="-180" max="180" value="0" /><output for="liveParticlesCamY">0</output></label>
                 <label class="slider"><span>Camera Z</span><input type="range" id="liveParticlesCamZ" min="-180" max="180" value="0" /><output for="liveParticlesCamZ">0</output></label>
@@ -485,7 +485,7 @@
                   </select>
                 </label>
                 <label class="slider"><span>Hue Shift</span><input type="range" id="liveParticlesHue" min="0" max="360" value="0" /><output for="liveParticlesHue">0</output></label>
-                <label class="toggle"><input type="checkbox" id="liveParticlesAudio" checked /><span>Audio React</span></label>
+                <label class="toggle"><input type="checkbox" id="liveParticlesAudio" /><span>Audio React</span></label>
                 <label class="slider"><span>Audio Amount</span><input type="range" id="liveParticlesAudioAmount" min="0" max="100" value="54" /><output for="liveParticlesAudioAmount">54</output></label>
                 <label class="slider"><span>Light Trail</span><input type="range" id="liveParticlesTrail" min="0" max="100" value="0" /><output for="liveParticlesTrail">0</output></label>
                 <label class="inline-select">
@@ -513,7 +513,7 @@
                   <label class="slider"><span>Vortex</span><input type="range" id="liveParticlesVortex" min="0" max="100" value="22" /><output for="liveParticlesVortex">22</output></label>
                   <label class="slider"><span>Spawn Rate</span><input type="range" id="liveParticlesSpawn" min="0" max="100" value="68" /><output for="liveParticlesSpawn">68</output></label>
                   <label class="slider"><span>Motion Threshold</span><input type="range" id="liveParticlesMotionThreshold" min="0" max="100" value="32" /><output for="liveParticlesMotionThreshold">32</output></label>
-                  <label class="slider"><span>Drift</span><input type="range" id="liveParticlesDrift" min="0" max="100" value="34" /><output for="liveParticlesDrift">34</output></label>
+                  <label class="slider"><span>Drift</span><input type="range" id="liveParticlesDrift" min="0" max="100" value="0" /><output for="liveParticlesDrift">0</output></label>
                   <label class="slider"><span>Focal Points</span><input type="range" id="liveParticlesFocus" min="0" max="100" value="38" /><output for="liveParticlesFocus">38</output></label>
                   <label class="inline-select">
                     <span>Gradient Mode</span>
@@ -959,10 +959,14 @@
                 <label class="inline-select">
                   <span>Kaleido Type</span>
                   <select id="kaleidoFxType">
-                    <option value="mirror">Mirror</option>
-                    <option value="tunnel">Tunnel</option>
+                    <option value="tunnel" selected>Tunnel</option>
                     <option value="radial">Radial</option>
                     <option value="spiral">Spiral</option>
+                    <option value="mandala">Mandala</option>
+                    <option value="petals">Sacred Petals</option>
+                    <option value="moire">Moire Flow</option>
+                    <option value="lotus">Lotus Bloom</option>
+                    <option value="lattice">Sacred Lattice</option>
                   </select>
                 </label>
                 <label class="slider">
@@ -982,8 +986,8 @@
                 </label>
                 <label class="slider">
                   <span>Kaleido Segments</span>
-                  <input type="range" id="kaleidoFxSegments" min="4" max="28" value="12" />
-                  <output for="kaleidoFxSegments">12</output>
+                  <input type="range" id="kaleidoFxSegments" min="4" max="16" value="10" />
+                  <output for="kaleidoFxSegments">10</output>
                 </label>
                 <div class="pad-label"><span class="pad-icon">KAL</span><span>Kaleido Pad (X=Amount / Y=Smooth)</span></div>
                 <div id="kaleidoFxPad" class="depth-pad live-fx-pad">
@@ -1013,7 +1017,23 @@
 
             <div class="output-zone">
               <p class="subgroup-title" data-i18n="recording">Recording</p>
-              <div class="recording-head">
+              <div class="recording-quick">
+                <button id="recordStartBtn" class="btn btn-record-main">
+                  <span id="recordStartIcon" class="action-icon action-icon-rec">REC</span>
+                  <span class="action-label" data-i18n="record">Record</span>
+                </button>
+                <button id="recordSaveBtn" class="btn btn-save-main">
+                  <span class="action-icon action-icon-save">SAVE</span>
+                  <span class="action-label" data-i18n="save_recording">Save Recording</span>
+                </button>
+                <div class="rec-indicator" id="recordingIndicator" aria-live="polite">
+                  <span class="dot"></span>
+                  <span id="recordingStatusText" data-i18n="record_status_idle">IDLE</span>
+                </div>
+              </div>
+              <details class="recording-advanced">
+                <summary>Recording Settings</summary>
+                <div class="recording-head">
                 <label class="inline-select">
                   <span data-i18n="record_source">Record Source</span>
                   <select id="recordSource">
@@ -1038,21 +1058,8 @@
                     <option value="1440">1440p</option>
                   </select>
                 </label>
-                <div class="rec-indicator" id="recordingIndicator" aria-live="polite">
-                  <span class="dot"></span>
-                  <span id="recordingStatusText" data-i18n="record_status_idle">IDLE</span>
                 </div>
-              </div>
-              <div class="audio-reactive-box">
-                <button id="recordStartBtn" class="btn btn-record-main">
-                  <span id="recordStartIcon" class="action-icon action-icon-rec">REC</span>
-                  <span class="action-label" data-i18n="record">Record</span>
-                </button>
-                <button id="recordSaveBtn" class="btn btn-save-main">
-                  <span class="action-icon action-icon-save">SAVE</span>
-                  <span class="action-label" data-i18n="save_recording">Save Recording</span>
-                </button>
-              </div>
+              </details>
               <p class="subgroup-title" data-i18n="exports">Exports</p>
               <div class="audio-reactive-box">
                 <button id="exportPhotoBtn" class="btn btn-photo-main">

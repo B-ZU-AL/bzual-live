@@ -757,6 +757,22 @@ body {
   border-color: rgba(127, 255, 237, 0.72);
 }
 
+.btn-audio-react {
+  --audio-pulse: 0;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.btn-audio-react.audio-rhythm-active {
+  transform: scale(calc(1 + var(--audio-pulse) * 0.042));
+  box-shadow:
+    0 0 0 1px rgba(120, 255, 232, calc(0.2 + var(--audio-pulse) * 0.18)),
+    0 0 calc(10px + var(--audio-pulse) * 24px) rgba(91, 248, 255, 0.34);
+}
+
 .btn-audio-load {
   border-color: rgba(173, 196, 255, 0.45);
 }
@@ -1152,10 +1168,35 @@ body {
 
 .recording-head {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  align-items: end;
+  align-items: center;
+  margin: 8px 0 4px;
+}
+
+.recording-quick {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.recording-advanced {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 6px 8px;
   margin-bottom: 8px;
+  background: rgba(8, 12, 22, 0.5);
+}
+
+.recording-advanced summary {
+  cursor: pointer;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: #cfe3ff;
+  user-select: none;
 }
 
 .rec-indicator {
@@ -1441,6 +1482,10 @@ body {
   }
 
   .recording-head {
+    grid-template-columns: 1fr;
+  }
+
+  .recording-quick {
     grid-template-columns: 1fr;
   }
 

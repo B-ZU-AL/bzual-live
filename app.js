@@ -445,7 +445,7 @@ const defaults = {
   depthColorWave: 0,
   depthExaggeration: 100,
   pointSpread: 0,
-  bgMotion: 35,
+  bgMotion: 0,
   audioSensitivity: 92,
   audioTolerance: 12,
   audioPointsIntensity: 120,
@@ -783,9 +783,9 @@ let particlesCamYSmooth = 0;
 let particlesCamZSmooth = 0;
 let particlesCamAnimTime = 0;
 let particlesCamLastTs = performance.now();
-let particlesCamModePrev = "orbit";
+let particlesCamModePrev = "static";
 let particlesCamModeBlendStart = 0;
-let particlesCamSpeedSmooth = 0.34;
+let particlesCamSpeedSmooth = 0;
 let particlesRandomTween = null;
 let particlesCameraTween = null;
 let particlesWarmupUntil = 0;
@@ -794,6 +794,8 @@ let fractalMorphTween = null;
 let fractalCameraTween = null;
 let kaleidoMorphTween = null;
 let kaleidoSegSmooth = 12;
+const KALEIDO_TYPES = ["tunnel", "radial", "spiral", "mandala", "petals", "moire", "lotus", "lattice"];
+const KALEIDO_DEFAULT_TYPE = "tunnel";
 let particlesGpuReady = false;
 let particlesGpuTriedInit = false;
 let particlesGpu = null;
@@ -805,6 +807,12 @@ let smoothCamZoom = null;
 let smoothRotX = null;
 let smoothRotY = null;
 let smoothRotZ = null;
+let smoothMotionRx = null;
+let smoothMotionRy = null;
+let smoothMotionRz = null;
+let smoothMotionZoom = null;
+let smoothMotionPanX = null;
+let smoothMotionPanY = null;
 let targetPanX = null;
 let targetPanY = null;
 let targetCamFollow = null;
@@ -826,8 +834,8 @@ let webcamStream = null;
 let webcamActive = false;
 let selectedCameraDeviceId = "";
 let recordingActive = false;
-let cameraMode = "cursor";
-let cameraModePrev = "cursor";
+let cameraMode = "static";
+let cameraModePrev = "static";
 let cameraModeBlendStart = 0;
 let micStream = null;
 let micActive = false;
@@ -2356,21 +2364,43 @@ function syncLiveAudioQuickUi() {
     setButtonActionLabel(liveAudioToggleBtn, hasAudioReactiveInput() ? t("pause") : t("live_audio_toggle"));
     liveAudioToggleBtn.classList.toggle("audio-active", hasAudioReactiveInput());
   }
-  const showFileMini = Boolean(
-    liveAudioFileMini &&
-      audioFilePlayer &&
-      audioFilePlayer.src &&
-      audioInputSource &&
-      audioInputSource.value === "file"
-  );
-  if (liveAudioFileMini) liveAudioFileMini.hidden = !showFileMini;
-  if (liveAudioPlayPauseBtn && audioFilePlayer) {
+  const inputMode = audioInputSource ? audioInputSource.value : "mic";
+  const isFileMode = Boolean(inputMode === "file" && audioFilePlayer && audioFilePlayer.src);
+  const hasLiveRoute = Boolean(hasAudioReactiveInput() || micActive || audioFileActive);
+  const showAudioMini = Boolean(liveAudioFileMini && (isFileMode || hasLiveRoute));
+  if (liveAudioFileMini) liveAudioFileMini.hidden = !showAudioMini;
+
+  const fileControlsWrap = liveAudioFileMini ? liveAudioFileMini.querySelector(".live-audio-file-controls") : null;
+  if (fileControlsWrap) fileControlsWrap.hidden = !isFileMode;
+  if (liveAudioPlayPauseBtn) liveAudioPlayPauseBtn.disabled = !isFileMode;
+  if (liveAudioSeek) liveAudioSeek.disabled = !isFileMode;
+  if (liveAudioClearBtn) liveAudioClearBtn.disabled = !isFileMode;
+
+  if (liveAudioFileName) {
+    if (isFileMode) {
+      const name = liveAudioFileName.dataset.text || liveAudioFileName.textContent || "-";
+      liveAudioFileName.textContent = name;
+      liveAudioFileName.dataset.text = name;
+    } else if (hasLiveRoute) {
+      const routeText = inputMode === "system" ? t("audio_input_system") : t("audio_input_mic");
+      liveAudioFileName.textContent = routeText;
+      liveAudioFileName.dataset.text = routeText;
+    } else {
+      liveAudioFileName.textContent = "-";
+      liveAudioFileName.dataset.text = "";
+    }
+  }
+
+  if (liveAudioPlayPauseBtn && audioFilePlayer && isFileMode) {
     liveAudioPlayPauseBtn.textContent = audioFilePlayer.paused ? t("play") : t("pause");
   }
-  if (showFileMini) updateLiveAudioFileMini();
-  else {
+
+  if (isFileMode) {
+    updateLiveAudioFileMini();
+  } else {
+    if (liveAudioTime) liveAudioTime.textContent = hasLiveRoute ? "LIVE" : "00:00 / 00:00";
     updateLiveAudioPlayPausePulse();
-    drawLiveAudioWaveform();
+    drawLiveAudioWaveform(true);
   }
 }
 
@@ -2409,6 +2439,22 @@ function formatMediaTime(sec) {
 }
 
 function updateLiveAudioPlayPausePulse() {
+  const hasReactive = hasAudioReactiveInput();
+  const routeActive = Boolean(micActive || audioFileActive);
+  const tNow = performance.now() / 1000;
+  const energy = hasReactive
+    ? clamp(audioFeatures.rms * 0.75 + audioFeatures.bands[1] * 0.38 + audioFeatures.transient * 0.34, 0, 1.25)
+    : routeActive
+      ? 0.08 + 0.06 * (0.5 + 0.5 * Math.sin(tNow * 2.4))
+      : 0;
+
+  // Main Live toggle pulse: reacts for file, mic, or system audio.
+  if (liveAudioToggleBtn) {
+    liveAudioToggleBtn.classList.toggle("audio-rhythm-active", routeActive);
+    liveAudioToggleBtn.style.setProperty("--audio-pulse", String(energy));
+  }
+
+  // Mini file play/pause pulse: only for file playback controls.
   if (!liveAudioPlayPauseBtn || !audioFilePlayer || !audioFilePlayer.src) {
     if (liveAudioPlayPauseBtn) {
       liveAudioPlayPauseBtn.classList.remove("audio-rhythm-active");
@@ -2416,10 +2462,9 @@ function updateLiveAudioPlayPausePulse() {
     }
     return;
   }
-  const active = !audioFilePlayer.paused;
-  liveAudioPlayPauseBtn.classList.toggle("audio-rhythm-active", active);
-  const energy = active ? clamp(audioFeatures.rms * 0.8 + audioFeatures.bands[1] * 0.4 + audioFeatures.transient * 0.25, 0, 1.2) : 0;
-  liveAudioPlayPauseBtn.style.setProperty("--audio-pulse", String(energy));
+  const fileActive = !audioFilePlayer.paused;
+  liveAudioPlayPauseBtn.classList.toggle("audio-rhythm-active", fileActive);
+  liveAudioPlayPauseBtn.style.setProperty("--audio-pulse", String(fileActive ? energy : 0));
 }
 
 function drawLiveAudioWaveform(force = false) {
@@ -3437,9 +3482,10 @@ function applyLive3dMacros() {
     meshColorShift: Math.round((m * 2.4 + s * 0.7) % 360),
     lightEnabled: Math.round(l),
     flatIllustrated: style === "flat" ? 100 : 0,
-    pointFloat: Math.round(clamp((p * 0.35 + m * 0.42), 0, 100)),
+    // Keep default idle stable; add organic motion only when explicitly raised.
+    pointFloat: Math.round(clamp(o * 0.22, 0, 48)),
     pointOrganic: Math.round(clamp(o, 0, 100)),
-    autoRotate: Math.round(clamp((m * 0.45 + s * 0.3), 0, 100)),
+    autoRotate: 0,
     bgMotion: Math.round(clamp(bg, 0, 100)),
     ambientLight: style === "flat" ? 58 : 35,
   });
@@ -3585,6 +3631,11 @@ function normalize3(vx, vy, vz) {
   return [vx / len, vy / len, vz / len];
 }
 
+function lerpAngle(current, target, alpha) {
+  const diff = Math.atan2(Math.sin(target - current), Math.cos(target - current));
+  return current + diff * alpha;
+}
+
 if ("FaceDetector" in window) {
   try {
     faceDetector = new FaceDetector({ fastMode: false, maxDetectedFaces: 12 });
@@ -3683,13 +3734,27 @@ function getCameraMotion(settings, tSec) {
     cameraModeBlendStart = 0;
   }
 
+  const rawRx = baseCursorY * cursorWeight + extraRotX;
+  const rawRy = baseCursorX * cursorWeight + extraRotY;
+  const rawRz = extraRotZ;
+  const rawZoom = zoomMul;
+  const rawPanX = cameraPanX * panMul;
+  const rawPanY = cameraPanY * panMul;
+  const easeK = clamp(0.16 + cameraFlowEase * 0.06, 0.14, 0.34);
+  smoothMotionRx = smoothMotionRx === null ? rawRx : smoothMotionRx + (rawRx - smoothMotionRx) * easeK;
+  smoothMotionRy = smoothMotionRy === null ? rawRy : smoothMotionRy + (rawRy - smoothMotionRy) * easeK;
+  smoothMotionRz = smoothMotionRz === null ? rawRz : smoothMotionRz + (rawRz - smoothMotionRz) * easeK;
+  smoothMotionZoom = smoothMotionZoom === null ? rawZoom : smoothMotionZoom + (rawZoom - smoothMotionZoom) * easeK;
+  smoothMotionPanX = smoothMotionPanX === null ? rawPanX : smoothMotionPanX + (rawPanX - smoothMotionPanX) * easeK;
+  smoothMotionPanY = smoothMotionPanY === null ? rawPanY : smoothMotionPanY + (rawPanY - smoothMotionPanY) * easeK;
+
   return {
-    rxDeg: baseCursorY * cursorWeight + extraRotX,
-    ryDeg: baseCursorX * cursorWeight + extraRotY,
-    rzDeg: extraRotZ,
-    zoomMul,
-    panX: cameraPanX * panMul,
-    panY: cameraPanY * panMul,
+    rxDeg: smoothMotionRx,
+    ryDeg: smoothMotionRy,
+    rzDeg: smoothMotionRz,
+    zoomMul: smoothMotionZoom,
+    panX: smoothMotionPanX,
+    panY: smoothMotionPanY,
   };
 }
 
@@ -3891,17 +3956,17 @@ function getParticlesSettings() {
     emitter: liveParticlesEmitter ? liveParticlesEmitter.value : "grid",
     size: liveParticlesSize ? Number(liveParticlesSize.value) : 42,
     depth: liveParticlesDepth ? Number(liveParticlesDepth.value) : 58,
-    noise: liveParticlesNoise ? Number(liveParticlesNoise.value) : 34,
+    noise: liveParticlesNoise ? Number(liveParticlesNoise.value) : 0,
     attractor: liveParticlesAttractor ? Number(liveParticlesAttractor.value) : 26,
-    flow: liveParticlesFlow ? Number(liveParticlesFlow.value) : 30,
-    camMode: liveParticlesCamMode ? liveParticlesCamMode.value : "orbit",
-    camSpeed: liveParticlesCamSpeed ? Number(liveParticlesCamSpeed.value) : 34,
+    flow: liveParticlesFlow ? Number(liveParticlesFlow.value) : 0,
+    camMode: liveParticlesCamMode ? liveParticlesCamMode.value : "static",
+    camSpeed: liveParticlesCamSpeed ? Number(liveParticlesCamSpeed.value) : 0,
     camX: liveParticlesCamX ? Number(liveParticlesCamX.value) : 0,
     camY: liveParticlesCamY ? Number(liveParticlesCamY.value) : 0,
     camZ: liveParticlesCamZ ? Number(liveParticlesCamZ.value) : 0,
     colorMode: liveParticlesColorMode ? liveParticlesColorMode.value : "source",
     hue: liveParticlesHue ? Number(liveParticlesHue.value) : 0,
-    audioOn: liveParticlesAudio ? liveParticlesAudio.checked : true,
+    audioOn: liveParticlesAudio ? liveParticlesAudio.checked : false,
     audioAmount: liveParticlesAudioAmount ? Number(liveParticlesAudioAmount.value) : 54,
     trail: liveParticlesTrail ? Number(liveParticlesTrail.value) : 0,
     structure: liveParticlesStructure ? liveParticlesStructure.value : "cloud",
@@ -3911,7 +3976,7 @@ function getParticlesSettings() {
     vortex: liveParticlesVortex ? Number(liveParticlesVortex.value) : 22,
     spawn: liveParticlesSpawn ? Number(liveParticlesSpawn.value) : 68,
     motionThreshold: liveParticlesMotionThreshold ? Number(liveParticlesMotionThreshold.value) : 32,
-    drift: liveParticlesDrift ? Number(liveParticlesDrift.value) : 34,
+    drift: liveParticlesDrift ? Number(liveParticlesDrift.value) : 0,
     focus: liveParticlesFocus ? Number(liveParticlesFocus.value) : 38,
     gradientMode: liveParticlesGradientMode ? liveParticlesGradientMode.value : "radial",
     colorMix: liveParticlesColorMix ? Number(liveParticlesColorMix.value) : 44,
@@ -4015,15 +4080,15 @@ function getFractalLiveSettings() {
   return {
     quality,
     camMode,
-    camSpeed: liveFractalCamSpeed ? Number(liveFractalCamSpeed.value) / 100 : 0.28,
+    camSpeed: liveFractalCamSpeed ? Number(liveFractalCamSpeed.value) / 100 : 0,
     camDistance: liveFractalDistance ? Number(liveFractalDistance.value) / 30 : 2.53,
     symmetry: liveFractalSymmetry ? Number(liveFractalSymmetry.value) : 14,
     power: liveFractalPower ? Number(liveFractalPower.value) / 10 : 8.4,
     fog: liveFractalFog ? Number(liveFractalFog.value) / 1000 : 0.024,
     glow: liveFractalGlow ? Number(liveFractalGlow.value) / 50 : 1.04,
     light: liveFractalLight ? Number(liveFractalLight.value) / 100 : 1.2,
-    spin: liveFractalSpin ? Number(liveFractalSpin.value) / 100 : 0.36,
-    breath: liveFractalBreath ? Number(liveFractalBreath.value) / 100 : 0.48,
+    spin: liveFractalSpin ? Number(liveFractalSpin.value) / 100 : 0,
+    breath: liveFractalBreath ? Number(liveFractalBreath.value) / 100 : 0,
     warmth: liveFractalWarmth ? Number(liveFractalWarmth.value) / 100 : 0.66,
     textureMode,
     textureModeCode:
@@ -4093,11 +4158,15 @@ function getFractalInputReactiveState(imageData) {
   const avgLuma = l / n;
   const variance = Math.max(0, l2 / n - avgLuma * avgLuma);
   const contrastNow = clamp(Math.sqrt(variance) * 2.3, 0, 1);
-  const lumaMix = clamp(avgLuma * 0.65 + visualFeatures.luma * 0.35, 0, 1);
+  const lumaMix = clamp(avgLuma * 0.7 + visualFeatures.luma * 0.3, 0, 1);
+  const motionRaw = clamp(visualFeatures.motion, 0, 1.2);
+  const motionDead = motionRaw < 0.035 ? 0 : motionRaw;
+  const motionSoft = motionDead * motionDead * (3.0 - 2.0 * clamp(motionDead, 0, 1));
+  const contrastSoft = contrastNow < 0.03 ? 0 : contrastNow;
   return {
     luma: lumaMix,
-    motion: clamp(visualFeatures.motion, 0, 1.2),
-    contrast: contrastNow,
+    motion: motionSoft,
+    contrast: contrastSoft,
     color: [r / n, g / n, b / n],
   };
 }
@@ -4227,8 +4296,10 @@ function ensureFractalRenderer() {
     }
 
     float mapScene(vec3 p) {
-      float breath = 0.5 + 0.5 * sin(uTime * (0.22 + 0.18 * max(uBreath, 0.2)));
-      float spin = uTime * (0.08 + 0.25 * uSpin * (0.2 + uBass) + uVisualMotion * 0.22);
+      float breathRate = max(uBreath, 0.0) * (0.22 + 0.16 * (0.3 + uVisualMotion));
+      float breath = (breathRate > 0.0001) ? (0.5 + 0.5 * sin(uTime * breathRate)) : 0.5;
+      float spinRate = max(uSpin, 0.0) * (0.22 + 0.18 * (0.2 + uBass) + uVisualMotion * 0.16);
+      float spin = uTime * spinRate;
       p.xz *= rot(spin);
       p.xy *= rot(spin * 0.7);
       p *= 0.92 + breath * 0.16;
@@ -4284,9 +4355,9 @@ function ensureFractalRenderer() {
       uv.x *= uResolution.x / max(uResolution.y, 1.0);
       float yaw = uCamYaw;
       float pitch = clamp(uCamPitch, -1.45, 1.45);
-      float autoYaw = uTime * (0.05 + uCamSpeed * 0.35) * (uCamMode < 0.5 ? 1.0 : 0.35);
+      float autoYaw = uTime * (uCamSpeed * 0.35) * (uCamMode < 0.5 ? 1.0 : 0.35);
       yaw += autoYaw;
-      vec3 orbitPos = vec3(sin(yaw) * uCamDist, sin(uTime * 0.09) * 0.24, cos(yaw) * uCamDist);
+      vec3 orbitPos = vec3(sin(yaw) * uCamDist, sin(uTime * uCamSpeed * 0.12) * (0.24 * uCamSpeed), cos(yaw) * uCamDist);
       vec3 insideDir = normalize(vec3(
         cos(pitch) * sin(yaw),
         sin(pitch),
@@ -4468,10 +4539,10 @@ function renderFractalLive(tSec, sourceImageData = null) {
     fractalGlCanvas.height = canvas.height;
   }
   const fs = getFractalLiveSettings();
-  fractalCamYaw += (fractalCamYawTarget - fractalCamYaw) * 0.08;
-  fractalCamPitch += (fractalCamPitchTarget - fractalCamPitch) * 0.08;
+  fractalCamYaw = lerpAngle(fractalCamYaw, fractalCamYawTarget, 0.075);
+  fractalCamPitch += (fractalCamPitchTarget - fractalCamPitch) * 0.075;
   const camDistTarget = clamp(fs.camDistance, 1.2, 8);
-  fractalCamDistSmooth += (camDistTarget - fractalCamDistSmooth) * 0.08;
+  fractalCamDistSmooth += (camDistTarget - fractalCamDistSmooth) * 0.075;
   const bass = fs.useAudio ? clamp((audioFeatures.bands[0] * 0.85 + audioFeatures.bands[1] * 0.75) * fs.audioGain, 0, 1) : 0;
   const mid = fs.useAudio ? clamp((audioFeatures.bands[1] * 0.4 + audioFeatures.bands[2] * 0.7) * fs.audioGain, 0, 1) : 0;
   const high = fs.useAudio ? clamp((audioFeatures.bands[3] * 0.9 + audioFeatures.transient * 0.35) * fs.audioGain, 0, 1) : 0;
@@ -4940,11 +5011,11 @@ function panicReset() {
   if (masterFxSpeed) masterFxSpeed.value = "42";
   if (masterFxColor) masterFxColor.value = "52";
   if (kaleidoFxEnabled) kaleidoFxEnabled.checked = false;
-  if (kaleidoFxType) kaleidoFxType.value = "mirror";
+  if (kaleidoFxType) kaleidoFxType.value = KALEIDO_DEFAULT_TYPE;
   if (kaleidoFxAmount) kaleidoFxAmount.value = "38";
   if (kaleidoFxSpeed) kaleidoFxSpeed.value = "35";
   if (kaleidoFxSmooth) kaleidoFxSmooth.value = "44";
-  if (kaleidoFxSegments) kaleidoFxSegments.value = "12";
+  if (kaleidoFxSegments) kaleidoFxSegments.value = "10";
   kaleidoSegSmooth = 12;
   if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
     masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
@@ -7062,17 +7133,18 @@ function applyKaleidoFxGlobal(tSec) {
   const outW = canvas.width;
   const outH = canvas.height;
   if (outW <= 2 || outH <= 2) return;
-  const fxScale = clamp(getAdaptivePostFxScale() * 0.92, 0.48, 1);
-  const w = Math.max(2, Math.round(outW * fxScale));
-  const h = Math.max(2, Math.round(outH * fxScale));
-
   const amount = clamp(Number(kaleidoFxAmount ? kaleidoFxAmount.value : 38) / 100, 0, 1);
   const speed = clamp(Number(kaleidoFxSpeed ? kaleidoFxSpeed.value : 35) / 100, 0, 1);
   const smooth = clamp(Number(kaleidoFxSmooth ? kaleidoFxSmooth.value : 44) / 100, 0, 1);
-  const segBase = Math.max(4, Number(kaleidoFxSegments ? kaleidoFxSegments.value : 12));
+  const segBase = clamp(Number(kaleidoFxSegments ? kaleidoFxSegments.value : 10), 4, 16);
+  const qualityLoad = clamp(0.52 + (segBase / 16) * 0.32 + smooth * 0.2, 0.52, 1);
+  const fxScale = clamp(getAdaptivePostFxScale() * 0.84 / qualityLoad, 0.34, 0.86);
+  const w = Math.max(2, Math.round(outW * fxScale));
+  const h = Math.max(2, Math.round(outH * fxScale));
   kaleidoSegSmooth += (segBase - kaleidoSegSmooth) * 0.06;
   const seg = Math.max(4, Math.round(kaleidoSegSmooth));
-  const baseType = kaleidoFxType ? kaleidoFxType.value : "mirror";
+  const selectedType = kaleidoFxType ? kaleidoFxType.value : KALEIDO_DEFAULT_TYPE;
+  const baseType = KALEIDO_TYPES.includes(selectedType) ? selectedType : KALEIDO_DEFAULT_TYPE;
   const morphBlend = clamp(kaleidoMorphTween ? Number(kaleidoMorphTween.typeBlend || 0) : 0, 0, 1);
   const morphFromType = kaleidoMorphTween && kaleidoMorphTween.fromType ? kaleidoMorphTween.fromType : baseType;
   const morphToType = kaleidoMorphTween && kaleidoMorphTween.toType ? kaleidoMorphTween.toType : baseType;
@@ -7100,23 +7172,31 @@ function applyKaleidoFxGlobal(tSec) {
   const maxR = Math.max(1, Math.min(w, h) * 0.5);
   const smoothBlend = clamp(0.08 + smooth * 0.34, 0.08, 0.44);
   const smoothAngle = smooth * 0.1;
-  const sourceAspect =
-    loadedImage && loadedImage.width && loadedImage.height ? loadedImage.width / Math.max(1, loadedImage.height) : outW / Math.max(1, outH);
-  const useSeamStitch = sourceAspect >= 1.95;
-  if (useSeamStitch) updateDomeAutoSeamFromImageData(src);
-  const seamShiftPx = useSeamStitch ? domeAutoSeamU * w : 0;
+  const useDualSample = smooth > 0.2 || amount > 0.42;
+  // Kaleidoscope should not inherit dome seam compensation.
+  // Keep pure wrapped sampling to avoid artificial border cuts in mirror mode.
+  const seamShiftPx = 0;
 
-  const mapAngleByType = (typeName, aFold, a0, rrLocal, rnLocal) => {
+  const mapAngleByType = (typeName, aFold, rrLocal, rnLocal) => {
     let aa = aFold + Math.sin(rnLocal * Math.PI * 2 + tSec * (0.3 + speed * 1.4)) * smoothAngle;
     if (typeName === "spiral") aa += rrLocal * (0.0016 + amount * 0.0068);
     if (typeName === "radial") aa *= 0.74 + amount * 0.72;
-    if (typeName === "mirror") aa = aa * (1 - smooth * 0.06) + a0 * (smooth * 0.06);
+    if (typeName === "mandala") aa += Math.sin(aFold * (1.7 + smooth * 3.2) + tSec * (0.24 + speed * 0.5)) * (0.18 + amount * 0.62);
+    if (typeName === "petals") aa += Math.sin(aFold * (3.6 + smooth * 5.2) + tSec * (0.2 + speed * 0.44)) * (0.08 + amount * 0.32);
+    if (typeName === "moire") aa += Math.sin(rrLocal * (0.018 + amount * 0.056) + tSec * (0.32 + speed * 0.88)) * (0.2 + smooth * 0.52);
+    if (typeName === "lotus") aa += Math.sin(aFold * 6 + rrLocal * 0.013 + tSec * (0.18 + speed * 0.38)) * (0.12 + amount * 0.26);
+    if (typeName === "lattice") aa += Math.sin(aFold * 8 - rrLocal * 0.008 + tSec * (0.16 + speed * 0.34)) * (0.09 + amount * 0.22);
     return aa;
   };
 
   const mapRadiusByType = (typeName, rLocal, rnLocal) => {
     if (typeName === "tunnel") return Math.pow(clamp(rnLocal, 0, 1), 0.72 + amount * 0.36) * rLocal;
     if (typeName === "spiral") return rLocal * (0.98 + Math.sin(rnLocal * 7 + tSec * 0.7) * 0.02 * smooth);
+    if (typeName === "mandala") return rLocal * (0.9 + 0.16 * Math.sin(rnLocal * 11 + tSec * (0.22 + speed * 0.42)));
+    if (typeName === "petals") return rLocal * (0.88 + 0.22 * Math.abs(Math.sin(rnLocal * 8 + tSec * (0.15 + speed * 0.38))));
+    if (typeName === "moire") return rLocal * (0.96 + Math.sin(rnLocal * 24 + tSec * (0.4 + speed * 1.2)) * (0.02 + amount * 0.05));
+    if (typeName === "lotus") return rLocal * (0.9 + 0.17 * Math.sin(rnLocal * 14 + tSec * (0.2 + speed * 0.52)));
+    if (typeName === "lattice") return rLocal * (0.92 + 0.14 * Math.sin(rnLocal * 10 + tSec * (0.16 + speed * 0.34)) * Math.cos(rnLocal * 7 + tSec * 0.22));
     return rLocal;
   };
 
@@ -7126,11 +7206,12 @@ function applyKaleidoFxGlobal(tSec) {
       const dy = y - cy;
       const r = Math.hypot(dx, dy);
       const rn = r / maxR;
-      const a0 = Math.atan2(dy, dx) + spin;
-      let aFold = ((a0 % sector) + sector) % sector;
-      aFold = Math.abs(aFold - sector * 0.5);
-      const aA = mapAngleByType(morphFromType, aFold, a0, r, rn);
-      const aB = mapAngleByType(morphToType, aFold, a0, r, rn);
+      // Center offset avoids seam alignment on cardinal axes.
+      const a0 = Math.atan2(dy, dx) + spin + sector * 0.5;
+      const aWrapped = Math.atan2(Math.sin(a0), Math.cos(a0));
+      const aFold = Math.abs(fract01(aWrapped / sector + 0.5) - 0.5) * sector;
+      const aA = mapAngleByType(morphFromType, aFold, r, rn);
+      const aB = mapAngleByType(morphToType, aFold, r, rn);
       const a = aA * (1 - morphBlend) + aB * morphBlend;
       const rrA = mapRadiusByType(morphFromType, r, rn);
       const rrB = mapRadiusByType(morphToType, r, rn);
@@ -7138,22 +7219,29 @@ function applyKaleidoFxGlobal(tSec) {
 
       const sx = cx + Math.cos(a) * rr + seamShiftPx;
       const sy = cy + Math.sin(a) * rr;
-      const s = sampleWrappedBilinear(sd, w, h, sx, sy);
-
-      // Blend a second nearby wrapped sample to soften harsh kaleido edges.
-      const sx2 = cx + Math.cos(a + sector * 0.08) * rr + seamShiftPx;
-      const sy2 = cy + Math.sin(a + sector * 0.08) * rr;
-      const s2 = sampleWrappedBilinear(sd, w, h, sx2, sy2);
+      const s = sampleMirroredBilinear(sd, w, h, sx, sy);
       const i = (y * w + x) * 4;
-      od[i] = clamp(s[0] * (1 - smoothBlend) + s2[0] * smoothBlend, 0, 255);
-      od[i + 1] = clamp(s[1] * (1 - smoothBlend) + s2[1] * smoothBlend, 0, 255);
-      od[i + 2] = clamp(s[2] * (1 - smoothBlend) + s2[2] * smoothBlend, 0, 255);
+      if (useDualSample) {
+        // Blend a second nearby sample to soften kaleido sector boundaries.
+        const sx2 = cx + Math.cos(a + sector * 0.08) * rr + seamShiftPx;
+        const sy2 = cy + Math.sin(a + sector * 0.08) * rr;
+        const s2 = sampleMirroredBilinear(sd, w, h, sx2, sy2);
+        od[i] = clamp(s[0] * (1 - smoothBlend) + s2[0] * smoothBlend, 0, 255);
+        od[i + 1] = clamp(s[1] * (1 - smoothBlend) + s2[1] * smoothBlend, 0, 255);
+        od[i + 2] = clamp(s[2] * (1 - smoothBlend) + s2[2] * smoothBlend, 0, 255);
+      } else {
+        od[i] = clamp(s[0], 0, 255);
+        od[i + 1] = clamp(s[1], 0, 255);
+        od[i + 2] = clamp(s[2], 0, 255);
+      }
       od[i + 3] = 255;
     }
   }
 
+  // No border post-blend: wrapped bilinear + circular angle blend keeps mirror continuous.
+
   kaleidoFxCtx.putImageData(out, 0, 0);
-  if (smooth > 0.03) {
+  if (smooth > 0.04 && useDualSample) {
     kaleidoFxCtx.save();
     kaleidoFxCtx.globalCompositeOperation = "screen";
     kaleidoFxCtx.globalAlpha = clamp(0.06 + smooth * 0.28, 0.06, 0.34);
@@ -7228,21 +7316,60 @@ function drawDomeGuideOverlay(w, h, amount) {
 }
 
 function sampleWrappedBilinear(srcData, w, h, x, y) {
-  const yy = clamp(y, 0, h - 1);
-  const y0 = Math.floor(yy);
-  const y1 = Math.min(h - 1, y0 + 1);
-  const fy = yy - y0;
-
-  const wrap = (vx) => {
+  const wrapX = (vx) => {
     let n = vx % w;
     if (n < 0) n += w;
     return n;
   };
+  const wrapY = (vy) => {
+    let n = vy % h;
+    if (n < 0) n += h;
+    return n;
+  };
 
-  const xx = wrap(x);
+  const xx = wrapX(x);
+  const yy = wrapY(y);
   const x0 = Math.floor(xx);
-  const x1 = wrap(x0 + 1);
+  const y0 = Math.floor(yy);
+  const x1 = wrapX(x0 + 1);
+  const y1 = wrapY(y0 + 1);
   const fx = xx - x0;
+  const fy = yy - y0;
+
+  const i00 = (y0 * w + x0) * 4;
+  const i10 = (y0 * w + x1) * 4;
+  const i01 = (y1 * w + x0) * 4;
+  const i11 = (y1 * w + x1) * 4;
+
+  const w00 = (1 - fx) * (1 - fy);
+  const w10 = fx * (1 - fy);
+  const w01 = (1 - fx) * fy;
+  const w11 = fx * fy;
+
+  return [
+    srcData[i00] * w00 + srcData[i10] * w10 + srcData[i01] * w01 + srcData[i11] * w11,
+    srcData[i00 + 1] * w00 + srcData[i10 + 1] * w10 + srcData[i01 + 1] * w01 + srcData[i11 + 1] * w11,
+    srcData[i00 + 2] * w00 + srcData[i10 + 2] * w10 + srcData[i01 + 2] * w01 + srcData[i11 + 2] * w11,
+  ];
+}
+
+function sampleMirroredBilinear(srcData, w, h, x, y) {
+  const mirror = (v, max) => {
+    if (max <= 1) return 0;
+    const period = (max - 1) * 2;
+    let n = v % period;
+    if (n < 0) n += period;
+    if (n > max - 1) n = period - n;
+    return n;
+  };
+  const xx = mirror(x, w);
+  const yy = mirror(y, h);
+  const x0 = Math.floor(xx);
+  const y0 = Math.floor(yy);
+  const x1 = Math.min(w - 1, x0 + 1);
+  const y1 = Math.min(h - 1, y0 + 1);
+  const fx = xx - x0;
+  const fy = yy - y0;
 
   const i00 = (y0 * w + x0) * 4;
   const i10 = (y0 * w + x1) * 4;
@@ -7534,6 +7661,47 @@ function randomize3dCameraViewSmooth() {
   if (smoothCamFollow === null && controls.cameraFollow) smoothCamFollow = Number(controls.cameraFollow.value);
   dragRotateX = 0;
   dragRotateY = 0;
+  scheduleRender();
+}
+
+function randomizeParticlesCameraView() {
+  if (mode !== "particles") return;
+  if (liveParticlesCamMode) {
+    const opts = ["orbit", "sweep", "helix", "inside"];
+    liveParticlesCamMode.value = opts[Math.floor(Math.random() * opts.length)];
+    particlesCamModePrev = liveParticlesCamMode.value;
+    particlesCamModeBlendStart = 0;
+  }
+  if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = String(Math.round(24 + Math.random() * 56));
+  if (liveParticlesCamX) liveParticlesCamX.value = String(Math.round(-36 + Math.random() * 72));
+  if (liveParticlesCamY) liveParticlesCamY.value = String(Math.round(-68 + Math.random() * 136));
+  if (liveParticlesCamZ) liveParticlesCamZ.value = String(Math.round(-48 + Math.random() * 96));
+  particlesCamXSmooth = liveParticlesCamX ? Number(liveParticlesCamX.value) : particlesCamXSmooth;
+  particlesCamYSmooth = liveParticlesCamY ? Number(liveParticlesCamY.value) : particlesCamYSmooth;
+  particlesCamZSmooth = liveParticlesCamZ ? Number(liveParticlesCamZ.value) : particlesCamZSmooth;
+  particlesCameraTween = null;
+  particlesRandomTween = null;
+  updateLiveQuickOutputs();
+  scheduleRender();
+}
+
+function randomizeFractalCameraView() {
+  if (mode !== "fractal") return;
+  if (liveFractalCameraMode) {
+    const opts = ["orbit", "inside"];
+    liveFractalCameraMode.value = opts[Math.floor(Math.random() * opts.length)];
+  }
+  if (liveFractalCamSpeed) liveFractalCamSpeed.value = String(Math.round(8 + Math.random() * 60));
+  if (liveFractalDistance) liveFractalDistance.value = String(Math.round(22 + Math.random() * 134));
+  const nextYaw = fractalCamYaw + (Math.random() * 2 - 1) * 1.25;
+  const nextPitch = clamp(fractalCamPitch + (Math.random() * 2 - 1) * 0.58, -1.2, 1.2);
+  fractalCamYaw = nextYaw;
+  fractalCamYawTarget = nextYaw;
+  fractalCamPitch = nextPitch;
+  fractalCamPitchTarget = nextPitch;
+  fractalCameraTween = null;
+  fractalMorphTween = null;
+  updateLiveQuickOutputs();
   scheduleRender();
 }
 
@@ -8574,13 +8742,14 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
   ensureParticlesBuffers(baseImageData, ps);
   if (!particlesX || particlesBufferN <= 0) return;
 
-  if (fps < 30) {
+  const fpsReady = Number.isFinite(fps) && fps > 1;
+  if (fpsReady && fps < 30) {
     particlesPerfStreak += 1;
     if (particlesPerfStreak > 10) {
       particlesDrawStride = Math.min(8, particlesDrawStride + 1);
       particlesPerfStreak = 0;
     }
-  } else if (fps > 52 && particlesDrawStride > 1) {
+  } else if (fpsReady && fps > 52 && particlesDrawStride > 1) {
     particlesDrawStride = Math.max(1, particlesDrawStride - 1);
   } else {
     particlesPerfStreak = Math.max(0, particlesPerfStreak - 1);
@@ -8899,7 +9068,15 @@ function renderFrame() {
     applyKaleidoFxGlobal(tSec);
     syncCleanOutput();
     finalizeFrameStats();
-    if (webcamActive || isDomeAutoRotateActive() || isMasterFxAnimated() || Boolean(kaleidoMorphTween)) scheduleRender();
+    if (
+      webcamActive ||
+      hasAudioReactiveInput() ||
+      isAudioPlaybackActive() ||
+      isDomeAutoRotateActive() ||
+      isMasterFxAnimated() ||
+      Boolean(kaleidoMorphTween)
+    )
+      scheduleRender();
     return;
   }
 
@@ -9311,8 +9488,8 @@ function triggerKaleidoMorphTween(forceEnable = true) {
   if (!kaleidoFxEnabled || !kaleidoFxType || !kaleidoFxAmount || !kaleidoFxSpeed || !kaleidoFxSmooth || !kaleidoFxSegments) return;
   if (forceEnable && !kaleidoFxEnabled.checked) kaleidoFxEnabled.checked = true;
   if (kaleidoFxDetails) kaleidoFxDetails.open = true;
-  const types = ["mirror", "tunnel", "radial", "spiral"];
-  const current = kaleidoFxType.value || "mirror";
+  const types = KALEIDO_TYPES;
+  const current = kaleidoFxType.value || KALEIDO_DEFAULT_TYPE;
   const pool = types.filter((t) => t !== current);
   const nextType = pool[Math.floor(Math.random() * pool.length)] || types[0];
 
@@ -9329,7 +9506,7 @@ function triggerKaleidoMorphTween(forceEnable = true) {
   pushEntry(kaleidoFxAmount, 20, 96, false);
   pushEntry(kaleidoFxSpeed, 8, 92, false);
   pushEntry(kaleidoFxSmooth, 16, 96, false);
-  pushEntry(kaleidoFxSegments, 6, 24, false);
+  pushEntry(kaleidoFxSegments, 6, 16, false);
   kaleidoMorphTween = {
     startMs: performance.now(),
     durationMs: 5600 + Math.random() * 2800,
@@ -9355,7 +9532,7 @@ function applyKaleidoMorphTween() {
     const v = from + (to - from) * k;
     el.value = integer ? String(Math.round(v)) : String(v.toFixed(2));
   });
-  if (kaleidoFxSegments) kaleidoFxSegments.value = String(clamp(Number(kaleidoFxSegments.value), 4, 28).toFixed(2));
+  if (kaleidoFxSegments) kaleidoFxSegments.value = String(clamp(Number(kaleidoFxSegments.value), 4, 16).toFixed(2));
   if (kaleidoFxType && kaleidoMorphTween.fromType && kaleidoMorphTween.toType) {
     // Delay type morph start so first half feels ultra smooth.
     const t = clamp((kRaw - 0.3) / 0.7, 0, 1);
@@ -9770,9 +9947,10 @@ function cycleMasterFxMode(step = 1) {
 
 function cycleKaleidoFxType(step = 1) {
   if (!kaleidoFxType) return;
-  const types = ["mirror", "tunnel", "radial", "spiral"];
+  const types = KALEIDO_TYPES;
   const idx = types.indexOf(kaleidoFxType.value);
-  kaleidoFxType.value = types[(idx + (step >= 0 ? 1 : -1) + types.length) % types.length];
+  const startIdx = idx >= 0 ? idx : 0;
+  kaleidoFxType.value = types[(startIdx + (step >= 0 ? 1 : -1) + types.length) % types.length];
   scheduleRender();
 }
 
@@ -9848,6 +10026,12 @@ function resetCameraTransientState() {
   smoothRotX = controls.pointRotateX ? Number(controls.pointRotateX.value) : 0;
   smoothRotY = controls.pointRotateY ? Number(controls.pointRotateY.value) : 0;
   smoothRotZ = controls.pointRotateZ ? Number(controls.pointRotateZ.value) : 0;
+  smoothMotionRx = null;
+  smoothMotionRy = null;
+  smoothMotionRz = null;
+  smoothMotionZoom = null;
+  smoothMotionPanX = null;
+  smoothMotionPanY = null;
   cameraModePrev = cameraMode;
   cameraModeBlendStart = 0;
   lastCameraAnimTs = performance.now();
@@ -9879,7 +10063,7 @@ function setMode(newMode) {
 
   if (newMode === "depth") {
     if (previousMode !== "depth" && previousMode !== "mix" && previousMode !== "particles") {
-      setCameraMode("cursor", { instant: true });
+      setCameraMode("static", { instant: true });
       dragRotateX = 0;
       dragRotateY = 0;
       resetCameraTransientState();
@@ -9890,7 +10074,7 @@ function setMode(newMode) {
   }
   if (newMode === "particles") {
     if (previousMode !== "depth" && previousMode !== "mix" && previousMode !== "particles") {
-      setCameraMode("cursor", { instant: true });
+      setCameraMode("static", { instant: true });
       dragRotateX = 0;
       dragRotateY = 0;
       resetCameraTransientState();
@@ -9906,13 +10090,20 @@ function setMode(newMode) {
     particlesCamZSmooth = 0;
     particlesCamAnimTime = 0;
     particlesCamLastTs = performance.now();
-    particlesCamModePrev = liveParticlesCamMode ? liveParticlesCamMode.value : "orbit";
+    particlesCamModePrev = liveParticlesCamMode ? liveParticlesCamMode.value : "static";
     particlesCamModeBlendStart = 0;
-    particlesCamSpeedSmooth = 0.34;
+    particlesCamSpeedSmooth = 0;
     particlesWarmupUntil = performance.now() + 1200;
     if (liveParticlesCamX) liveParticlesCamX.value = "0";
     if (liveParticlesCamY) liveParticlesCamY.value = "0";
     if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
+  }
+  if (newMode === "fractal" && previousMode !== "fractal") {
+    fractalCameraTween = null;
+    fractalCamYaw = lerpAngle(fractalCamYaw, fractalCamYawTarget, 1);
+    fractalCamYawTarget = fractalCamYaw;
+    fractalCamPitch = clamp(fractalCamPitch, -1.2, 1.2);
+    fractalCamPitchTarget = fractalCamPitch;
   }
 
   applyAspectRatioChange();
@@ -9992,6 +10183,12 @@ function resetAll() {
   }
   cameraAnimTime = 0;
   lastCameraAnimTs = performance.now();
+  smoothMotionRx = null;
+  smoothMotionRy = null;
+  smoothMotionRz = null;
+  smoothMotionZoom = null;
+  smoothMotionPanX = null;
+  smoothMotionPanY = null;
   stageGeomPrevCx = null;
   stageGeomPrevCy = null;
   stageGeomMotionX = 0;
@@ -10023,11 +10220,11 @@ function resetAll() {
   if (liveParticlesEmitter) liveParticlesEmitter.value = "grid";
   if (liveParticlesSize) liveParticlesSize.value = "42";
   if (liveParticlesDepth) liveParticlesDepth.value = "58";
-  if (liveParticlesNoise) liveParticlesNoise.value = "34";
+  if (liveParticlesNoise) liveParticlesNoise.value = "0";
   if (liveParticlesAttractor) liveParticlesAttractor.value = "26";
-  if (liveParticlesFlow) liveParticlesFlow.value = "30";
-  if (liveParticlesCamMode) liveParticlesCamMode.value = "orbit";
-  if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = "34";
+  if (liveParticlesFlow) liveParticlesFlow.value = "0";
+  if (liveParticlesCamMode) liveParticlesCamMode.value = "static";
+  if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = "0";
   if (liveParticlesCamX) liveParticlesCamX.value = "0";
   if (liveParticlesCamY) liveParticlesCamY.value = "0";
   if (liveParticlesCamZ) liveParticlesCamZ.value = "0";
@@ -10035,7 +10232,7 @@ function resetAll() {
   if (liveParticlesStructure) liveParticlesStructure.value = "cloud";
   if (liveParticlesAudioSplit) liveParticlesAudioSplit.value = "basic";
   if (liveParticlesHue) liveParticlesHue.value = "0";
-  if (liveParticlesAudio) liveParticlesAudio.checked = true;
+  if (liveParticlesAudio) liveParticlesAudio.checked = false;
   if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = "54";
   if (liveParticlesTrail) liveParticlesTrail.value = "0";
   if (liveParticlesOrder) liveParticlesOrder.value = "48";
@@ -10043,7 +10240,7 @@ function resetAll() {
   if (liveParticlesVortex) liveParticlesVortex.value = "22";
   if (liveParticlesSpawn) liveParticlesSpawn.value = "68";
   if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = "32";
-  if (liveParticlesDrift) liveParticlesDrift.value = "34";
+  if (liveParticlesDrift) liveParticlesDrift.value = "0";
   if (liveParticlesFocus) liveParticlesFocus.value = "38";
   if (liveParticlesGradientMode) liveParticlesGradientMode.value = "radial";
   if (liveParticlesColorMix) liveParticlesColorMix.value = "44";
@@ -10076,11 +10273,11 @@ function resetAll() {
   if (masterFxSpeed) masterFxSpeed.value = "42";
   if (masterFxColor) masterFxColor.value = "52";
   if (kaleidoFxEnabled) kaleidoFxEnabled.checked = false;
-  if (kaleidoFxType) kaleidoFxType.value = "mirror";
+  if (kaleidoFxType) kaleidoFxType.value = KALEIDO_DEFAULT_TYPE;
   if (kaleidoFxAmount) kaleidoFxAmount.value = "38";
   if (kaleidoFxSpeed) kaleidoFxSpeed.value = "35";
   if (kaleidoFxSmooth) kaleidoFxSmooth.value = "44";
-  if (kaleidoFxSegments) kaleidoFxSegments.value = "12";
+  if (kaleidoFxSegments) kaleidoFxSegments.value = "10";
   kaleidoSegSmooth = 12;
   if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
     masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
@@ -10092,7 +10289,11 @@ function resetAll() {
   updateKaleidoFxPadDot();
   const none = modeInputs.find((m) => m.value === "none");
   if (none) none.checked = true;
-  setCameraMode("cursor");
+  if (liveFractalCamSpeed) liveFractalCamSpeed.value = "0";
+  if (liveFractalSpin) liveFractalSpin.value = "0";
+  if (liveFractalBreath) liveFractalBreath.value = "0";
+  if (liveFractalAudio) liveFractalAudio.checked = false;
+  setCameraMode("static");
   setMode("none");
   updateCanvasEntryOverlay();
   scheduleRender();
@@ -10107,39 +10308,31 @@ function downloadCurrentImage() {
 
 function exportPhotoHQ() {
   if (!canvas || canvas.width <= 0 || canvas.height <= 0) return;
-  const prevW = canvas.width;
-  const prevH = canvas.height;
-  const prevOrig = originalImageData;
-
-  const src = getCurrentSourceDimensions();
-  const target = computeCanvasSizeForSource(src.width, src.height, {
-    maxW: EXPORT_CANVAS_MAX_W,
-    maxH: EXPORT_CANVAS_MAX_H,
-  });
-
-  resizeWorkingCanvases(target.width, target.height);
-
-  if (webcamActive || loadedImage) {
-    const freshSource = getSourceImageData();
-    if (freshSource) {
-      originalImageData = copyImageData(freshSource);
-    }
-  }
-
+  // Capture the exact visible frame first to avoid black exports in heavy FX states.
   renderFrame();
-  canvas.toBlob(
+  const srcW = canvas.width;
+  const srcH = canvas.height;
+  const scale = clamp(Math.min(EXPORT_CANVAS_MAX_W / srcW, EXPORT_CANVAS_MAX_H / srcH), 1, 2.5);
+  const outW = Math.max(2, Math.round(srcW * scale));
+  const outH = Math.max(2, Math.round(srcH * scale));
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = outW;
+  exportCanvas.height = outH;
+  const exportCtx = exportCanvas.getContext("2d");
+  if (!exportCtx) return;
+  exportCtx.imageSmoothingEnabled = true;
+  exportCtx.imageSmoothingQuality = "high";
+  exportCtx.drawImage(canvas, 0, 0, srcW, srcH, 0, 0, outW, outH);
+
+  exportCanvas.toBlob(
     (blob) => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.download = `pixel-error-photo-hq-${Date.now()}.png`;
-        a.href = url;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 3000);
-      }
-      resizeWorkingCanvases(prevW, prevH);
-      originalImageData = prevOrig;
-      scheduleRender();
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.download = `pixel-error-photo-hq-${Date.now()}.png`;
+      a.href = url;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
     },
     "image/png",
     1
@@ -11983,6 +12176,16 @@ window.addEventListener("keydown", (e) => {
     scheduleRender();
     return;
   }
+  if (e.code === "KeyJ") {
+    e.preventDefault();
+    if (e.repeat) return;
+    if (!kaleidoFxEnabled) return;
+    if (!kaleidoFxEnabled.checked) kaleidoFxEnabled.checked = true;
+    if (kaleidoFxDetails) kaleidoFxDetails.open = true;
+    cycleKaleidoFxType(1);
+    updateLiveQuickOutputs();
+    return;
+  }
   if (e.code === "KeyX") {
     e.preventDefault();
     cycleCurrentBackgroundColors();
@@ -12019,14 +12222,16 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "KeyY") {
     e.preventDefault();
     if (e.repeat) return;
-    randomize3dCameraViewSmooth();
+    if (mode === "particles") triggerParticlesCameraTween();
+    else if (mode === "fractal") triggerFractalCameraTween();
+    else randomize3dCameraViewSmooth();
     return;
   }
   if (e.key === "t" || e.key === "T") {
     e.preventDefault();
-    if (mode === "particles") triggerParticlesCameraTween();
-    else if (mode === "fractal") triggerFractalCameraTween();
-    else randomize3dCameraViewSmooth();
+    if (mode === "particles") randomizeParticlesCameraView();
+    else if (mode === "fractal") randomizeFractalCameraView();
+    else randomize3dCameraView();
     return;
   }
   if (e.key === "g" || e.key === "G") {
@@ -12070,7 +12275,7 @@ setValues(defaults);
 syncModeUi();
 setWorkspacePanel("live");
 setUiMode("live");
-setCameraMode("cursor");
+setCameraMode("static");
 if (masterFxDetails) masterFxDetails.open = false;
 if (kaleidoFxDetails) kaleidoFxDetails.open = false;
 updateMasterFxPadDot();
