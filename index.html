@@ -101,6 +101,9 @@
                 <label><input type="radio" name="mode" value="lines" /> <span>Lines</span></label>
                 <label><input type="radio" name="mode" value="tunnel" /> <span>Tunnel</span></label>
                 <label><input type="radio" name="mode" value="interior" /> <span>Interior</span></label>
+                <label><input type="radio" name="mode" value="atlas" /> <span>Morpho</span></label>
+                <label><input type="radio" name="mode" value="materia" /> <span>Materia</span></label>
+                <label><input type="radio" name="mode" value="code" /> <span>Code Rain</span></label>
               </div>
 
               <div class="control preset-control">
@@ -611,6 +614,15 @@
                 <label class="slider"><span>Face Amount</span><input type="range" id="liveParticlesFaceAmount" min="0" max="100" value="68" /><output for="liveParticlesFaceAmount">68</output></label>
                 <label class="slider"><span>Light Trail</span><input type="range" id="liveParticlesTrail" min="0" max="100" value="0" /><output for="liveParticlesTrail">0</output></label>
                 <label class="inline-select">
+                  <span>FX Style</span>
+                  <select id="liveParticlesFxStyle">
+                    <option value="none">None</option>
+                    <option value="neon" selected>Neon Sweep</option>
+                    <option value="datamosh">DataMosh Sweep</option>
+                  </select>
+                </label>
+                <label class="slider"><span>FX Amount</span><input type="range" id="liveParticlesFxAmount" min="0" max="100" value="58" /><output for="liveParticlesFxAmount">58</output></label>
+                <label class="inline-select">
                   <span>Structure</span>
                   <select id="liveParticlesStructure">
                     <option value="cloud" selected>Cloud</option>
@@ -618,6 +630,9 @@
                     <option value="ring">Ring</option>
                     <option value="helix">Helix</option>
                     <option value="mandala">Mandala</option>
+                    <option value="torus">Torus</option>
+                    <option value="lissajous">Lissajous</option>
+                    <option value="attractor">Attractor</option>
                   </select>
                 </label>
                 <label class="inline-select">
@@ -800,6 +815,78 @@
                 <label class="slider"><span>Glow</span><input type="range" id="liveInteriorGlow" min="0" max="100" value="44" /><output for="liveInteriorGlow">44</output></label>
                 <label class="slider"><span>Audio Amount</span><input type="range" id="liveInteriorAudioAmount" min="0" max="100" value="68" /><output for="liveInteriorAudioAmount">68</output></label>
                 <p class="micro-tip">Tip: O = morph interior, T/Y = camara rapida/suave.</p>
+              </div>
+              <div id="livePaneAtlas" class="group live-pane" hidden>
+                <h2>Morpho Live Essentials</h2>
+                <label class="inline-select">
+                  <span>Morpho Preset</span>
+                  <select id="liveAtlasPreset">
+                    <option value="ribbon" selected>Ribbon Core</option>
+                    <option value="orbital">Orbital Cell</option>
+                    <option value="shard">Liquid Shard</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Morph</span><input type="range" id="liveAtlasSeed" min="0" max="100" value="52" /><output for="liveAtlasSeed">52</output></label>
+                <label class="slider"><span>Desplazamiento</span><input type="range" id="liveAtlasVariation" min="0" max="100" value="58" /><output for="liveAtlasVariation">58</output></label>
+                <label class="slider"><span>Volumen</span><input type="range" id="liveAtlasComposition" min="0" max="100" value="58" /><output for="liveAtlasComposition">58</output></label>
+                <label class="slider"><span>Estructura</span><input type="range" id="liveAtlasComplexity" min="0" max="30" value="22" /><output for="liveAtlasComplexity">22</output></label>
+                <label class="slider"><span>Fluidez</span><input type="range" id="liveAtlasMotion" min="0" max="100" value="46" /><output for="liveAtlasMotion">46</output></label>
+                <label class="slider"><span>Contraste</span><input type="range" id="liveAtlasContrast" min="0" max="100" value="56" /><output for="liveAtlasContrast">56</output></label>
+                <label class="slider"><span>Color Mod</span><input type="range" id="liveAtlasColorMod" min="0" max="100" value="62" /><output for="liveAtlasColorMod">62</output></label>
+                <label class="slider"><span>Malla</span><input type="range" id="liveAtlasMesh" min="0" max="100" value="46" /><output for="liveAtlasMesh">46</output></label>
+                <label class="slider"><span>Esferas</span><input type="range" id="liveAtlasSpheres" min="0" max="100" value="36" /><output for="liveAtlasSpheres">36</output></label>
+                <label class="toggle"><input type="checkbox" id="liveAtlasAudio" checked /><span>Audio Reactive</span></label>
+                <label class="slider"><span>Audio Amount</span><input type="range" id="liveAtlasAudioAmount" min="0" max="100" value="72" /><output for="liveAtlasAudioAmount">72</output></label>
+                <p class="micro-tip">Tip: sin seed, todo fluye continuo. O = morph, T/Y = camara rapida/suave.</p>
+              </div>
+              <div id="livePaneMateria" class="group live-pane" hidden>
+                <h2>Materia Live Essentials</h2>
+                <label class="inline-select">
+                  <span>Materia Preset</span>
+                  <select id="liveMateriaPreset">
+                    <option value="mineral" selected>Mineral</option>
+                    <option value="ink">Ink Cloud</option>
+                    <option value="ash">Ceniza Digital</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Seed</span><input type="range" id="liveMateriaSeed" min="1" max="9999" value="2424" /><output for="liveMateriaSeed">2424</output></label>
+                <label class="slider"><span>Fluidez</span><input type="range" id="liveMateriaFlow" min="0" max="100" value="58" /><output for="liveMateriaFlow">58</output></label>
+                <label class="slider"><span>Porosidad</span><input type="range" id="liveMateriaPorosity" min="0" max="100" value="48" /><output for="liveMateriaPorosity">48</output></label>
+                <label class="slider"><span>Capas</span><input type="range" id="liveMateriaLayers" min="0" max="100" value="52" /><output for="liveMateriaLayers">52</output></label>
+                <label class="slider"><span>Deriva</span><input type="range" id="liveMateriaDrift" min="0" max="100" value="42" /><output for="liveMateriaDrift">42</output></label>
+                <label class="slider"><span>Contraste</span><input type="range" id="liveMateriaContrast" min="0" max="100" value="54" /><output for="liveMateriaContrast">54</output></label>
+                <label class="toggle"><input type="checkbox" id="liveMateriaAudio" checked /><span>Audio Reactive</span></label>
+                <label class="slider"><span>Audio Amount</span><input type="range" id="liveMateriaAudioAmount" min="0" max="100" value="66" /><output for="liveMateriaAudioAmount">66</output></label>
+                <p class="micro-tip">Tip: R = mutar estructura, O = morph organico, T/Y = camara rapida/suave.</p>
+              </div>
+              <div id="livePaneCode" class="group live-pane" hidden>
+                <h2>Code Rain Essentials</h2>
+                <label class="inline-select">
+                  <span>Preset</span>
+                  <select id="liveCodePreset">
+                    <option value="matrix" selected>Matrix Core</option>
+                    <option value="glyph">Glyph Storm</option>
+                    <option value="oracle">Oracle Text</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Cámara</span>
+                  <select id="liveCodeCameraMode">
+                    <option value="wide" selected>Wide Field</option>
+                    <option value="chase">Chase Letter</option>
+                    <option value="macro">Macro Glyph</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Densidad</span><input type="range" id="liveCodeDensity" min="0" max="100" value="58" /><output for="liveCodeDensity">58</output></label>
+                <label class="slider"><span>Velocidad</span><input type="range" id="liveCodeSpeed" min="0" max="100" value="44" /><output for="liveCodeSpeed">44</output></label>
+                <label class="slider"><span>Zoom Cámara</span><input type="range" id="liveCodeZoom" min="0" max="100" value="38" /><output for="liveCodeZoom">38</output></label>
+                <label class="slider"><span>Cantidad de letras</span><input type="range" id="liveCodeLetters" min="0" max="100" value="62" /><output for="liveCodeLetters">62</output></label>
+                <label class="slider"><span>Figura</span><input type="range" id="liveCodeFigure" min="0" max="100" value="62" /><output for="liveCodeFigure">62</output></label>
+                <label class="slider"><span>Idioma Mix</span><input type="range" id="liveCodeLanguage" min="0" max="100" value="66" /><output for="liveCodeLanguage">66</output></label>
+                <label class="slider"><span>Glow</span><input type="range" id="liveCodeGlow" min="0" max="100" value="54" /><output for="liveCodeGlow">54</output></label>
+                <label class="toggle"><input type="checkbox" id="liveCodeAudio" checked /><span>Audio Reactive</span></label>
+                <label class="slider"><span>Audio Amount</span><input type="range" id="liveCodeAudioAmount" min="0" max="100" value="72" /><output for="liveCodeAudioAmount">72</output></label>
+                <p class="micro-tip">Tip: webcam reactiva (rostro pintado en código), lluvia multi-idioma y firma B.ZU.AL.</p>
               </div>
               <div id="liveOutputGroup" class="group">
                 <h2>Output View</h2>
@@ -1089,6 +1176,9 @@
                     <option value="ring">Ring</option>
                     <option value="helix">Helix</option>
                     <option value="mandala">Mandala</option>
+                    <option value="torus">Torus</option>
+                    <option value="lissajous">Lissajous</option>
+                    <option value="attractor">Attractor</option>
                   </select>
                 </label>
                 <label class="inline-select">
@@ -1189,6 +1279,15 @@
                 <button class="btn module-route-btn" data-module-route="interior">
                   <span class="live-mode-icon">IR</span><span>Interior</span>
                 </button>
+                <button class="btn module-route-btn" data-module-route="atlas">
+                  <span class="live-mode-icon">MO</span><span>Morpho</span>
+                </button>
+                <button class="btn module-route-btn" data-module-route="materia">
+                  <span class="live-mode-icon">MB</span><span>Materia</span>
+                </button>
+                <button class="btn module-route-btn" data-module-route="code">
+                  <span class="live-mode-icon">CD</span><span>Code</span>
+                </button>
               </div>
               <div class="module-route-utility">
                 <button id="liveModeRandomBtn" class="btn module-route-random-btn">
@@ -1231,6 +1330,7 @@
                       <option value="visionpass">Visionary High Pass</option>
                       <option value="neon">Neon Glow</option>
                       <option value="neongrad">Neon Gradient</option>
+                      <option value="matrix">Matrix</option>
                     </select>
                   </label>
                   <label class="slider">

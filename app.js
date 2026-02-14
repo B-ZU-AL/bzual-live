@@ -6,7 +6,7 @@ const canvasOverlayWebcamBtn = document.getElementById("canvasOverlayWebcamBtn")
 const canvasOverlayNoInputBtn = document.getElementById("canvasOverlayNoInputBtn");
 const canvasFullscreenBtn = document.getElementById("canvasFullscreenBtn");
 const moduleRouteHint = document.getElementById("moduleRouteHint");
-const moduleRouteButtons = [...document.querySelectorAll(".module-route-btn")];
+let moduleRouteButtons = [...document.querySelectorAll(".module-route-btn")];
 const quickInputSelect = document.getElementById("quickInputSelect");
 const quickInputActiveText = document.getElementById("quickInputActiveText");
 
@@ -87,6 +87,37 @@ const performanceStatus = document.getElementById("performanceStatus");
 const canvasMiniResolution = document.getElementById("canvasMiniResolution");
 const canvasMiniFps = document.getElementById("canvasMiniFps");
 const canvasMiniLoad = document.getElementById("canvasMiniLoad");
+function ensureLiveRouteButtons() {
+  const container = document.querySelector("#moduleRouteHint .module-route-switch");
+  if (!container) return;
+  const defs = [
+    { route: "glitch", icon: "GL", label: "Glitch" },
+    { route: "fractal", icon: "FR", label: "Fractal" },
+    { route: "depth", icon: "3D", label: "3D" },
+    { route: "particles", icon: "PT", label: "Particles" },
+    { route: "lines", icon: "LN", label: "Lines" },
+    { route: "tunnel", icon: "TN", label: "Tunnel" },
+    { route: "interior", icon: "IR", label: "Interior" },
+    { route: "atlas", icon: "MO", label: "Morpho" },
+    { route: "materia", icon: "MB", label: "Materia" },
+    { route: "code", icon: "CD", label: "Code" },
+  ];
+  defs.forEach(({ route, icon, label }) => {
+    if (container.querySelector(`.module-route-btn[data-module-route="${route}"]`)) return;
+    const btn = document.createElement("button");
+    btn.className = "btn module-route-btn";
+    btn.dataset.moduleRoute = route;
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "live-mode-icon";
+    iconSpan.textContent = icon;
+    const labelSpan = document.createElement("span");
+    labelSpan.textContent = label;
+    btn.append(iconSpan, labelSpan);
+    container.appendChild(btn);
+  });
+  moduleRouteButtons = [...document.querySelectorAll(".module-route-btn")];
+}
+ensureLiveRouteButtons();
 const performanceHint = document.getElementById("performanceHint");
 const moduleLoadStatus = document.getElementById("moduleLoadStatus");
 const webcamSetupControls = document.getElementById("webcamSetupControls");
@@ -135,6 +166,9 @@ const livePaneParticles = document.getElementById("livePaneParticles");
 const livePaneLines = document.getElementById("livePaneLines");
 const livePaneTunnel = document.getElementById("livePaneTunnel");
 const livePaneInterior = document.getElementById("livePaneInterior");
+const livePaneAtlas = document.getElementById("livePaneAtlas");
+const livePaneMateria = document.getElementById("livePaneMateria");
+const livePaneCode = document.getElementById("livePaneCode");
 const livePaneSynth = document.getElementById("livePaneSynth");
 const liveLinesDensity = document.getElementById("liveLinesDensity");
 const liveLinesPreset = document.getElementById("liveLinesPreset");
@@ -175,6 +209,38 @@ const liveInteriorWave = document.getElementById("liveInteriorWave");
 const liveInteriorGlitch = document.getElementById("liveInteriorGlitch");
 const liveInteriorGlow = document.getElementById("liveInteriorGlow");
 const liveInteriorAudioAmount = document.getElementById("liveInteriorAudioAmount");
+const liveAtlasPreset = document.getElementById("liveAtlasPreset");
+const liveAtlasSeed = document.getElementById("liveAtlasSeed");
+const liveAtlasVariation = document.getElementById("liveAtlasVariation");
+const liveAtlasComposition = document.getElementById("liveAtlasComposition");
+const liveAtlasComplexity = document.getElementById("liveAtlasComplexity");
+const liveAtlasMotion = document.getElementById("liveAtlasMotion");
+const liveAtlasContrast = document.getElementById("liveAtlasContrast");
+const liveAtlasColorMod = document.getElementById("liveAtlasColorMod");
+const liveAtlasMesh = document.getElementById("liveAtlasMesh");
+const liveAtlasSpheres = document.getElementById("liveAtlasSpheres");
+const liveAtlasAudio = document.getElementById("liveAtlasAudio");
+const liveAtlasAudioAmount = document.getElementById("liveAtlasAudioAmount");
+const liveMateriaPreset = document.getElementById("liveMateriaPreset");
+const liveMateriaSeed = document.getElementById("liveMateriaSeed");
+const liveMateriaFlow = document.getElementById("liveMateriaFlow");
+const liveMateriaPorosity = document.getElementById("liveMateriaPorosity");
+const liveMateriaLayers = document.getElementById("liveMateriaLayers");
+const liveMateriaDrift = document.getElementById("liveMateriaDrift");
+const liveMateriaContrast = document.getElementById("liveMateriaContrast");
+const liveMateriaAudio = document.getElementById("liveMateriaAudio");
+const liveMateriaAudioAmount = document.getElementById("liveMateriaAudioAmount");
+const liveCodePreset = document.getElementById("liveCodePreset");
+const liveCodeCameraMode = document.getElementById("liveCodeCameraMode");
+const liveCodeDensity = document.getElementById("liveCodeDensity");
+const liveCodeSpeed = document.getElementById("liveCodeSpeed");
+const liveCodeZoom = document.getElementById("liveCodeZoom");
+const liveCodeLetters = document.getElementById("liveCodeLetters");
+const liveCodeFigure = document.getElementById("liveCodeFigure");
+const liveCodeLanguage = document.getElementById("liveCodeLanguage");
+const liveCodeGlow = document.getElementById("liveCodeGlow");
+const liveCodeAudio = document.getElementById("liveCodeAudio");
+const liveCodeAudioAmount = document.getElementById("liveCodeAudioAmount");
 const liveFractalPreset = document.getElementById("liveFractalPreset");
 const liveFractalQuality = document.getElementById("liveFractalQuality");
 const liveFractalBehavior = document.getElementById("liveFractalBehavior");
@@ -302,6 +368,8 @@ const liveParticlesFaceTrack = document.getElementById("liveParticlesFaceTrack")
 const liveParticlesFaceDelay = document.getElementById("liveParticlesFaceDelay");
 const liveParticlesFaceAmount = document.getElementById("liveParticlesFaceAmount");
 const liveParticlesTrail = document.getElementById("liveParticlesTrail");
+const liveParticlesFxStyle = document.getElementById("liveParticlesFxStyle");
+const liveParticlesFxAmount = document.getElementById("liveParticlesFxAmount");
 const liveParticlesStructure = document.getElementById("liveParticlesStructure");
 const liveParticlesAudioSplit = document.getElementById("liveParticlesAudioSplit");
 const liveParticlesOrder = document.getElementById("liveParticlesOrder");
@@ -912,11 +980,66 @@ let linesStringVibeSmooth = 0;
 let linesBeatCooldown = 0;
 let linesBeatPulse = 0;
 let linesInvertSign = 1;
+let linesInvertBlend = 1;
 let linesConstellationNodes = [];
 let linesConstellationCacheKey = "";
 let linesConstellationTick = 0;
 let linesGlowSmooth = 0;
 let linesNeonSmooth = 0;
+let atlasCamYaw = 0;
+let atlasCamPitch = 0;
+let atlasCamDist = 1.04;
+let atlasCamYawTarget = 0;
+let atlasCamPitchTarget = 0;
+let atlasCamDistTarget = 1.04;
+let atlasMorphTween = null;
+let atlasSeedSmooth = 52;
+let atlasVariationSmooth = 58;
+let atlasCompositionSmooth = 58;
+let atlasComplexitySmooth = 22;
+let atlasMotionSmooth = 46;
+let atlasContrastSmooth = 56;
+let atlasColorModSmooth = 62;
+let atlasMeshSmooth = 46;
+let atlasSpheresSmooth = 36;
+let atlasAudioBassSmooth = 0;
+let atlasAudioMidSmooth = 0;
+let atlasAudioHighSmooth = 0;
+let atlasAudioEnergySmooth = 0;
+let atlasCamRig = 0;
+let atlasCamRigTarget = 0;
+let materiaCamYaw = 0;
+let materiaCamPitch = 0;
+let materiaCamDist = 1.02;
+let materiaCamYawTarget = 0;
+let materiaCamPitchTarget = 0;
+let materiaCamDistTarget = 1.02;
+let materiaMorphTween = null;
+let materiaSeedSmooth = 2424;
+let materiaFlowSmooth = 58;
+let materiaPorositySmooth = 48;
+let materiaLayersSmooth = 52;
+let materiaDriftSmooth = 42;
+let materiaContrastSmooth = 54;
+let materiaAudioBassSmooth = 0;
+let materiaAudioMidSmooth = 0;
+let materiaAudioHighSmooth = 0;
+let materiaAudioEnergySmooth = 0;
+let codeRainDrops = new Float32Array(0);
+let codeRainSpeeds = new Float32Array(0);
+let codeRainSeeds = new Float32Array(0);
+let codeRainCols = 0;
+let codeRainFontPx = 14;
+let codeRainCharStep = 12;
+let codeRainCamX = 0;
+let codeRainCamY = 0;
+let codeRainCamXTarget = 0;
+let codeRainCamYTarget = 0;
+let codeRainFigurePhase = 0;
+let codeRainTextMaskCanvas = null;
+let codeRainTextMaskCtx = null;
+let codeRainTextMaskW = 0;
+let codeRainTextMaskH = 0;
 let tunnelCamYaw = 0;
 let tunnelCamPitch = 0;
 let tunnelCamDist = 1.08;
@@ -2342,7 +2465,13 @@ const extendedLocaleTexts = {
       "#moduleRouteHint .module-route-btn[data-module-route='particles'] span:last-child": "Partículas",
       "#moduleRouteHint .module-route-btn[data-module-route='tunnel'] span:last-child": "Tunnel",
       "#moduleRouteHint .module-route-btn[data-module-route='interior'] span:last-child": "Interior",
+      "#moduleRouteHint .module-route-btn[data-module-route='atlas'] span:last-child": "Morpho",
+      "#moduleRouteHint .module-route-btn[data-module-route='materia'] span:last-child": "Materia",
+      "#moduleRouteHint .module-route-btn[data-module-route='code'] span:last-child": "Code",
       "#livePaneInterior h2": "Esenciales Interior Black",
+      "#livePaneAtlas h2": "Esenciales Morpho Live",
+      "#livePaneMateria h2": "Esenciales Materia Live",
+      "#livePaneCode h2": "Esenciales Code Rain",
     },
     labels: {
       liveGlitchIntensity: "Intensidad",
@@ -2429,6 +2558,8 @@ const extendedLocaleTexts = {
       liveParticlesFaceDelay: "Delay facial",
       liveParticlesFaceAmount: "Cantidad facial",
       liveParticlesTrail: "Estela de luz",
+      liveParticlesFxStyle: "Estilo FX",
+      liveParticlesFxAmount: "Cantidad FX",
       liveParticlesDamping: "Damping",
       liveParticlesVortex: "Vórtice",
       liveParticlesSpawn: "Tasa de spawn",
@@ -2601,6 +2732,7 @@ const extendedLocaleTexts = {
         visionpass: "Paso Alto Visionario",
         neon: "Neón Glow",
         neongrad: "Neón Gradiente",
+        matrix: "Matrix",
       },
       liveParticlesCount: {
         low: "Baja",
@@ -2726,12 +2858,20 @@ const extendedLocaleTexts = {
         "axis-y": "Eje Y",
         spiral: "Espiral",
       },
+      liveParticlesFxStyle: {
+        none: "Off",
+        neon: "Neón",
+        datamosh: "Datamosh",
+      },
       studioParticlesStructure: {
         cloud: "Nube",
         grid: "Grid",
         ring: "Anillo",
         helix: "Hélice",
         mandala: "Mandala",
+        torus: "Toro",
+        lissajous: "Lissajous",
+        attractor: "Atractor",
       },
       studioParticlesAudioSplit: {
         off: "Off",
@@ -2853,7 +2993,13 @@ const extendedLocaleTexts = {
       "#moduleRouteHint .module-route-btn[data-module-route='particles'] span:last-child": "Particles",
       "#moduleRouteHint .module-route-btn[data-module-route='tunnel'] span:last-child": "Tunnel",
       "#moduleRouteHint .module-route-btn[data-module-route='interior'] span:last-child": "Interior",
+      "#moduleRouteHint .module-route-btn[data-module-route='atlas'] span:last-child": "Morpho",
+      "#moduleRouteHint .module-route-btn[data-module-route='materia'] span:last-child": "Materia",
+      "#moduleRouteHint .module-route-btn[data-module-route='code'] span:last-child": "Code",
       "#livePaneInterior h2": "Interior Black Essentials",
+      "#livePaneAtlas h2": "Morpho Live Essentials",
+      "#livePaneMateria h2": "Materia Live Essentials",
+      "#livePaneCode h2": "Code Rain Essentials",
     },
     labels: {
       liveGlitchIntensity: "Intensity",
@@ -2940,6 +3086,8 @@ const extendedLocaleTexts = {
       liveParticlesFaceDelay: "Face Delay",
       liveParticlesFaceAmount: "Face Amount",
       liveParticlesTrail: "Light Trail",
+      liveParticlesFxStyle: "FX Style",
+      liveParticlesFxAmount: "FX Amount",
       liveParticlesDamping: "Damping",
       liveParticlesVortex: "Vortex",
       liveParticlesSpawn: "Spawn Rate",
@@ -3112,6 +3260,7 @@ const extendedLocaleTexts = {
         visionpass: "Visionary High Pass",
         neon: "Neon Glow",
         neongrad: "Neon Gradient",
+        matrix: "Matrix",
       },
       liveParticlesCount: {
         low: "Low",
@@ -3237,12 +3386,20 @@ const extendedLocaleTexts = {
         "axis-y": "Axis Y",
         spiral: "Spiral",
       },
+      liveParticlesFxStyle: {
+        none: "Off",
+        neon: "Neon",
+        datamosh: "Datamosh",
+      },
       studioParticlesStructure: {
         cloud: "Cloud",
         grid: "Grid",
         ring: "Ring",
         helix: "Helix",
         mandala: "Mandala",
+        torus: "Torus",
+        lissajous: "Lissajous",
+        attractor: "Attractor",
       },
       studioParticlesAudioSplit: {
         off: "Off",
@@ -4069,10 +4226,11 @@ function estimateActiveModuleLoad() {
     const countKey = liveParticlesCount ? String(liveParticlesCount.value || "med").toLowerCase() : "med";
     score += countMap[countKey] ?? 0.5;
     score += n(liveParticlesTrail ? liveParticlesTrail.value : 0) * 0.85;
+    score += n(liveParticlesFxAmount ? liveParticlesFxAmount.value : 0) * 0.7;
     score += n(liveParticlesNoise ? liveParticlesNoise.value : 0) * 0.7;
     score += n(liveParticlesFlow ? liveParticlesFlow.value : 0) * 0.7;
     score += n(liveParticlesAudioAmount ? liveParticlesAudioAmount.value : 0) * 0.55;
-    score /= 3.8;
+    score /= 4.4;
   } else if (mode === "fractal") {
     const qualityMap = { low: 0.35, med: 0.62, high: 1 };
     const qualityKey = liveFractalQuality ? String(liveFractalQuality.value || "med").toLowerCase() : "med";
@@ -4095,7 +4253,7 @@ function estimateActiveModuleLoad() {
     score += n(liveLinesSpeed ? liveLinesSpeed.value : 42) * 0.35;
     score += n(liveLinesInsideDepth ? liveLinesInsideDepth.value : 62) * 0.25;
     score += n(liveLinesStringVibe ? liveLinesStringVibe.value : 58, 0, 200) * 0.28;
-    score += n(liveLinesConstellation ? liveLinesConstellation.value : 32) * 0.62;
+    score += n(liveLinesConstellation ? liveLinesConstellation.value : 56) * 0.62;
     score /= 3.95;
   } else if (mode === "tunnel") {
     score += n(liveTunnelDensity ? liveTunnelDensity.value : 22, 8, 44) * 1.1;
@@ -4116,6 +4274,35 @@ function estimateActiveModuleLoad() {
     score += n(liveInteriorGlow ? liveInteriorGlow.value : 44) * 0.42;
     score += n(liveInteriorAudioAmount ? liveInteriorAudioAmount.value : 68) * 0.3;
     score /= 3.95;
+  } else if (mode === "atlas") {
+    score += n(liveAtlasComplexity ? liveAtlasComplexity.value : 22, 0, 30) * 1.08;
+    score += n(liveAtlasVariation ? liveAtlasVariation.value : 58) * 0.64;
+    score += n(liveAtlasComposition ? liveAtlasComposition.value : 58) * 0.52;
+    score += n(liveAtlasMotion ? liveAtlasMotion.value : 46) * 0.58;
+    score += n(liveAtlasContrast ? liveAtlasContrast.value : 56) * 0.36;
+    score += n(liveAtlasColorMod ? liveAtlasColorMod.value : 62) * 0.2;
+    score += n(liveAtlasMesh ? liveAtlasMesh.value : 46) * 0.24;
+    score += n(liveAtlasSpheres ? liveAtlasSpheres.value : 36) * 0.24;
+    score += n(liveAtlasAudioAmount ? liveAtlasAudioAmount.value : 72) * 0.34;
+    score /= 3.96;
+  } else if (mode === "materia") {
+    score += n(liveMateriaLayers ? liveMateriaLayers.value : 52) * 0.95;
+    score += n(liveMateriaFlow ? liveMateriaFlow.value : 58) * 0.76;
+    score += n(liveMateriaPorosity ? liveMateriaPorosity.value : 48) * 0.66;
+    score += n(liveMateriaDrift ? liveMateriaDrift.value : 42) * 0.58;
+    score += n(liveMateriaContrast ? liveMateriaContrast.value : 54) * 0.35;
+    score += n(liveMateriaAudioAmount ? liveMateriaAudioAmount.value : 66) * 0.33;
+    score /= 3.3;
+  } else if (mode === "code") {
+    score += n(liveCodeDensity ? liveCodeDensity.value : 58) * 0.9;
+    score += n(liveCodeSpeed ? liveCodeSpeed.value : 44) * 0.62;
+    score += n(liveCodeZoom ? liveCodeZoom.value : 38) * 0.46;
+    score += n(liveCodeLetters ? liveCodeLetters.value : 62) * 0.86;
+    score += n(liveCodeFigure ? liveCodeFigure.value : 62) * 0.66;
+    score += n(liveCodeLanguage ? liveCodeLanguage.value : 66) * 0.34;
+    score += n(liveCodeGlow ? liveCodeGlow.value : 54) * 0.46;
+    score += n(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72) * 0.34;
+    score /= 4.72;
   } else if (mode === "synth") {
     score += n(liveSynthBlend ? liveSynthBlend.value : 58) * 0.55;
     score += n(liveSynthEcho ? liveSynthEcho.value : 48) * 0.9;
@@ -4129,7 +4316,7 @@ function estimateActiveModuleLoad() {
   if (isKaleidoFxActive()) score += 0.22 + n(kaleidoFxAmount ? kaleidoFxAmount.value : 38) * 0.28;
   if (masterFxMode && (masterFxMode.value || "none") !== "none") score += 0.18 + n(masterFxAmount ? masterFxAmount.value : 28) * 0.2;
   if (liveOutputView && liveOutputView.value === "dome") score += 0.16;
-  if (webcamActive && (mode === "glitch" || mode === "particles" || mode === "synth" || mode === "lines" || mode === "tunnel" || mode === "interior")) score += 0.08;
+  if (webcamActive && (mode === "glitch" || mode === "particles" || mode === "synth" || mode === "lines" || mode === "tunnel" || mode === "interior" || mode === "atlas" || mode === "materia" || mode === "code")) score += 0.08;
 
   const fpsPressure = clamp((30 - fps) / 18, 0, 1);
   const finalScore = clamp(score * 0.72 + fpsPressure * 0.6, 0, 1);
@@ -4515,6 +4702,7 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveParticlesHue", liveParticlesHue ? liveParticlesHue.value : 0);
   updateQuickOutputById("liveParticlesAudioAmount", liveParticlesAudioAmount ? liveParticlesAudioAmount.value : 0);
   updateQuickOutputById("liveParticlesTrail", liveParticlesTrail ? liveParticlesTrail.value : 0);
+  updateQuickOutputById("liveParticlesFxAmount", liveParticlesFxAmount ? liveParticlesFxAmount.value : 0);
   updateQuickOutputById("liveParticlesOrder", liveParticlesOrder ? liveParticlesOrder.value : 0);
   updateQuickOutputById("liveParticlesDamping", liveParticlesDamping ? liveParticlesDamping.value : 0);
   updateQuickOutputById("liveParticlesVortex", liveParticlesVortex ? liveParticlesVortex.value : 0);
@@ -4551,6 +4739,31 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveInteriorGlitch", liveInteriorGlitch ? liveInteriorGlitch.value : 0);
   updateQuickOutputById("liveInteriorGlow", liveInteriorGlow ? liveInteriorGlow.value : 0);
   updateQuickOutputById("liveInteriorAudioAmount", liveInteriorAudioAmount ? liveInteriorAudioAmount.value : 0);
+  updateQuickOutputById("liveAtlasSeed", liveAtlasSeed ? liveAtlasSeed.value : 0);
+  updateQuickOutputById("liveAtlasVariation", liveAtlasVariation ? liveAtlasVariation.value : 0);
+  updateQuickOutputById("liveAtlasComposition", liveAtlasComposition ? liveAtlasComposition.value : 0);
+  updateQuickOutputById("liveAtlasComplexity", liveAtlasComplexity ? liveAtlasComplexity.value : 0);
+  updateQuickOutputById("liveAtlasMotion", liveAtlasMotion ? liveAtlasMotion.value : 0);
+  updateQuickOutputById("liveAtlasContrast", liveAtlasContrast ? liveAtlasContrast.value : 0);
+  updateQuickOutputById("liveAtlasColorMod", liveAtlasColorMod ? liveAtlasColorMod.value : 0);
+  updateQuickOutputById("liveAtlasMesh", liveAtlasMesh ? liveAtlasMesh.value : 0);
+  updateQuickOutputById("liveAtlasSpheres", liveAtlasSpheres ? liveAtlasSpheres.value : 0);
+  updateQuickOutputById("liveAtlasAudioAmount", liveAtlasAudioAmount ? liveAtlasAudioAmount.value : 0);
+  updateQuickOutputById("liveMateriaSeed", liveMateriaSeed ? liveMateriaSeed.value : 0);
+  updateQuickOutputById("liveMateriaFlow", liveMateriaFlow ? liveMateriaFlow.value : 0);
+  updateQuickOutputById("liveMateriaPorosity", liveMateriaPorosity ? liveMateriaPorosity.value : 0);
+  updateQuickOutputById("liveMateriaLayers", liveMateriaLayers ? liveMateriaLayers.value : 0);
+  updateQuickOutputById("liveMateriaDrift", liveMateriaDrift ? liveMateriaDrift.value : 0);
+  updateQuickOutputById("liveMateriaContrast", liveMateriaContrast ? liveMateriaContrast.value : 0);
+  updateQuickOutputById("liveMateriaAudioAmount", liveMateriaAudioAmount ? liveMateriaAudioAmount.value : 0);
+  updateQuickOutputById("liveCodeDensity", liveCodeDensity ? liveCodeDensity.value : 0);
+  updateQuickOutputById("liveCodeSpeed", liveCodeSpeed ? liveCodeSpeed.value : 0);
+  updateQuickOutputById("liveCodeZoom", liveCodeZoom ? liveCodeZoom.value : 0);
+  updateQuickOutputById("liveCodeLetters", liveCodeLetters ? liveCodeLetters.value : 0);
+  updateQuickOutputById("liveCodeFigure", liveCodeFigure ? liveCodeFigure.value : 0);
+  updateQuickOutputById("liveCodeLanguage", liveCodeLanguage ? liveCodeLanguage.value : 0);
+  updateQuickOutputById("liveCodeGlow", liveCodeGlow ? liveCodeGlow.value : 0);
+  updateQuickOutputById("liveCodeAudioAmount", liveCodeAudioAmount ? liveCodeAudioAmount.value : 0);
   updateQuickOutputById("studioParticlesOrder", studioParticlesOrder ? studioParticlesOrder.value : 0);
   updateQuickOutputById("studioParticlesDrift", studioParticlesDrift ? studioParticlesDrift.value : 0);
   updateQuickOutputById("studioParticlesFocus", studioParticlesFocus ? studioParticlesFocus.value : 0);
@@ -5377,7 +5590,7 @@ function getLiveModeReadoutText(tab) {
   const hasVisualInput = webcamActive || Boolean(loadedImage) || Boolean(originalImageData);
   const hasActiveFilter =
     hasVisualInput &&
-    (mode === "glitch" || mode === "depth" || mode === "particles" || mode === "fractal" || mode === "lines" || mode === "tunnel" || mode === "interior" || mode === "mix");
+    (mode === "glitch" || mode === "depth" || mode === "particles" || mode === "fractal" || mode === "lines" || mode === "tunnel" || mode === "interior" || mode === "atlas" || mode === "materia" || mode === "code" || mode === "mix");
   if (!hasActiveFilter) return "B.ZU.AL Studio";
   const isEn = locale === "en";
   if (tab === "fractal") return isEn ? "[ FRACTAL // LIVE ]" : "[ FRACTAL // LIVE ]";
@@ -5386,6 +5599,9 @@ function getLiveModeReadoutText(tab) {
   if (tab === "lines") return isEn ? "[ LINES // LIVE ]" : "[ LINEAS // LIVE ]";
   if (tab === "tunnel") return isEn ? "[ INFINITE TUNNEL // LIVE ]" : "[ TUNEL INFINITO // LIVE ]";
   if (tab === "interior") return isEn ? "[ INTERIOR BLACK // LIVE ]" : "[ INTERIOR BLACK // LIVE ]";
+  if (tab === "atlas") return isEn ? "[ MORPHO // LIVE ]" : "[ MORPHO // LIVE ]";
+  if (tab === "materia") return isEn ? "[ MATERIA // LIVE ]" : "[ MATERIA // LIVE ]";
+  if (tab === "code") return isEn ? "[ CODE RAIN // LIVE ]" : "[ CODE RAIN // LIVE ]";
   return isEn ? "[ GLITCH // LIVE ]" : "[ GLITCH // LIVE ]";
 }
 
@@ -5415,6 +5631,9 @@ function normalizeLiveTab(tabName) {
   if (tabName === "lines") return "lines";
   if (tabName === "tunnel") return "tunnel";
   if (tabName === "interior") return "interior";
+  if (tabName === "atlas") return "atlas";
+  if (tabName === "materia") return "materia";
+  if (tabName === "code") return "code";
   return "glitch";
 }
 
@@ -5435,6 +5654,9 @@ function syncLiveModeTabsFromMode() {
   if (livePaneLines) livePaneLines.hidden = tab !== "lines";
   if (livePaneTunnel) livePaneTunnel.hidden = tab !== "tunnel";
   if (livePaneInterior) livePaneInterior.hidden = tab !== "interior";
+  if (livePaneAtlas) livePaneAtlas.hidden = tab !== "atlas";
+  if (livePaneMateria) livePaneMateria.hidden = tab !== "materia";
+  if (livePaneCode) livePaneCode.hidden = tab !== "code";
   if (livePaneSynth) livePaneSynth.hidden = true;
 }
 
@@ -5455,6 +5677,9 @@ function setLiveModeTab(tabName) {
   if (livePaneLines) livePaneLines.hidden = liveActiveTab !== "lines";
   if (livePaneTunnel) livePaneTunnel.hidden = liveActiveTab !== "tunnel";
   if (livePaneInterior) livePaneInterior.hidden = liveActiveTab !== "interior";
+  if (livePaneAtlas) livePaneAtlas.hidden = liveActiveTab !== "atlas";
+  if (livePaneMateria) livePaneMateria.hidden = liveActiveTab !== "materia";
+  if (livePaneCode) livePaneCode.hidden = liveActiveTab !== "code";
   if (livePaneSynth) livePaneSynth.hidden = true;
   const nextMode = normalizeLiveTab(liveActiveTab);
   const radio = modeInputs.find((m) => m.value === nextMode);
@@ -5466,7 +5691,7 @@ function setLiveModeTab(tabName) {
 }
 
 function cycleLiveModeTab(direction) {
-  const order = ["glitch", "fractal", "depth", "particles", "lines", "tunnel", "interior"];
+  const order = ["glitch", "fractal", "depth", "particles", "lines", "tunnel", "interior", "atlas", "materia", "code"];
   const current = liveActiveTab && order.includes(liveActiveTab) ? liveActiveTab : "glitch";
   const idx = order.indexOf(current);
   const step = direction >= 0 ? 1 : -1;
@@ -5846,59 +6071,55 @@ function generateNoInputFrame(width, height, tSec = 0, animated = false) {
   const d = img.data;
   const invW = 1 / Math.max(1, w - 1);
   const invH = 1 / Math.max(1, h - 1);
-  const pulse = animated ? Math.sin(tSec * 0.46) * 0.5 + 0.5 : 0.35;
-  const drift = animated ? tSec * 0.16 : 0;
-  const angle = animated ? tSec * 0.11 + Math.sin(tSec * 0.18) * 0.08 : 0;
-  const ca = Math.cos(angle);
-  const sa = Math.sin(angle);
-  const horizon = 0.2 + (0.03 * pulse);
-  const gridBoost = 0.75 + pulse * 0.35;
+  const pulse = animated ? Math.sin(tSec * 0.78) * 0.5 + 0.5 : 0.35;
+  const drift = animated ? tSec * 0.42 : 0;
+  const sway = animated ? Math.sin(tSec * 0.24) * 0.22 : 0;
+  const rot = animated ? Math.sin(tSec * 0.11) * 0.24 : 0;
+  const cr = Math.cos(rot);
+  const sr = Math.sin(rot);
+  const horizon = 0.16 + pulse * 0.04;
+  const glowBoost = 0.8 + pulse * 0.32;
   for (let y = 0; y < h; y++) {
     const py = y * invH * 2 - 1;
     for (let x = 0; x < w; x++) {
       const px = x * invW * 2 - 1;
       const i = (y * w + x) * 4;
       const sky = clamp((py + 1) * 0.5, 0, 1);
-      const nearField = clamp((horizon - py) * 1.7, 0, 1);
-      const z = 1 / Math.max(0.12, py + 1.25);
-      const wx = px * z * 4.8;
-      const wz = z * 7.0 + drift * 1.5;
-      const rx = wx * ca - wz * sa;
-      const rz = wx * sa + wz * ca;
-      const elevA = Math.pow(fbm2d(rx * 0.2, rz * 0.2, 4), 1.35);
-      const elevB = fbm2d(rx * 0.47 + 19.2, rz * 0.44 + 7.8, 3);
-      const wave = Math.sin((rz * 0.72) - tSec * 0.75 + Math.sin(rx * 0.18) * 0.6) * 0.22;
-      const elev = (elevA * 1.22 + elevB * 0.68 + wave) * 1.55;
-      const ridge = Math.abs(py + 0.24 - elev * 0.18);
-      const terrainMask = 1 - smoothstepEdge(0.0, 0.052 + z * 0.009, ridge);
-      const floorMask = clamp((horizon - py + 0.58) * 1.2, 0, 1);
-      const gx = Math.abs((rx - Math.floor(rx + 0.5)));
-      const gz = Math.abs((rz - Math.floor(rz + 0.5)));
-      const lineWidthX = 0.028 + z * 0.0022;
-      const lineWidthZ = 0.034 + z * 0.0038;
+      const floorMask = clamp((horizon - py + 0.62 + Math.sin(tSec * 0.3) * 0.02) * 1.3, 0, 1);
+      const z = 1 / Math.max(0.12, py + 1.22);
+      const worldX = (px + sway * 0.12) * z * 4.2;
+      const worldZ = z * 6.8 + drift;
+      const rx = worldX * cr - worldZ * sr;
+      const rz = worldX * sr + worldZ * cr;
+      const ripple = Math.sin(rx * 0.14 + tSec * 0.42) * 0.34 + Math.cos(rz * 0.1 - tSec * 0.38) * 0.22;
+      const elevA = Math.pow(fbm2d(rx * 0.22, (rz + ripple) * 0.22, 4), 1.2);
+      const elevB = fbm2d(rx * 0.42 + 13.7, (rz + ripple * 0.8) * 0.38 + 5.1, 3);
+      const slowWave = Math.sin(rz * 0.66 - tSec * 0.62 + Math.sin(rx * 0.22) * 0.5) * 0.28;
+      const terrain = (elevA * 1.15 + elevB * 0.7 + slowWave) * 1.48;
+      const ridge = Math.abs(py + 0.18 - terrain * 0.28);
+      const terrainMask = 1 - smoothstepEdge(0.0, 0.06 + z * 0.01, ridge);
+      const gx = Math.abs(rx - Math.floor(rx + 0.5));
+      const gz = Math.abs(rz - Math.floor(rz + 0.5));
+      const lineWidthX = 0.022 + z * 0.002;
+      const lineWidthZ = 0.03 + z * 0.0036;
       const line = Math.max(
-        1 - smoothstepEdge(lineWidthX, lineWidthX + 0.022, gx),
-        1 - smoothstepEdge(lineWidthZ, lineWidthZ + 0.03, gz)
+        1 - smoothstepEdge(lineWidthX, lineWidthX + 0.018, gx),
+        1 - smoothstepEdge(lineWidthZ, lineWidthZ + 0.026, gz)
       );
-      const wirePlane = line * floorMask * 0.42;
-      const wireTerrain = line * terrainMask * 1.42;
-      const wire = Math.max(wirePlane, wireTerrain) * gridBoost;
-      const scan = 0.85 + 0.15 * Math.sin((y * 0.85 + tSec * 11.0));
-      const glitchRow = randHash(Math.floor(y * 0.42) + Math.floor(tSec * 6), Math.floor(tSec * 14), randomSeed + 317);
-      const glitchMask = glitchRow > 0.9 ? 1 : 0;
-      const glitchWave = Math.sin((y * 0.08) + tSec * 22 + randHash(y, 7, randomSeed + 177) * 6.28318);
-      const glitchAmp = glitchMask * (0.12 + 0.18 * nearField);
-      const vignette = clamp(1 - Math.hypot(px * 0.78, py * 0.9), 0, 1);
-      const bgR = 2 + 8 * sky + 8 * vignette;
-      const bgG = 10 + 34 * sky + 20 * vignette;
-      const bgB = 14 + 46 * sky + 30 * vignette;
-      const glow = wire * (154 + nearField * 80) * scan * (1 + glitchAmp * glitchWave);
-      const haze = nearField * (18 + 12 * pulse);
-      const noise = (randHash(x, y, randomSeed + 91 + Math.floor(tSec * 9)) - 0.5) * 3.2;
-      const glitchTint = glitchMask * (18 + 26 * (0.5 + 0.5 * glitchWave));
-      d[i] = clamp(bgR + glow * 0.07 + haze * 0.16 + noise * 0.34 + glitchTint * 0.08, 0, 255);
-      d[i + 1] = clamp(bgG + glow * 1.1 + haze * 0.42 + noise * 0.58 + glitchTint * 0.38, 0, 255);
-      d[i + 2] = clamp(bgB + glow * 0.32 + haze * 0.66 + noise * 0.45 + glitchTint * 0.14, 0, 255);
+      const wirePlane = line * floorMask * 0.52;
+      const wireTerrain = line * terrainMask * 1.48;
+      const wire = Math.max(wirePlane, wireTerrain);
+      const scan = 0.88 + 0.12 * Math.sin(y * 0.76 + tSec * 8.8);
+      const vignette = clamp(1 - Math.hypot(px * 0.8, py * 0.9), 0, 1);
+      const bgR = 0 + 4 * sky + 3 * vignette;
+      const bgG = 8 + 18 * sky + 10 * vignette;
+      const bgB = 10 + 24 * sky + 16 * vignette;
+      const glow = wire * (132 + floorMask * 64 + terrainMask * 58) * scan * glowBoost;
+      const haze = floorMask * (10 + 12 * pulse) + terrainMask * (4 + pulse * 5);
+      const noise = (randHash(x, y, randomSeed + 71 + Math.floor(tSec * 7)) - 0.5) * 2.2;
+      d[i] = clamp(bgR + glow * 0.05 + haze * 0.08 + noise * 0.24, 0, 255);
+      d[i + 1] = clamp(bgG + glow * 1.08 + haze * 0.34 + noise * 0.5, 0, 255);
+      d[i + 2] = clamp(bgB + glow * 0.22 + haze * 0.5 + noise * 0.34, 0, 255);
       d[i + 3] = 255;
     }
   }
@@ -6034,6 +6255,8 @@ function getParticlesSettings() {
     faceDelay: liveParticlesFaceDelay ? Number(liveParticlesFaceDelay.value) : 24,
     faceAmount: liveParticlesFaceAmount ? Number(liveParticlesFaceAmount.value) : 68,
     trail: liveParticlesTrail ? Number(liveParticlesTrail.value) : 0,
+    fxStyle: liveParticlesFxStyle ? liveParticlesFxStyle.value : "neon",
+    fxAmount: liveParticlesFxAmount ? Number(liveParticlesFxAmount.value) : 58,
     structure: liveParticlesStructure ? liveParticlesStructure.value : "cloud",
     audioSplit: liveParticlesAudioSplit ? liveParticlesAudioSplit.value : "basic",
     order: liveParticlesOrder ? Number(liveParticlesOrder.value) : 48,
@@ -6049,6 +6272,63 @@ function getParticlesSettings() {
     gradientA: liveParticlesGradientA ? liveParticlesGradientA.value : "#00d8ff",
     gradientB: liveParticlesGradientB ? liveParticlesGradientB.value : "#ff2ea6",
   };
+}
+
+function weightedPick(list) {
+  if (!Array.isArray(list) || list.length === 0) return null;
+  let total = 0;
+  for (let i = 0; i < list.length; i++) total += Math.max(0, Number(list[i].w) || 0);
+  if (total <= 0) return list[Math.floor(Math.random() * list.length)].v;
+  let r = Math.random() * total;
+  for (let i = 0; i < list.length; i++) {
+    r -= Math.max(0, Number(list[i].w) || 0);
+    if (r <= 0) return list[i].v;
+  }
+  return list[list.length - 1].v;
+}
+
+function tuneParticlesStructureProfile(structure, options = {}) {
+  const modeId = String(structure || (liveParticlesStructure ? liveParticlesStructure.value : "cloud"));
+  const withJitter = Boolean(options.withJitter);
+  const setIf = (el, value, spread = 0) => {
+    if (!el) return;
+    const v = Number(value);
+    if (!Number.isFinite(v)) return;
+    const j = withJitter && spread > 0 ? (Math.random() * 2 - 1) * spread : 0;
+    const nv = Math.round(clamp(v + j, Number(el.min || -9999), Number(el.max || 9999)));
+    el.value = String(nv);
+  };
+  const setSel = (el, value) => {
+    if (el && value) el.value = value;
+  };
+
+  // Tuned live-safe profiles for each mathematical structure.
+  const profiles = {
+    cloud: { order: 44, depth: 60, size: 52, noise: 30, attractor: 24, flow: 34, damping: 34, vortex: 30, drift: 28, focus: 34, trail: 14, cam: "orbit", split: "basic" },
+    grid: { order: 58, depth: 56, size: 50, noise: 16, attractor: 34, flow: 20, damping: 38, vortex: 20, drift: 20, focus: 42, trail: 10, cam: "sweep", split: "zones" },
+    ring: { order: 64, depth: 64, size: 56, noise: 18, attractor: 30, flow: 26, damping: 36, vortex: 44, drift: 18, focus: 56, trail: 18, cam: "orbit", split: "basic" },
+    helix: { order: 68, depth: 74, size: 54, noise: 22, attractor: 36, flow: 30, damping: 35, vortex: 48, drift: 16, focus: 58, trail: 16, cam: "helix", split: "zones" },
+    mandala: { order: 72, depth: 62, size: 58, noise: 20, attractor: 34, flow: 30, damping: 34, vortex: 38, drift: 14, focus: 62, trail: 20, cam: "orbit", split: "basic" },
+    torus: { order: 70, depth: 74, size: 60, noise: 16, attractor: 38, flow: 24, damping: 36, vortex: 42, drift: 16, focus: 64, trail: 16, cam: "inside", split: "zones" },
+    lissajous: { order: 78, depth: 68, size: 58, noise: 18, attractor: 34, flow: 32, damping: 36, vortex: 30, drift: 14, focus: 66, trail: 18, cam: "sweep", split: "zones" },
+    attractor: { order: 82, depth: 70, size: 62, noise: 24, attractor: 44, flow: 36, damping: 37, vortex: 36, drift: 12, focus: 74, trail: 22, cam: "inside", split: "zones" },
+  };
+  const p = profiles[modeId] || profiles.cloud;
+
+  setIf(liveParticlesOrder, p.order, 8);
+  setIf(liveParticlesDepth, p.depth, 10);
+  setIf(liveParticlesSize, p.size, 10);
+  setIf(liveParticlesNoise, p.noise, 14);
+  setIf(liveParticlesAttractor, p.attractor, 16);
+  setIf(liveParticlesFlow, p.flow, 16);
+  setIf(liveParticlesDamping, p.damping, 10);
+  setIf(liveParticlesVortex, p.vortex, 16);
+  setIf(liveParticlesDrift, p.drift, 14);
+  setIf(liveParticlesFocus, p.focus, 14);
+  setIf(liveParticlesTrail, p.trail, 14);
+  if (liveParticlesAudioAmount && Number(liveParticlesAudioAmount.value) < 38) liveParticlesAudioAmount.value = "54";
+  setSel(liveParticlesAudioSplit, p.split);
+  setSel(liveParticlesCamMode, p.cam);
 }
 
 function getTemporalSynthSettings() {
@@ -7619,7 +7899,7 @@ function getSourceImageData() {
     const w = Math.max(2, canvas.width | 0);
     const h = Math.max(2, canvas.height | 0);
     const nowMs = performance.now();
-    const active3d = mode === "depth" || mode === "particles" || mode === "fractal" || mode === "lines" || mode === "tunnel" || mode === "interior" || mode === "synth" || mode === "mix";
+    const active3d = mode === "depth" || mode === "particles" || mode === "fractal" || mode === "lines" || mode === "tunnel" || mode === "interior" || mode === "atlas" || mode === "materia" || mode === "code" || mode === "synth" || mode === "mix";
     const refreshMs = active3d ? 30 : 66;
     const staleSize = !originalImageData || originalImageData.width !== w || originalImageData.height !== h;
     if (staleSize || nowMs - noInputLastRefreshMs >= refreshMs) {
@@ -7669,7 +7949,7 @@ function applyLiveSafeBaseline(options = {}) {
   const setChecked = (el, value) => {
     if (el) el.checked = Boolean(value);
   };
-  const safeModes = ["glitch", "fractal", "depth", "particles", "lines", "tunnel", "interior"];
+  const safeModes = ["glitch", "fractal", "depth", "particles", "lines", "tunnel", "interior", "atlas", "materia"];
   const currentSafeMode = safeModes.includes(mode) ? mode : "depth";
   const targetMode = keepMode ? currentSafeMode : "depth";
 
@@ -7786,6 +8066,8 @@ function applyLiveSafeBaseline(options = {}) {
     setVal(liveParticlesFaceDelay, 24);
     setVal(liveParticlesFaceAmount, 68);
     setVal(liveParticlesTrail, 14);
+    setVal(liveParticlesFxStyle, "neon");
+    setVal(liveParticlesFxAmount, 58);
     setVal(liveParticlesOrder, 48);
     setVal(liveParticlesDamping, 34);
     setVal(liveParticlesVortex, 22);
@@ -7821,7 +8103,7 @@ function applyLiveSafeBaseline(options = {}) {
     setVal(liveLinesPattern, "flow");
     setVal(liveLinesGeometry, "ribbon");
     setVal(liveLinesCameraMode, "orbit");
-    setVal(liveLinesConstellation, 32);
+    setVal(liveLinesConstellation, 56);
   } else if (targetMode === "tunnel") {
     if (liveTunnelPreset) liveTunnelPreset.value = "deep";
     applyTunnelPreset("deep", false);
@@ -7847,6 +8129,43 @@ function applyLiveSafeBaseline(options = {}) {
     setVal(liveInteriorGlitch, 42);
     setVal(liveInteriorGlow, 44);
     setVal(liveInteriorAudioAmount, 68);
+  } else if (targetMode === "atlas") {
+    if (liveAtlasPreset) liveAtlasPreset.value = "ribbon";
+    applyAtlasPreset("ribbon", false);
+    setChecked(liveAtlasAudio, true);
+    setVal(liveAtlasSeed, 52);
+    setVal(liveAtlasVariation, 58);
+    setVal(liveAtlasComposition, 58);
+    setVal(liveAtlasComplexity, 22);
+    setVal(liveAtlasMotion, 46);
+    setVal(liveAtlasContrast, 56);
+    setVal(liveAtlasColorMod, 62);
+    setVal(liveAtlasMesh, 46);
+    setVal(liveAtlasSpheres, 36);
+    setVal(liveAtlasAudioAmount, 72);
+  } else if (targetMode === "materia") {
+    if (liveMateriaPreset) liveMateriaPreset.value = "mineral";
+    applyMateriaPreset("mineral", false);
+    setChecked(liveMateriaAudio, true);
+    setVal(liveMateriaSeed, 2424);
+    setVal(liveMateriaFlow, 58);
+    setVal(liveMateriaPorosity, 48);
+    setVal(liveMateriaLayers, 52);
+    setVal(liveMateriaDrift, 42);
+    setVal(liveMateriaContrast, 54);
+    setVal(liveMateriaAudioAmount, 66);
+  } else if (targetMode === "code") {
+    setVal(liveCodePreset, "matrix");
+    setVal(liveCodeCameraMode, "wide");
+    setChecked(liveCodeAudio, true);
+    setVal(liveCodeDensity, 58);
+    setVal(liveCodeSpeed, 44);
+    setVal(liveCodeZoom, 38);
+    setVal(liveCodeLetters, 62);
+    setVal(liveCodeFigure, 62);
+    setVal(liveCodeLanguage, 66);
+    setVal(liveCodeGlow, 54);
+    setVal(liveCodeAudioAmount, 72);
   }
 
   updateOutputs();
@@ -8034,6 +8353,7 @@ function shouldRunTracking(settings) {
   if (mode === "particles") {
     return Boolean(liveParticlesFaceTrack && liveParticlesFaceTrack.checked);
   }
+  if (mode === "code") return true;
   if (mode !== "glitch" && mode !== "mix") return false;
   if (!settings) return false;
   return settings.subjectGhost > 0 || settings.polygonTrack > 0;
@@ -8053,7 +8373,8 @@ function isMasterFxAnimated() {
     v === "luminous" ||
     v === "visionpass" ||
     v === "neon" ||
-    v === "neongrad"
+    v === "neongrad" ||
+    v === "matrix"
   );
 }
 
@@ -8064,6 +8385,9 @@ function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
     mode === "lines" ||
     mode === "tunnel" ||
     mode === "interior" ||
+    mode === "atlas" ||
+    mode === "materia" ||
+    mode === "code" ||
     mode === "synth" ||
     isMasterFxAnimated() ||
     isKaleidoFxActive() ||
@@ -8072,6 +8396,7 @@ function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
     Boolean(fractalMorphTween) ||
     Boolean(tunnelMorphTween) ||
     Boolean(interiorMorphTween) ||
+    Boolean(materiaMorphTween) ||
     webcamActive ||
     recordingActive ||
     hasAudioReactiveInput() ||
@@ -10245,7 +10570,8 @@ function applyMasterFxGlobal(tSec) {
     fxMode === "datamosh" ||
     fxMode === "pixelart" ||
     fxMode === "neon" ||
-    fxMode === "neongrad";
+    fxMode === "neongrad" ||
+    fxMode === "matrix";
   const perfStress = clamp((24 - fps) / 8, 0, 1);
   let skipEvery = mode === "fractal" ? 1 : perfStress > 0.75 ? 3 : perfStress > 0.35 ? 2 : 1;
   if (mode === "lines") {
@@ -10254,23 +10580,14 @@ function applyMasterFxGlobal(tSec) {
   }
   const canReusePrev = expensiveMode && skipEvery > 1 && !recordingActive;
   if (canReusePrev && postFxFrameCounter % skipEvery !== 0) {
-    if (mode === "lines") {
-      // Blend current raw frame and previous processed frame for a smoother hold frame.
-      masterFxCtx.clearRect(0, 0, w, h);
-      masterFxCtx.drawImage(canvas, 0, 0, w, h);
-      ctx.save();
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      ctx.globalAlpha = 0.46;
-      ctx.drawImage(masterFxCanvas, 0, 0, w, h, 0, 0, outW, outH);
-      ctx.globalAlpha = 0.54;
-      ctx.drawImage(masterPrevCanvas, 0, 0, w, h, 0, 0, outW, outH);
-      ctx.restore();
-      return;
-    }
     ctx.save();
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
+    // Temporal blend avoids visible flicker when expensive FX are frame-skipped.
+    const holdBlend = mode === "lines" ? 0.54 : 0.6;
+    ctx.globalAlpha = 1 - holdBlend;
+    ctx.drawImage(canvas, 0, 0, w, h, 0, 0, outW, outH);
+    ctx.globalAlpha = holdBlend;
     ctx.drawImage(masterPrevCanvas, 0, 0, w, h, 0, 0, outW, outH);
     ctx.restore();
     return;
@@ -10724,6 +11041,65 @@ function applyMasterFxGlobal(tSec) {
     masterFxCtx.filter = `blur(${1.2 + amount * 6 + speed * 2.8}px)`;
     masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
     masterFxCtx.restore();
+  } else if (fxMode === "matrix" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const prev = masterPrevCtx.getImageData(0, 0, w, h);
+    const sd = src.data;
+    const od = out.data;
+    const pd = prev.data;
+    const trailPx = Math.max(1, Math.round(1 + amount * 6 + speed * 4));
+    const tintMix = clamp(0.42 + amount * 0.42, 0.32, 0.88);
+    const glowMix = clamp(0.14 + amount * 0.34 + colorDrive * 0.18, 0.14, 0.74);
+    const jitterAmp = amount * (0.2 + speed * 0.34);
+    for (let y = 0; y < h; y++) {
+      const v = y / Math.max(1, h - 1);
+      const rainLine = 0.5 + 0.5 * Math.sin(tSec * (1.6 + speed * 2.4) + y * 0.065);
+      for (let x = 0; x < w; x++) {
+        const u = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const lum = (sd[i] * 0.299 + sd[i + 1] * 0.587 + sd[i + 2] * 0.114) / 255;
+        const trailY = clamp(y - trailPx, 0, h - 1);
+        const pi = (trailY * w + x) * 4;
+        const prevLum = (pd[pi] * 0.299 + pd[pi + 1] * 0.587 + pd[pi + 2] * 0.114) / 255;
+        const edgeL = (sd[(y * w + Math.max(0, x - 1)) * 4] * 0.299 + sd[(y * w + Math.max(0, x - 1)) * 4 + 1] * 0.587 + sd[(y * w + Math.max(0, x - 1)) * 4 + 2] * 0.114) / 255;
+        const edgeR = (sd[(y * w + Math.min(w - 1, x + 1)) * 4] * 0.299 + sd[(y * w + Math.min(w - 1, x + 1)) * 4 + 1] * 0.587 + sd[(y * w + Math.min(w - 1, x + 1)) * 4 + 2] * 0.114) / 255;
+        const edgeU = (sd[(Math.max(0, y - 1) * w + x) * 4] * 0.299 + sd[(Math.max(0, y - 1) * w + x) * 4 + 1] * 0.587 + sd[(Math.max(0, y - 1) * w + x) * 4 + 2] * 0.114) / 255;
+        const edgeD = (sd[(Math.min(h - 1, y + 1) * w + x) * 4] * 0.299 + sd[(Math.min(h - 1, y + 1) * w + x) * 4 + 1] * 0.587 + sd[(Math.min(h - 1, y + 1) * w + x) * 4 + 2] * 0.114) / 255;
+        const edge = clamp(Math.abs(edgeR - edgeL) * 0.68 + Math.abs(edgeD - edgeU) * 1.12, 0, 1);
+        const colPhase = tSec * (0.5 + speed * 0.8) + u * 7.4 - v * 5.8;
+        const rainMask = clamp(rainLine * 0.5 + (0.5 + 0.5 * Math.sin(colPhase)) * 0.5, 0, 1);
+        const signal = clamp(lum * 0.64 + prevLum * 0.24 + edge * 0.52 + rainMask * 0.14, 0, 1);
+        const jitter = Math.sin(tSec * 8.2 + y * 0.08 + x * 0.05) * jitterAmp;
+        const base = clamp(signal + jitter * 0.03, 0, 1);
+        const g = clamp(base * (110 + tintMix * 130), 0, 255);
+        const r = clamp(base * (8 + tintMix * 28) + edge * 30, 0, 255);
+        const b = clamp(base * (10 + tintMix * 34) + rainMask * 18, 0, 255);
+        od[i] = r;
+        od[i + 1] = g;
+        od[i + 2] = b;
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "source-over";
+    masterFxCtx.globalAlpha = clamp(0.08 + amount * 0.22, 0.08, 0.32);
+    masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.14 + glowMix * 0.52, 0.14, 0.72);
+    masterFxCtx.filter = `blur(${0.8 + amount * 4.6 + speed * 2.4}px)`;
+    masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "source-over";
+    masterFxCtx.globalAlpha = clamp(0.07 + amount * 0.22, 0.07, 0.34);
+    masterFxCtx.fillStyle = "rgba(18,255,114,0.32)";
+    const scanStep = Math.max(2, Math.round(2 + (1 - speed) * 3));
+    for (let y = 0; y < h; y += scanStep) masterFxCtx.fillRect(0, y, w, 1);
+    masterFxCtx.restore();
   } else if (fxMode === "simsecho" && amount > 0.001) {
     const src = masterFxCtx.getImageData(0, 0, w, h);
     const out = masterFxCtx.createImageData(w, h);
@@ -10767,7 +11143,7 @@ function applyMasterFxGlobal(tSec) {
     const matteCut = clamp(
       10 +
         amount * 22 +
-        ((fxMode === "neon" || fxMode === "neongrad" || fxMode === "psygrad" || fxMode === "psychedelic") ? 6 : 0),
+        ((fxMode === "neon" || fxMode === "neongrad" || fxMode === "matrix" || fxMode === "psygrad" || fxMode === "psychedelic") ? 6 : 0),
       8,
       40
     );
@@ -11714,7 +12090,7 @@ function randomizeLinesCameraView() {
   if (mode !== "lines") return;
   linesCamYaw += (Math.random() * 2 - 1) * 0.8;
   linesCamPitch = clamp(linesCamPitch + (Math.random() * 2 - 1) * 0.45, -1.1, 1.1);
-  linesCamDist = clamp(linesCamDist + (Math.random() * 2 - 1) * 0.26, 0.66, 2.2);
+  linesCamDist = clamp(linesCamDist + (Math.random() * 2 - 1) * 0.26, 0.78, 2.2);
   linesCamYawTarget = linesCamYaw;
   linesCamPitchTarget = linesCamPitch;
   linesCamDistTarget = linesCamDist;
@@ -11725,7 +12101,7 @@ function randomizeLinesCameraViewSmooth() {
   if (mode !== "lines") return;
   linesCamYawTarget += (Math.random() * 2 - 1) * 1.1;
   linesCamPitchTarget = clamp(linesCamPitchTarget + (Math.random() * 2 - 1) * 0.6, -1.1, 1.1);
-  linesCamDistTarget = clamp(linesCamDistTarget + (Math.random() * 2 - 1) * 0.34, 0.66, 2.2);
+  linesCamDistTarget = clamp(linesCamDistTarget + (Math.random() * 2 - 1) * 0.34, 0.78, 2.2);
   scheduleRender();
 }
 
@@ -11747,7 +12123,7 @@ function applyLinesPreset(presetId, withRender = true) {
     if (liveLinesCamDrift) liveLinesCamDrift.value = "34";
     if (liveLinesInsideDepth) liveLinesInsideDepth.value = "46";
     if (liveLinesStringVibe) liveLinesStringVibe.value = "72";
-    if (liveLinesConstellation) liveLinesConstellation.value = "28";
+    if (liveLinesConstellation) liveLinesConstellation.value = "52";
   } else if (id === "vocal") {
     if (liveLinesGeometry) liveLinesGeometry.value = "constellation";
     if (liveLinesCameraMode) liveLinesCameraMode.value = "inside";
@@ -11764,7 +12140,7 @@ function applyLinesPreset(presetId, withRender = true) {
     if (liveLinesCamDrift) liveLinesCamDrift.value = "24";
     if (liveLinesInsideDepth) liveLinesInsideDepth.value = "72";
     if (liveLinesStringVibe) liveLinesStringVibe.value = "88";
-    if (liveLinesConstellation) liveLinesConstellation.value = "72";
+    if (liveLinesConstellation) liveLinesConstellation.value = "78";
   } else {
     if (liveLinesGeometry) liveLinesGeometry.value = "ribbon";
     if (liveLinesCameraMode) liveLinesCameraMode.value = "orbit";
@@ -11781,7 +12157,7 @@ function applyLinesPreset(presetId, withRender = true) {
     if (liveLinesCamDrift) liveLinesCamDrift.value = "28";
     if (liveLinesInsideDepth) liveLinesInsideDepth.value = "62";
     if (liveLinesStringVibe) liveLinesStringVibe.value = "58";
-    if (liveLinesConstellation) liveLinesConstellation.value = "32";
+    if (liveLinesConstellation) liveLinesConstellation.value = "56";
   }
   updateLiveQuickOutputs();
   if (withRender) scheduleRender();
@@ -11791,6 +12167,7 @@ function renderLinesMode(baseImageData, tSec, settings) {
   const w = canvas.width;
   const h = canvas.height;
   if (w <= 1 || h <= 1) return;
+  ctx.globalCompositeOperation = "source-over";
 
   const density = clamp(Number(liveLinesDensity ? liveLinesDensity.value : 12), 6, 30);
   const macro = clamp(Number(liveLinesMacro ? liveLinesMacro.value : 42), 0, 100) / 100;
@@ -11803,7 +12180,7 @@ function renderLinesMode(baseImageData, tSec, settings) {
   const camDrift = clamp(Number(liveLinesCamDrift ? liveLinesCamDrift.value : 28), 0, 100) / 100;
   const insideDepth = clamp(Number(liveLinesInsideDepth ? liveLinesInsideDepth.value : 62), 0, 100) / 100;
   const stringVibeSensitivity = clamp(Number(liveLinesStringVibe ? liveLinesStringVibe.value : 58), 0, 200) / 100;
-  const lineGlowControl = clamp(Number(liveLinesConstellation ? liveLinesConstellation.value : 32), 0, 100) / 100;
+  const lineGlowControl = clamp(Number(liveLinesConstellation ? liveLinesConstellation.value : 56), 0, 100) / 100;
   const linesPresetId = liveLinesPreset ? (liveLinesPreset.value || "ambient") : "ambient";
   const linesPatternId = liveLinesPattern ? (liveLinesPattern.value || "flow") : "flow";
   const cameraModeLocal = liveLinesCameraMode ? liveLinesCameraMode.value : "orbit";
@@ -11828,13 +12205,13 @@ function renderLinesMode(baseImageData, tSec, settings) {
   const mid = linesAudioMidSmooth;
   const high = linesAudioHighSmooth;
   const energy = linesAudioEnergySmooth;
-  const glowTarget = clamp(lineGlowControl * (0.64 + energy * 0.46), 0, 1.2);
+  const glowTarget = clamp(lineGlowControl * (0.84 + energy * 0.58), 0, 1.45);
   linesGlowSmooth = smoothAR(linesGlowSmooth, glowTarget, clamp(0.14 + dt * 1.8, 0.1, 0.28), clamp(0.06 + dt * 1.1, 0.05, 0.14));
-  const lineGlow = clamp(linesGlowSmooth, 0, 1.2);
-  const neonTargetBase = linesPresetId === "techno" ? 1 : linesPresetId === "vocal" ? 0.45 : 0.18;
-  const neonTarget = clamp(neonTargetBase + lineGlowControl * 0.28, 0, 1.2);
+  const lineGlow = clamp(linesGlowSmooth, 0, 1.45);
+  const neonTargetBase = linesPresetId === "techno" ? 1.08 : linesPresetId === "vocal" ? 0.62 : 0.38;
+  const neonTarget = clamp(neonTargetBase + lineGlowControl * 0.42, 0, 1.45);
   linesNeonSmooth = smoothAR(linesNeonSmooth, neonTarget, clamp(0.1 + dt * 1.2, 0.08, 0.22), clamp(0.05 + dt * 0.9, 0.04, 0.14));
-  const neonAmt = clamp(linesNeonSmooth, 0, 1.2);
+  const neonAmt = clamp(linesNeonSmooth, 0, 1.45);
   const audioSens = controls.audioSensitivity ? clamp(Number(controls.audioSensitivity.value) / 120, 0, 1.6) : 0.43;
   const audioTolInv = controls.audioTolerance ? clamp(1 - Number(controls.audioTolerance.value) / 120, 0, 1.2) : 0.74;
   const padReactiveDrive = clamp(0.25 + audioSens * 1.25 + audioTolInv * 0.95, 0.2, 2.35);
@@ -11848,14 +12225,16 @@ function renderLinesMode(baseImageData, tSec, settings) {
   if (audioOn && audioState.transient > beatGate && linesBeatCooldown <= 0) {
     linesInvertSign *= -1;
     linesBeatPulse = 1;
-    linesBeatCooldown = 0.18;
+    linesBeatCooldown = 0.28;
   } else {
     linesBeatPulse *= 0.88;
   }
+  // Smooth sign transitions to avoid abrupt geometry jumps on beat flips.
+  linesInvertBlend = smoothAR(linesInvertBlend, linesInvertSign, clamp(0.08 + dt * 1.2, 0.06, 0.18), clamp(0.08 + dt * 1.2, 0.06, 0.18));
   const beat = clamp(linesBeatPulse + audioState.transient * 0.35, 0, 1.8);
 
   if (cameraModeLocal === "inside") {
-    const insideDist = 0.56 + (1 - insideDepth) * 0.32;
+    const insideDist = 0.82 + (1 - insideDepth) * 0.28;
     linesCamDistTarget += (insideDist - linesCamDistTarget) * 0.08;
     linesCamYawTarget += (0.0065 + speed * 0.018) * (0.4 + camDrift * 0.9) * (1 + bass * 0.14);
     linesCamPitchTarget += Math.sin(tSec * (0.45 + speed * 0.72) + beat * 0.8) * 0.0042 * (0.22 + camDrift * 0.9);
@@ -11871,10 +12250,10 @@ function renderLinesMode(baseImageData, tSec, settings) {
     linesCamDistTarget += (orbitDist - linesCamDistTarget) * 0.035;
   }
   linesCamPitchTarget = clamp(linesCamPitchTarget, -1.1, 1.1);
-  linesCamYaw += (linesCamYawTarget - linesCamYaw) * 0.085;
-  linesCamPitch += (linesCamPitchTarget - linesCamPitch) * 0.085;
-  linesCamDist += (linesCamDistTarget - linesCamDist) * 0.09;
-  linesCamDist = clamp(linesCamDist, 0.66, 2.2);
+  linesCamYaw += (linesCamYawTarget - linesCamYaw) * 0.062;
+  linesCamPitch += (linesCamPitchTarget - linesCamPitch) * 0.062;
+  linesCamDist += (linesCamDistTarget - linesCamDist) * 0.074;
+  linesCamDist = clamp(linesCamDist, 0.78, 2.2);
 
   // Matte black background, fixed and clean.
   ctx.fillStyle = "#000000";
@@ -11889,7 +12268,8 @@ function renderLinesMode(baseImageData, tSec, settings) {
     masterFxVal === "chromatic" ||
     masterFxVal === "pixelart" ||
     masterFxVal === "neon" ||
-    masterFxVal === "neongrad";
+    masterFxVal === "neongrad" ||
+    masterFxVal === "matrix";
   const kaleidoOn = isKaleidoFxActive();
   const domeOn = Boolean(liveOutputView && liveOutputView.value === "dome");
   const heavyStackCount = (masterOn ? 1 : 0) + (kaleidoOn ? 1 : 0) + (domeOn ? 1 : 0);
@@ -11927,7 +12307,9 @@ function renderLinesMode(baseImageData, tSec, settings) {
   const sideVibe = mid * (isMinimal ? 0.06 : 0.15) * macroChaos;
   const micro = high * (isMinimal ? 0.017 : 0.04) * (0.8 + macro * 0.7);
   const stringVibeAmount = stringVibeSensitivity * (0.2 + linesStringVibeSmooth * (0.95 + macro * 0.85));
-  const invert = beatFlipEnabled ? linesInvertSign : 1;
+  const invert = beatFlipEnabled ? linesInvertBlend : 1;
+  const invertWarp = 1 + invert * 0.14;
+  const invertPhase = invert * 0.75;
 
   const cyaw = Math.cos(linesCamYaw);
   const syaw = Math.sin(linesCamYaw);
@@ -11980,12 +12362,7 @@ function renderLinesMode(baseImageData, tSec, settings) {
         ctx.lineJoin = "miter";
         const glowStrength = lineGlow * (0.76 + neonAmt * 0.46);
         const glowAlpha = clamp(0.06 + glowStrength * 0.24 + high * 0.1, 0.03, 0.42);
-        const allowShadow =
-          fps > 24 &&
-          !recordingActive &&
-          !(masterHeavy && fps < 34) &&
-          !(kaleidoOn && fps < 32) &&
-          glowStrength > 0.06;
+        const allowShadow = false;
         if (allowShadow) {
           ctx.shadowColor = `rgba(${rr}, ${gg}, ${bb}, ${glowAlpha})`;
           ctx.shadowBlur = clamp(0.6 + thickness * 0.12 + glowStrength * 9 + energy * 1.8, 0, 14);
@@ -11999,7 +12376,7 @@ function renderLinesMode(baseImageData, tSec, settings) {
           const xN = segCount <= 0 ? 0 : sIdx / segCount;
           const x = xN * 2 - 1;
           const beatWarp = 1 + beat * 0.22 * macroPunch;
-          const waveA = Math.sin(x * (3.2 + curvature * 7.4) * invert * beatWarp + layerPhase + y * 2.1) * curveAmp;
+          const waveA = Math.sin(x * (3.2 + curvature * 7.4) * invertWarp * beatWarp + layerPhase + y * 2.1 + invertPhase) * curveAmp;
           const waveB = Math.cos(x * 6.6 - layerPhase * 0.64 + y * (2.4 + sideVibe * 4.4)) * curveAmp * (isMinimal ? 0.34 : 0.52);
           const vib = Math.sin(x * 20 + tSec * (2.4 + speed * 5.5) + i * 0.23) * micro;
           const stringFreq = 16 + yN * 30 + layerN * 11 + high * 14;
@@ -12051,26 +12428,14 @@ function renderLinesMode(baseImageData, tSec, settings) {
   if (drawHorizontal) renderFamily(false, famGainH);
   if (drawVertical) renderFamily(true, famGainV);
 
-  // Subtle gradient tint over existing lines only.
-  const gradA = hslToRgb(fract01(colorShift), 0.16, 0.52);
-  const gradB = hslToRgb(fract01(colorShift + 0.12), 0.18, 0.5);
-  const gradC = hslToRgb(fract01(colorShift + 0.24), 0.16, 0.48);
-  const lineGradient = ctx.createLinearGradient(0, 0, w, h);
-  lineGradient.addColorStop(0, `rgb(${gradA[0]}, ${gradA[1]}, ${gradA[2]})`);
-  lineGradient.addColorStop(0.5, `rgb(${gradB[0]}, ${gradB[1]}, ${gradB[2]})`);
-  lineGradient.addColorStop(1, `rgb(${gradC[0]}, ${gradC[1]}, ${gradC[2]})`);
-  ctx.save();
-  ctx.globalCompositeOperation = "source-atop";
-  ctx.globalAlpha = clamp(0.06 + lineGlow * 0.08 + high * 0.05, 0.05, 0.16);
-  ctx.fillStyle = lineGradient;
-  ctx.fillRect(0, 0, w, h);
-  ctx.restore();
+  // Keep pure matte black background in Lines mode: no global tint wash.
 
   // Constellation image/webcam overlay disabled in Lines mode to keep
   // composition focused on elegant line families only.
   linesConstellationNodes = [];
   linesConstellationCacheKey = "";
   linesConstellationTick = 0;
+  ctx.globalCompositeOperation = "source-over";
   ctx.shadowBlur = 0;
   ctx.shadowColor = "rgba(0,0,0,0)";
 }
@@ -12144,7 +12509,7 @@ function triggerTunnelMorphTween() {
   const now = performance.now();
   tunnelMorphTween = {
     start: now,
-    duration: 1200,
+    duration: 760,
     from: {
       density: Number(liveTunnelDensity ? liveTunnelDensity.value : 22),
       depth: Number(liveTunnelDepth ? liveTunnelDepth.value : 74),
@@ -13247,9 +13612,15 @@ function initParticlesState(baseImageData, ps, fullReset = false) {
       particlesY[i] = (v0 * 2 - 1) * 0.85 + jy;
       particlesZ[i] = (lum - 0.5) * 1.8 + (randHash(i, 47, randomSeed + 709) * 2 - 1) * 0.2;
     } else {
-      particlesX[i] = (u0 * 2 - 1) * 0.92;
-      particlesY[i] = (v0 * 2 - 1) * 0.92;
-      particlesZ[i] = (lum - 0.5) * 1.6;
+      // Default cloud: volumetric spawn to avoid planar projection of source UV.
+      const qx = randHash(i, 191, randomSeed + 913) * 2 - 1;
+      const qy = randHash(i, 193, randomSeed + 919) * 2 - 1;
+      const qz = randHash(i, 197, randomSeed + 929) * 2 - 1;
+      const invLen = 1 / Math.max(0.001, Math.hypot(qx, qy, qz));
+      const rad = Math.pow(randHash(i, 199, randomSeed + 937), 0.72) * 1.08;
+      particlesX[i] = qx * invLen * rad + (u0 * 2 - 1) * 0.12;
+      particlesY[i] = qy * invLen * rad + (v0 * 2 - 1) * 0.12;
+      particlesZ[i] = qz * invLen * rad + (lum - 0.5) * 0.28;
     }
     if (fullReset) {
       particlesVX[i] = (randHash(i, 59, randomSeed + 711) * 2 - 1) * 0.02;
@@ -13350,6 +13721,51 @@ function getStructuredParticleTarget(ps, u, v, seed, idx, n, tSec, split) {
       x: Math.cos(a) * r,
       y: Math.sin(a) * r,
       z: petal * (0.22 + split.lift * 0.28) + Math.sin(a * 2 + tSec * 0.8) * 0.08,
+    };
+  }
+  if (structure === "torus") {
+    const major = clamp(0.34 + order * 0.46 + split.radial * 0.1, 0.2, 1.1);
+    const minor = clamp(0.12 + order * 0.2 + split.high * 0.06, 0.06, 0.42);
+    const uAng = theta + twist * 0.8 + seed * 0.42;
+    const vAng = ((idx / Math.max(1, n - 1)) * Math.PI * 2 * (2 + Math.floor(order * 5))) + tSec * (0.32 + split.angular * 0.3);
+    const tube = major + Math.cos(vAng) * minor;
+    return {
+      x: Math.cos(uAng) * tube,
+      y: Math.sin(uAng) * tube,
+      z: Math.sin(vAng) * minor * (1.2 + split.lift * 0.34),
+    };
+  }
+  if (structure === "lissajous") {
+    const t = (idx / Math.max(1, n - 1)) * Math.PI * 2;
+    const ax = 2 + Math.floor(order * 5);
+    const ay = 3 + Math.floor(order * 6);
+    const az = 4 + Math.floor(order * 7);
+    const phase = seed * Math.PI * 2;
+    const amp = clamp(0.38 + order * 0.5 + split.radial * 0.08, 0.2, 1.18);
+    const drive = t + tSec * (0.28 + split.angular * 0.4);
+    return {
+      x: Math.sin(ax * drive + phase) * amp,
+      y: Math.sin(ay * drive + phase * 0.7) * amp * (0.88 + split.mid * 0.08),
+      z: Math.sin(az * drive + phase * 1.3) * amp * (0.82 + split.lift * 0.16),
+    };
+  }
+  if (structure === "attractor") {
+    const t = (idx / Math.max(1, n - 1)) * Math.PI * 2;
+    const a = 0.95 + order * 0.38;
+    const b = 0.35 + order * 0.3 + split.mid * 0.12;
+    const c = 0.45 + split.high * 0.16;
+    const p = 1 + Math.floor(order * 5);
+    const q = 2 + Math.floor(order * 6);
+    const ang = t + tSec * (0.22 + split.angular * 0.24) + seed * 4.3;
+    const s1 = Math.sin(ang * p);
+    const s2 = Math.sin(ang * q + seed * 7.1);
+    const x = s1 * (a + b * Math.cos(ang * 1.7));
+    const y = s2 * (a - b * Math.sin(ang * 1.3));
+    const z = Math.sin(ang * (p + q) * 0.35) * (c + split.lift * 0.22);
+    return {
+      x: x * 0.62,
+      y: y * 0.62,
+      z: z * 0.92,
     };
   }
 
@@ -13528,6 +13944,1038 @@ function disableParticlesGpu(reason) {
   particlesGpu = null;
 }
 
+function applyAtlasPreset(presetId, withRender = true) {
+  const id = String(presetId || "ribbon");
+  if (id === "orbital") {
+    if (liveAtlasSeed) liveAtlasSeed.value = "66";
+    if (liveAtlasVariation) liveAtlasVariation.value = "62";
+    if (liveAtlasComposition) liveAtlasComposition.value = "68";
+    if (liveAtlasComplexity) liveAtlasComplexity.value = "24";
+    if (liveAtlasMotion) liveAtlasMotion.value = "52";
+    if (liveAtlasContrast) liveAtlasContrast.value = "58";
+    if (liveAtlasColorMod) liveAtlasColorMod.value = "72";
+    if (liveAtlasMesh) liveAtlasMesh.value = "54";
+    if (liveAtlasSpheres) liveAtlasSpheres.value = "46";
+    if (liveAtlasAudioAmount) liveAtlasAudioAmount.value = "74";
+  } else if (id === "shard") {
+    if (liveAtlasSeed) liveAtlasSeed.value = "44";
+    if (liveAtlasVariation) liveAtlasVariation.value = "76";
+    if (liveAtlasComposition) liveAtlasComposition.value = "54";
+    if (liveAtlasComplexity) liveAtlasComplexity.value = "28";
+    if (liveAtlasMotion) liveAtlasMotion.value = "60";
+    if (liveAtlasContrast) liveAtlasContrast.value = "66";
+    if (liveAtlasColorMod) liveAtlasColorMod.value = "64";
+    if (liveAtlasMesh) liveAtlasMesh.value = "62";
+    if (liveAtlasSpheres) liveAtlasSpheres.value = "52";
+    if (liveAtlasAudioAmount) liveAtlasAudioAmount.value = "78";
+  } else {
+    if (liveAtlasSeed) liveAtlasSeed.value = "52";
+    if (liveAtlasVariation) liveAtlasVariation.value = "58";
+    if (liveAtlasComposition) liveAtlasComposition.value = "58";
+    if (liveAtlasComplexity) liveAtlasComplexity.value = "22";
+    if (liveAtlasMotion) liveAtlasMotion.value = "46";
+    if (liveAtlasContrast) liveAtlasContrast.value = "56";
+    if (liveAtlasColorMod) liveAtlasColorMod.value = "62";
+    if (liveAtlasMesh) liveAtlasMesh.value = "46";
+    if (liveAtlasSpheres) liveAtlasSpheres.value = "36";
+    if (liveAtlasAudioAmount) liveAtlasAudioAmount.value = "72";
+  }
+  if (liveAtlasAudio) liveAtlasAudio.checked = true;
+  updateLiveQuickOutputs();
+  if (withRender) scheduleRender();
+}
+
+function randomizeAtlasCameraView() {
+  if (mode !== "atlas") return;
+  // T shortcut: dive toward the core, but keep all motion interpolated.
+  const diveBias = Math.random();
+  const nearDist = diveBias < 0.7 ? 0.44 + Math.random() * 0.36 : 0.8 + Math.random() * 0.34;
+  atlasCamYawTarget += (Math.random() * 2 - 1) * 1.65;
+  atlasCamPitchTarget = clamp(atlasCamPitchTarget + (Math.random() * 2 - 1) * 0.8, -1.05, 1.05);
+  atlasCamDistTarget = clamp(nearDist, 0.42, 1.6);
+  atlasCamRigTarget = 1.05 + Math.random() * 0.45;
+  scheduleRender();
+}
+
+function randomizeAtlasCameraViewSmooth() {
+  if (mode !== "atlas") return;
+  atlasCamYawTarget += (Math.random() * 2 - 1) * 1.0;
+  atlasCamPitchTarget = clamp(atlasCamPitchTarget + (Math.random() * 2 - 1) * 0.5, -0.9, 0.9);
+  atlasCamDistTarget = clamp(atlasCamDistTarget + (Math.random() * 2 - 1) * 0.3, 0.62, 2.2);
+  scheduleRender();
+}
+
+function triggerAtlasMorphTween() {
+  if (mode !== "atlas") return;
+  const now = performance.now();
+  atlasMorphTween = {
+    start: now,
+    duration: 820,
+    from: {
+      seed: Number(liveAtlasSeed ? liveAtlasSeed.value : 52),
+      variation: Number(liveAtlasVariation ? liveAtlasVariation.value : 58),
+      composition: Number(liveAtlasComposition ? liveAtlasComposition.value : 58),
+      complexity: Number(liveAtlasComplexity ? liveAtlasComplexity.value : 22),
+      motion: Number(liveAtlasMotion ? liveAtlasMotion.value : 46),
+      contrast: Number(liveAtlasContrast ? liveAtlasContrast.value : 56),
+      colorMod: Number(liveAtlasColorMod ? liveAtlasColorMod.value : 62),
+      mesh: Number(liveAtlasMesh ? liveAtlasMesh.value : 46),
+      spheres: Number(liveAtlasSpheres ? liveAtlasSpheres.value : 36),
+      audioAmount: Number(liveAtlasAudioAmount ? liveAtlasAudioAmount.value : 72),
+    },
+    to: {
+      seed: Math.round(12 + Math.random() * 76),
+      variation: Math.round(Math.random() * 100),
+      composition: Math.round(20 + Math.random() * 58),
+      complexity: Math.round(6 + Math.random() * 24),
+      motion: Math.round(Math.random() * 100),
+      contrast: Math.round(22 + Math.random() * 78),
+      colorMod: Math.round(20 + Math.random() * 78),
+      mesh: Math.round(10 + Math.random() * 80),
+      spheres: Math.round(8 + Math.random() * 86),
+      audioAmount: Math.round(24 + Math.random() * 76),
+    },
+  };
+  scheduleRender();
+}
+
+function applyAtlasMorphTween() {
+  if (!atlasMorphTween) return;
+  const now = performance.now();
+  let k = clamp((now - atlasMorphTween.start) / Math.max(1, atlasMorphTween.duration), 0, 1);
+  const mix = (a, b) => Math.round(a + (b - a) * k);
+  if (liveAtlasSeed) liveAtlasSeed.value = String(mix(atlasMorphTween.from.seed, atlasMorphTween.to.seed));
+  if (liveAtlasVariation) liveAtlasVariation.value = String(mix(atlasMorphTween.from.variation, atlasMorphTween.to.variation));
+  if (liveAtlasComposition) liveAtlasComposition.value = String(mix(atlasMorphTween.from.composition, atlasMorphTween.to.composition));
+  if (liveAtlasComplexity) liveAtlasComplexity.value = String(mix(atlasMorphTween.from.complexity, atlasMorphTween.to.complexity));
+  if (liveAtlasMotion) liveAtlasMotion.value = String(mix(atlasMorphTween.from.motion, atlasMorphTween.to.motion));
+  if (liveAtlasContrast) liveAtlasContrast.value = String(mix(atlasMorphTween.from.contrast, atlasMorphTween.to.contrast));
+  if (liveAtlasColorMod) liveAtlasColorMod.value = String(mix(atlasMorphTween.from.colorMod, atlasMorphTween.to.colorMod));
+  if (liveAtlasMesh) liveAtlasMesh.value = String(mix(atlasMorphTween.from.mesh, atlasMorphTween.to.mesh));
+  if (liveAtlasSpheres) liveAtlasSpheres.value = String(mix(atlasMorphTween.from.spheres, atlasMorphTween.to.spheres));
+  if (liveAtlasAudioAmount) liveAtlasAudioAmount.value = String(mix(atlasMorphTween.from.audioAmount, atlasMorphTween.to.audioAmount));
+  if (k >= 1) atlasMorphTween = null;
+}
+
+function renderAtlasMode(baseImageData, tSec, settings) {
+  applyAtlasMorphTween();
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 2 || h <= 2) return;
+
+  const seedTarget = clamp(Number(liveAtlasSeed ? liveAtlasSeed.value : 52), 0, 100);
+  const variationTarget = clamp(Number(liveAtlasVariation ? liveAtlasVariation.value : 58), 0, 100);
+  const compositionTarget = clamp(Number(liveAtlasComposition ? liveAtlasComposition.value : 58), 0, 100);
+  const complexityTarget = clamp(Number(liveAtlasComplexity ? liveAtlasComplexity.value : 22), 0, 30);
+  const motionTarget = clamp(Number(liveAtlasMotion ? liveAtlasMotion.value : 46), 0, 100);
+  const contrastTarget = clamp(Number(liveAtlasContrast ? liveAtlasContrast.value : 56), 0, 100);
+  const colorModTarget = clamp(Number(liveAtlasColorMod ? liveAtlasColorMod.value : 62), 0, 100);
+  const meshTarget = clamp(Number(liveAtlasMesh ? liveAtlasMesh.value : 46), 0, 100);
+  const spheresTarget = clamp(Number(liveAtlasSpheres ? liveAtlasSpheres.value : 36), 0, 100);
+  const snapBlend = (curr, target, baseRate = 0.17, maxRate = 0.42) => {
+    const delta = Math.abs(target - curr);
+    const rate = clamp(baseRate + delta * 0.0065, baseRate, maxRate);
+    return curr + (target - curr) * rate;
+  };
+  atlasSeedSmooth = snapBlend(atlasSeedSmooth, seedTarget, 0.18, 0.44);
+  atlasVariationSmooth = snapBlend(atlasVariationSmooth, variationTarget, 0.18, 0.44);
+  atlasCompositionSmooth = snapBlend(atlasCompositionSmooth, compositionTarget, 0.2, 0.46);
+  atlasComplexitySmooth = snapBlend(atlasComplexitySmooth, complexityTarget, 0.1, 0.22);
+  atlasMotionSmooth = snapBlend(atlasMotionSmooth, motionTarget, 0.19, 0.45);
+  atlasContrastSmooth = snapBlend(atlasContrastSmooth, contrastTarget, 0.17, 0.42);
+  atlasColorModSmooth = snapBlend(atlasColorModSmooth, colorModTarget, 0.16, 0.36);
+  atlasMeshSmooth = snapBlend(atlasMeshSmooth, meshTarget, 0.16, 0.36);
+  atlasSpheresSmooth = snapBlend(atlasSpheresSmooth, spheresTarget, 0.16, 0.36);
+
+  const morph = clamp(atlasSeedSmooth / 100, 0, 1);
+  const displacement = clamp(atlasVariationSmooth / 100, 0, 1);
+  const volume = clamp(atlasCompositionSmooth / 100, 0, 1);
+  const structure = clamp(atlasComplexitySmooth / 30, 0, 1);
+  const fluid = clamp(atlasMotionSmooth / 100, 0, 1);
+  const contrast = clamp(atlasContrastSmooth / 100, 0, 1);
+  const colorMod = clamp(atlasColorModSmooth / 100, 0, 1);
+  const meshAmt = clamp(atlasMeshSmooth / 100, 0, 1);
+  const spheresAmt = clamp(atlasSpheresSmooth / 100, 0, 1);
+  const atlasAudioOn = !liveAtlasAudio || liveAtlasAudio.checked;
+  const atlasAudioAmount = clamp(Number(liveAtlasAudioAmount ? liveAtlasAudioAmount.value : 72) / 100, 0, 1);
+  const preset = liveAtlasPreset ? (liveAtlasPreset.value || "ribbon") : "ribbon";
+  const presetSeedBase = preset === "orbital" ? 2237 : preset === "shard" ? 4781 : 1373;
+  const seed = Math.round(presetSeedBase + morph * 971);
+
+  const audioState = getReactiveAudioState(settings, atlasAudioOn, atlasAudioAmount);
+  const bands = audioState.bands || [0, 0, 0, 0];
+  const smoothAR = (curr, target, att, rel) => curr + (target - curr) * (target > curr ? att : rel);
+  atlasAudioBassSmooth = smoothAR(atlasAudioBassSmooth, clamp(bands[1] * 1.2 + bands[0] * 0.6 + audioState.transient * 0.35, 0, 2), 0.18, 0.09);
+  atlasAudioMidSmooth = smoothAR(atlasAudioMidSmooth, clamp(bands[2] * 1.15 + bands[1] * 0.2, 0, 2), 0.16, 0.09);
+  atlasAudioHighSmooth = smoothAR(atlasAudioHighSmooth, clamp(bands[3] * 1.25 + bands[2] * 0.18, 0, 2), 0.2, 0.1);
+  atlasAudioEnergySmooth = smoothAR(atlasAudioEnergySmooth, clamp(audioState.level * 1.2 + audioState.transient * 0.45, 0, 2), 0.17, 0.1);
+  const bass = atlasAudioBassSmooth;
+  const mid = atlasAudioMidSmooth;
+  const high = atlasAudioHighSmooth;
+  const energy = atlasAudioEnergySmooth;
+
+  const aggression = clamp(0.2 + displacement * 0.46 + fluid * 0.56 + energy * 0.22, 0, 1.45);
+  const topologyDrive = clamp(0.18 + displacement * 0.5 + fluid * 0.38 + structure * 0.3, 0, 1.32);
+  const rigPeriod = 6.6 - fluid * 3.2 + (1 - displacement) * 1.2;
+  const rigTime = (tSec / Math.max(2.2, rigPeriod)) + seed * 0.00093;
+  const rigBase = Math.floor(rigTime) % 4;
+  const rigFrac = rigTime - Math.floor(rigTime);
+  const rigBlend = rigFrac * rigFrac * (3 - 2 * rigFrac);
+  const nextRig = (rigBase + 1) % 4;
+  atlasCamRigTarget = rigBase + (nextRig - rigBase) * rigBlend;
+  atlasCamRig += (atlasCamRigTarget - atlasCamRig) * (0.032 + fluid * 0.024);
+  const rigA = Math.round(clamp(atlasCamRig, 0, 3));
+  const rigBias = rigA === 1 ? clamp(0.62 + aggression * 0.28, 0, 1) : 0; // inside
+  const rigLevitate = rigA === 2 ? clamp(0.54 + aggression * 0.26, 0, 1) : 0; // levitate
+  const rigFloat = rigA === 3 ? clamp(0.58 + aggression * 0.24, 0, 1) : 0; // floating drift
+
+  const yawForce =
+    Math.sin(tSec * (0.13 + fluid * 0.3) + seed * 0.0018) * (0.0009 + aggression * 0.00095) +
+    Math.cos(tSec * (0.08 + displacement * 0.22) + high * 2.2) * 0.00065 * (0.28 + aggression * 0.82);
+  const pitchForce =
+    Math.cos(tSec * (0.11 + fluid * 0.27) + seed * 0.0007) * (0.00082 + aggression * 0.0009) +
+    Math.sin(tSec * (0.16 + displacement * 0.24) + bass * 1.6) * 0.00062 * (0.24 + aggression * 0.78);
+  atlasCamYawTarget += yawForce;
+  atlasCamPitchTarget += pitchForce + (rigLevitate * 0.0012 - rigBias * 0.00055);
+  // Camera follows curve flow slowly, keeping a medusa-like drift.
+  const curveGuideYaw = Math.sin(tSec * (0.18 + fluid * 0.22) + seed * 0.0011 + morph * Math.PI * 2) * (0.34 + displacement * 0.26);
+  const curveGuidePitch = Math.cos(tSec * (0.16 + fluid * 0.2) + seed * 0.0009 + morph * Math.PI * 1.7) * (0.26 + displacement * 0.18);
+  atlasCamYawTarget += (curveGuideYaw - atlasCamYawTarget) * (0.007 + fluid * 0.006);
+  atlasCamPitchTarget += (curveGuidePitch - atlasCamPitchTarget) * (0.007 + fluid * 0.006);
+
+  const travelBase = 0.8 + (1 - volume) * 0.72;
+  const insideTarget = 0.44 + (1 - volume) * 0.24 + bass * 0.14;
+  const floatTarget = 1.2 + displacement * 0.76 + high * 0.22;
+  const levitateTarget = 0.92 + (1 - volume) * 0.48 + Math.sin(tSec * (0.24 + fluid * 0.32)) * 0.18;
+  const rigDist = travelBase * (1 - rigBias - rigFloat - rigLevitate) + insideTarget * rigBias + floatTarget * rigFloat + levitateTarget * rigLevitate;
+  atlasCamDistTarget += (rigDist - atlasCamDistTarget) * (0.026 + fluid * 0.023);
+  atlasCamPitchTarget = clamp(atlasCamPitchTarget, -1.1, 1.1);
+  atlasCamYaw += (atlasCamYawTarget - atlasCamYaw) * 0.043;
+  atlasCamPitch += (atlasCamPitchTarget - atlasCamPitch) * 0.043;
+  atlasCamDist += (atlasCamDistTarget - atlasCamDist) * 0.052;
+  atlasCamDist = clamp(atlasCamDist, 0.42, 2.4);
+
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, w, h);
+
+  const masterOn = Boolean(masterFxMode && (masterFxMode.value || "none") !== "none");
+  const kaleidoOn = isKaleidoFxActive();
+  const stackCut = (masterOn ? 0.12 : 0) + (kaleidoOn ? 0.08 : 0);
+  // Stable topology: avoid FPS/audio-driven LOD jumps that cause flicker.
+  const qualityBudget = clamp(1 - stackCut, 0.64, 1);
+  const stripeLayers = clamp(Math.round((2 + structure * 2.2 + topologyDrive * 0.5) * qualityBudget), 2, 4);
+  const stripesPerLayer = clamp(Math.round((8 + structure * 18 + displacement * 8) * qualityBudget), 8, 34);
+  const stripeSteps = clamp(Math.round((30 + structure * 24 + fluid * 8) * qualityBudget), 26, 56);
+
+  const cyaw = Math.cos(atlasCamYaw);
+  const syaw = Math.sin(atlasCamYaw);
+  const cp = Math.cos(atlasCamPitch);
+  const sp = Math.sin(atlasCamPitch);
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const perspBase = 0.92 + atlasCamDist * 0.88;
+  const projectAtlasPoint = (x, y, z) => {
+    const rx = x * cyaw - z * syaw;
+    const rz = x * syaw + z * cyaw;
+    const ry = y * cp - rz * sp;
+    const rz2 = y * sp + rz * cp;
+    const p = 1 / Math.max(0.2, perspBase + rz2 * 0.9);
+    return [cx + rx * p * w * 0.45, cy + ry * p * h * 0.45, p];
+  };
+
+  // Layered moire ribbons (optical illusion field).
+  for (let l = 0; l < stripeLayers; l++) {
+    const lN = stripeLayers <= 1 ? 0 : l / (stripeLayers - 1);
+    const layerPhase = lN * Math.PI * 1.7 + seed * 0.0013;
+    const zBase = (lN - 0.5) * (0.88 + volume * 1.18);
+    for (let i = 0; i < stripesPerLayer; i++) {
+      const iN = stripesPerLayer <= 1 ? 0 : i / (stripesPerLayer - 1);
+      const alt = i % 2 === 0 ? 1 : 0;
+      const radiusBase = 0.08 + iN * (0.76 + volume * 0.58);
+      const path = [];
+      let depthAcc = 0;
+      for (let s = 0; s <= stripeSteps; s++) {
+        const a = (s / stripeSteps) * Math.PI * 2;
+        const waveA = Math.sin(a * (2 + displacement * 3.6 + morph * 1.9) + tSec * (0.24 + fluid * 0.92) + layerPhase + iN * (5.2 + morph * 2.1));
+        const waveB = Math.cos(a * (3.2 + displacement * 4.8 + morph * 1.5) - tSec * (0.22 + fluid * 1.05 + morph * 0.32) + layerPhase * 0.66 + iN * (7 + morph * 2.2));
+        const rad = radiusBase * (1 + waveA * (0.06 + displacement * 0.2 + morph * 0.1) + waveB * (0.03 + displacement * 0.14 + morph * 0.08));
+        const x = Math.cos(a) * rad * (0.86 + volume * 0.62 + morph * 0.18);
+        const y = Math.sin(a) * rad * (0.64 + volume * 0.84 + morph * 0.14);
+        const z = zBase + Math.sin(a * (1.7 + displacement * 3.7 + morph * 1.6) + iN * 7.5 + tSec * (0.2 + fluid * 1.1)) * (0.08 + displacement * 0.28 + morph * 0.14);
+        const proj = projectAtlasPoint(x, y, z);
+        if (!Number.isFinite(proj[0]) || !Number.isFinite(proj[1]) || proj[2] <= 0 || proj[2] > 4.2) {
+          path.length = 0;
+          break;
+        }
+        depthAcc += proj[2];
+        path.push(proj);
+      }
+      if (path.length < 4) continue;
+      const pAvg = depthAcc / path.length;
+      const stripePhase = Math.sin(iN * (34 + morph * 20) + tSec * (0.42 + fluid * 1.15 + morph * 0.35) + layerPhase * (1.2 + morph * 0.45) + high * 1.1);
+      const optical = 0.5 + stripePhase * 0.5;
+      const lumBase = alt ? 0.88 : 0.12;
+      const lum = clamp(lumBase + (optical - 0.5) * (0.36 + contrast * 0.44), 0.04, 0.96);
+      const hue = fract01((preset === "shard" ? 0.1 : preset === "orbital" ? 0.64 : 0.56) + lN * 0.1 + iN * 0.06 + mid * 0.02 + morph * 0.12 + colorMod * 0.2);
+      const sat = clamp(0.02 + contrast * 0.24 + (alt ? 0.02 : 0.1) + high * 0.08 + colorMod * 0.18, 0.01, 0.8);
+      const [r, g, b] = hslToRgb(hue, sat, lum);
+      const alpha = clamp((0.12 + pAvg * 0.25 + contrast * 0.34 + energy * 0.12) * (1 - lN * 0.34), 0.08, 0.86);
+      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      ctx.lineWidth = clamp((0.42 + pAvg * 1.3 + structure * 0.9 + displacement * 0.35) * qualityBudget * (0.86 + meshAmt * 0.3), 0.22, 2.8);
+      ctx.beginPath();
+      ctx.moveTo(path[0][0], path[0][1]);
+      for (let p = 1; p < path.length; p++) ctx.lineTo(path[p][0], path[p][1]);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }
+
+  // Morphing 3D core object (wire illusion).
+  const uLines = clamp(Math.round((5 + structure * 6) * qualityBudget), 4, 10);
+  const vLines = clamp(Math.round((6 + structure * 7) * qualityBudget), 5, 12);
+  const segs = clamp(Math.round((20 + structure * 18 + fluid * 8) * qualityBudget), 18, 40);
+  const objectScale = 0.24 + volume * 0.36 + bass * 0.05 + morph * 0.1;
+  const knotAmount = morph * 1.25 + displacement * 0.35;
+  for (let u = 0; u < uLines; u++) {
+    const uN = uLines <= 1 ? 0 : u / (uLines - 1);
+    const phi = uN * Math.PI * 2;
+    ctx.beginPath();
+    let drawn = false;
+    let pMean = 0;
+    let pCount = 0;
+    for (let s = 0; s <= segs; s++) {
+      const t = (s / segs) * Math.PI * 2;
+      const envelope = 0.7 + 0.3 * Math.sin(t * (2 + knotAmount * 4.2) + tSec * (0.16 + fluid * 0.8));
+      const radial = objectScale * envelope;
+      const q = 1.2 + knotAmount * 2.8;
+      const kx = Math.cos(phi) * (0.62 + 0.38 * Math.cos(t * q + tSec * (0.24 + fluid * 0.72)));
+      const ky = Math.sin(phi) * (0.62 + 0.38 * Math.sin(t * q - tSec * (0.2 + fluid * 0.64)));
+      const x = radial * kx + Math.cos(t * (1.4 + displacement * 2.2) + phi * 0.7) * (0.05 + displacement * 0.16);
+      const y = radial * ky + Math.sin(t * (1.7 + displacement * 2.6) - phi * 0.6) * (0.05 + displacement * 0.14);
+      const z = Math.sin(t + phi * (1.2 + knotAmount * 1.4) + tSec * (0.22 + fluid * 0.92)) * (0.16 + volume * 0.38);
+      const proj = projectAtlasPoint(x, y, z);
+      if (!Number.isFinite(proj[0]) || !Number.isFinite(proj[1]) || proj[2] <= 0 || proj[2] > 4.2) continue;
+      pMean += proj[2];
+      pCount += 1;
+      if (!drawn) {
+        ctx.moveTo(proj[0], proj[1]);
+        drawn = true;
+      } else {
+        ctx.lineTo(proj[0], proj[1]);
+      }
+    }
+    if (!drawn || pCount <= 2) continue;
+    pMean /= pCount;
+    const hue = fract01((preset === "shard" ? 0.08 : preset === "orbital" ? 0.66 : 0.58) + uN * 0.18 + high * 0.03);
+    const sat = clamp(0.08 + contrast * 0.44 + high * 0.1 + colorMod * 0.2, 0.04, 0.94);
+    const lit = clamp(0.34 + contrast * 0.42 + (u % 2 ? 0.14 : -0.08), 0.1, 0.95);
+    const [r, g, b] = hslToRgb(hue, sat, lit);
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${clamp(0.2 + pMean * 0.28 + energy * 0.12, 0.14, 0.9)})`;
+    ctx.lineWidth = clamp((0.4 + pMean * 1.5 + contrast * 1.4) * qualityBudget, 0.24, 3.4);
+    ctx.stroke();
+  }
+  for (let v = 0; v < vLines; v++) {
+    const vN = vLines <= 1 ? 0 : v / (vLines - 1);
+    const t0 = vN * Math.PI * 2;
+    ctx.beginPath();
+    let drawn = false;
+    for (let s = 0; s <= segs; s++) {
+      const phi = (s / segs) * Math.PI * 2;
+      const envelope = 0.72 + 0.28 * Math.cos(phi * (2.1 + morph * 3.4) + tSec * (0.15 + fluid * 0.7));
+      const radial = objectScale * envelope;
+      const x = radial * Math.cos(phi) * (0.7 + 0.3 * Math.cos(t0 * (2.4 + displacement * 2.3)));
+      const y = radial * Math.sin(phi) * (0.7 + 0.3 * Math.sin(t0 * (2.1 + displacement * 2.1)));
+      const z = Math.sin(t0 + phi * (1.4 + morph * 2.3) + tSec * (0.2 + fluid * 0.9)) * (0.14 + volume * 0.34);
+      const proj = projectAtlasPoint(x, y, z);
+      if (!Number.isFinite(proj[0]) || !Number.isFinite(proj[1]) || proj[2] <= 0 || proj[2] > 4.2) continue;
+      if (!drawn) {
+        ctx.moveTo(proj[0], proj[1]);
+        drawn = true;
+      } else {
+        ctx.lineTo(proj[0], proj[1]);
+      }
+    }
+    if (!drawn) continue;
+    const lum = v % 2 === 0 ? 0.86 : 0.16;
+    const [r, g, b] = hslToRgb(fract01(0.62 + vN * 0.12 + mid * 0.03 + colorMod * 0.12), clamp(0.04 + contrast * 0.26 + colorMod * 0.14, 0.02, 0.74), lum);
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${clamp(0.14 + contrast * 0.3 + energy * 0.08, 0.1, 0.72)})`;
+    ctx.lineWidth = clamp((0.24 + contrast * 1.1) * qualityBudget, 0.18, 2.6);
+    ctx.stroke();
+  }
+
+  // Bridge mesh: two animated polygons connected by soft ribs.
+  const bridgeSides = clamp(Math.round(4 + structure * 4 + meshAmt * 4), 4, 12);
+  const bridgeA = [];
+  const bridgeB = [];
+  const meshSpin = tSec * (0.16 + fluid * 0.42) + seed * 0.0009;
+  const radiusA = 0.18 + volume * 0.2;
+  const radiusB = 0.26 + volume * 0.26 + displacement * 0.08;
+  const zA = -0.18 - volume * 0.2 + Math.sin(tSec * (0.48 + fluid * 1.1)) * 0.05;
+  const zB = 0.2 + volume * 0.24 + Math.cos(tSec * (0.44 + fluid * 1.0)) * 0.06;
+  for (let i = 0; i < bridgeSides; i++) {
+    const n = i / bridgeSides;
+    const a = n * Math.PI * 2 + meshSpin;
+    const wob = Math.sin(a * (2.2 + displacement * 2.6) + tSec * (0.6 + fluid * 1.3)) * (0.015 + displacement * 0.05);
+    const ax = Math.cos(a) * (radiusA + wob);
+    const ay = Math.sin(a) * (radiusA * (0.86 + morph * 0.18) - wob * 0.6);
+    const bx = Math.cos(a + 0.26 + morph * 0.34) * (radiusB - wob * 0.5);
+    const by = Math.sin(a + 0.26 + morph * 0.34) * (radiusB * (0.8 + morph * 0.24) + wob * 0.7);
+    const pA = projectAtlasPoint(ax, ay, zA);
+    const pB = projectAtlasPoint(bx, by, zB);
+    if (pA[2] > 0 && pA[2] <= 4.2 && pB[2] > 0 && pB[2] <= 4.2) {
+      bridgeA.push(pA);
+      bridgeB.push(pB);
+    }
+  }
+  if (bridgeA.length >= 4 && bridgeB.length >= 4) {
+    const bridgeHue = fract01((preset === "shard" ? 0.08 : preset === "orbital" ? 0.64 : 0.56) + mid * 0.03 + colorMod * 0.16);
+    const [r0, g0, b0] = hslToRgb(bridgeHue, clamp(0.12 + contrast * 0.34, 0.08, 0.7), clamp(0.46 + contrast * 0.24, 0.35, 0.9));
+    const ribAlpha = clamp(0.08 + contrast * 0.12 + energy * 0.06 + meshAmt * 0.12, 0.06, 0.42);
+    ctx.strokeStyle = `rgba(${r0}, ${g0}, ${b0}, ${ribAlpha})`;
+    ctx.lineWidth = clamp((0.34 + contrast * 0.9) * qualityBudget, 0.2, 1.8);
+    const ribCount = Math.min(bridgeA.length, bridgeB.length);
+    for (let i = 0; i < ribCount; i++) {
+      const j = (i + 1) % ribCount;
+      ctx.beginPath();
+      ctx.moveTo(bridgeA[i][0], bridgeA[i][1]);
+      ctx.lineTo(bridgeB[i][0], bridgeB[i][1]);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(bridgeA[i][0], bridgeA[i][1]);
+      ctx.lineTo(bridgeA[j][0], bridgeA[j][1]);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(bridgeB[i][0], bridgeB[i][1]);
+      ctx.lineTo(bridgeB[j][0], bridgeB[j][1]);
+      ctx.stroke();
+    }
+  }
+
+  // Transparent floating spheres (particle-like volumetric accents).
+  if (spheresAmt > 0.02) {
+    const sphereCount = clamp(Math.round((3 + spheresAmt * 15) * qualityBudget), 2, 14);
+    for (let i = 0; i < sphereCount; i++) {
+      const rn = i / Math.max(1, sphereCount - 1);
+      const phase = seed * 0.0017 + i * 1.73;
+      const ang = tSec * (0.12 + fluid * 0.28) + phase;
+      const sx = Math.sin(ang * (1.1 + rn * 0.9)) * (0.22 + rn * 0.62 + displacement * 0.18);
+      const sy = Math.cos(ang * (0.86 + rn * 0.7) + i * 0.23) * (0.18 + rn * 0.5 + fluid * 0.12);
+      const sz = Math.sin(ang * (0.74 + rn * 0.55) + i * 0.37) * (0.24 + rn * 0.72) + (rn - 0.5) * 0.34;
+      const proj = projectAtlasPoint(sx, sy, sz);
+      if (!Number.isFinite(proj[0]) || !Number.isFinite(proj[1]) || proj[2] <= 0 || proj[2] > 4.2) continue;
+      const rad = clamp((8 + rn * 34 + spheresAmt * 26) * proj[2], 4, 62);
+      const hue = fract01((preset === "shard" ? 0.08 : preset === "orbital" ? 0.62 : 0.54) + colorMod * 0.22 + rn * 0.18);
+      const [sr, sg, sb] = hslToRgb(hue, clamp(0.16 + colorMod * 0.34, 0.12, 0.82), clamp(0.44 + contrast * 0.22, 0.36, 0.9));
+      const g = ctx.createRadialGradient(proj[0], proj[1], rad * 0.1, proj[0], proj[1], rad);
+      const a0 = clamp(0.08 + spheresAmt * 0.26 + energy * 0.08, 0.06, 0.38);
+      const a1 = clamp(a0 * 0.46, 0.03, 0.18);
+      g.addColorStop(0, `rgba(${sr}, ${sg}, ${sb}, ${a0})`);
+      g.addColorStop(0.55, `rgba(${sr}, ${sg}, ${sb}, ${a1})`);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(proj[0], proj[1], rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Radial luminous pulse: center to outside, soft and continuous.
+  {
+    const pulse = 0.5 + 0.5 * Math.sin(tSec * (0.62 + fluid * 0.86) + morph * Math.PI * 2 + energy * 1.4);
+    const radius = Math.min(w, h) * (0.16 + volume * 0.34 + pulse * 0.16);
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    const lumHue = fract01((preset === "shard" ? 0.06 : preset === "orbital" ? 0.62 : 0.54) + colorMod * 0.22 + pulse * 0.06);
+    const [lr, lg, lb] = hslToRgb(lumHue, clamp(0.26 + colorMod * 0.52, 0.2, 0.9), clamp(0.52 + contrast * 0.24, 0.45, 0.9));
+    grad.addColorStop(0, `rgba(${lr}, ${lg}, ${lb}, ${clamp(0.06 + pulse * 0.16 + energy * 0.08, 0.06, 0.32)})`);
+    grad.addColorStop(0.45, `rgba(${lr}, ${lg}, ${lb}, ${clamp(0.02 + pulse * 0.08, 0.02, 0.16)})`);
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+
+  if (contrast > 0.44 || preset === "orbital") {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = clamp(0.04 + contrast * 0.14 + energy * 0.08, 0.04, 0.32);
+    ctx.filter = `blur(${0.6 + (0.7 + contrast * 1.8) * qualityBudget}px)`;
+    ctx.drawImage(canvas, 0, 0, w, h);
+    ctx.restore();
+  }
+}
+
+function applyMateriaPreset(presetId, withRender = true) {
+  const id = String(presetId || "mineral");
+  if (id === "ink") {
+    if (liveMateriaSeed) liveMateriaSeed.value = "3771";
+    if (liveMateriaFlow) liveMateriaFlow.value = "68";
+    if (liveMateriaPorosity) liveMateriaPorosity.value = "62";
+    if (liveMateriaLayers) liveMateriaLayers.value = "46";
+    if (liveMateriaDrift) liveMateriaDrift.value = "56";
+    if (liveMateriaContrast) liveMateriaContrast.value = "50";
+    if (liveMateriaAudioAmount) liveMateriaAudioAmount.value = "72";
+  } else if (id === "ash") {
+    if (liveMateriaSeed) liveMateriaSeed.value = "6905";
+    if (liveMateriaFlow) liveMateriaFlow.value = "44";
+    if (liveMateriaPorosity) liveMateriaPorosity.value = "34";
+    if (liveMateriaLayers) liveMateriaLayers.value = "66";
+    if (liveMateriaDrift) liveMateriaDrift.value = "32";
+    if (liveMateriaContrast) liveMateriaContrast.value = "68";
+    if (liveMateriaAudioAmount) liveMateriaAudioAmount.value = "58";
+  } else {
+    if (liveMateriaSeed) liveMateriaSeed.value = "2424";
+    if (liveMateriaFlow) liveMateriaFlow.value = "58";
+    if (liveMateriaPorosity) liveMateriaPorosity.value = "48";
+    if (liveMateriaLayers) liveMateriaLayers.value = "52";
+    if (liveMateriaDrift) liveMateriaDrift.value = "42";
+    if (liveMateriaContrast) liveMateriaContrast.value = "54";
+    if (liveMateriaAudioAmount) liveMateriaAudioAmount.value = "66";
+  }
+  if (liveMateriaAudio) liveMateriaAudio.checked = true;
+  updateLiveQuickOutputs();
+  if (withRender) scheduleRender();
+}
+
+function randomizeMateriaCameraView() {
+  if (mode !== "materia") return;
+  materiaCamYaw += (Math.random() * 2 - 1) * 1.2;
+  materiaCamPitch = clamp(materiaCamPitch + (Math.random() * 2 - 1) * 0.62, -1.1, 1.1);
+  materiaCamDist = clamp(materiaCamDist + (Math.random() * 2 - 1) * 0.34, 0.46, 2.4);
+  materiaCamYawTarget = materiaCamYaw;
+  materiaCamPitchTarget = materiaCamPitch;
+  materiaCamDistTarget = materiaCamDist;
+  scheduleRender();
+}
+
+function randomizeMateriaCameraViewSmooth() {
+  if (mode !== "materia") return;
+  materiaCamYawTarget += (Math.random() * 2 - 1) * 1.3;
+  materiaCamPitchTarget = clamp(materiaCamPitchTarget + (Math.random() * 2 - 1) * 0.7, -1.1, 1.1);
+  materiaCamDistTarget = clamp(materiaCamDistTarget + (Math.random() * 2 - 1) * 0.42, 0.46, 2.4);
+  scheduleRender();
+}
+
+function triggerMateriaMorphTween() {
+  if (mode !== "materia") return;
+  const now = performance.now();
+  materiaMorphTween = {
+    start: now,
+    duration: 1200,
+    from: {
+      seed: Number(liveMateriaSeed ? liveMateriaSeed.value : 2424),
+      flow: Number(liveMateriaFlow ? liveMateriaFlow.value : 58),
+      porosity: Number(liveMateriaPorosity ? liveMateriaPorosity.value : 48),
+      layers: Number(liveMateriaLayers ? liveMateriaLayers.value : 52),
+      drift: Number(liveMateriaDrift ? liveMateriaDrift.value : 42),
+      contrast: Number(liveMateriaContrast ? liveMateriaContrast.value : 54),
+      audioAmount: Number(liveMateriaAudioAmount ? liveMateriaAudioAmount.value : 66),
+    },
+    to: {
+      seed: Math.round(1 + Math.random() * 9998),
+      flow: Math.round(Math.random() * 100),
+      porosity: Math.round(Math.random() * 100),
+      layers: Math.round(Math.random() * 100),
+      drift: Math.round(Math.random() * 100),
+      contrast: Math.round(Math.random() * 100),
+      audioAmount: Math.round(20 + Math.random() * 80),
+    },
+  };
+  scheduleRender();
+}
+
+function applyMateriaMorphTween() {
+  if (!materiaMorphTween) return;
+  const now = performance.now();
+  let k = clamp((now - materiaMorphTween.start) / Math.max(1, materiaMorphTween.duration), 0, 1);
+  k = k * k * (3 - 2 * k);
+  const mix = (a, b) => Math.round(a + (b - a) * k);
+  if (liveMateriaSeed) liveMateriaSeed.value = String(mix(materiaMorphTween.from.seed, materiaMorphTween.to.seed));
+  if (liveMateriaFlow) liveMateriaFlow.value = String(mix(materiaMorphTween.from.flow, materiaMorphTween.to.flow));
+  if (liveMateriaPorosity) liveMateriaPorosity.value = String(mix(materiaMorphTween.from.porosity, materiaMorphTween.to.porosity));
+  if (liveMateriaLayers) liveMateriaLayers.value = String(mix(materiaMorphTween.from.layers, materiaMorphTween.to.layers));
+  if (liveMateriaDrift) liveMateriaDrift.value = String(mix(materiaMorphTween.from.drift, materiaMorphTween.to.drift));
+  if (liveMateriaContrast) liveMateriaContrast.value = String(mix(materiaMorphTween.from.contrast, materiaMorphTween.to.contrast));
+  if (liveMateriaAudioAmount) liveMateriaAudioAmount.value = String(mix(materiaMorphTween.from.audioAmount, materiaMorphTween.to.audioAmount));
+  if (k >= 1) materiaMorphTween = null;
+}
+
+function renderMateriaMode(baseImageData, tSec, settings) {
+  applyMateriaMorphTween();
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 2 || h <= 2) return;
+
+  const seedTarget = clamp(Number(liveMateriaSeed ? liveMateriaSeed.value : 2424), 1, 9999);
+  const flowTarget = clamp(Number(liveMateriaFlow ? liveMateriaFlow.value : 58), 0, 100);
+  const porosityTarget = clamp(Number(liveMateriaPorosity ? liveMateriaPorosity.value : 48), 0, 100);
+  const layersTarget = clamp(Number(liveMateriaLayers ? liveMateriaLayers.value : 52), 0, 100);
+  const driftTarget = clamp(Number(liveMateriaDrift ? liveMateriaDrift.value : 42), 0, 100);
+  const contrastTarget = clamp(Number(liveMateriaContrast ? liveMateriaContrast.value : 54), 0, 100);
+  materiaSeedSmooth += (seedTarget - materiaSeedSmooth) * 0.12;
+  materiaFlowSmooth += (flowTarget - materiaFlowSmooth) * 0.11;
+  materiaPorositySmooth += (porosityTarget - materiaPorositySmooth) * 0.11;
+  materiaLayersSmooth += (layersTarget - materiaLayersSmooth) * 0.11;
+  materiaDriftSmooth += (driftTarget - materiaDriftSmooth) * 0.11;
+  materiaContrastSmooth += (contrastTarget - materiaContrastSmooth) * 0.11;
+
+  const seed = Math.round(clamp(materiaSeedSmooth, 1, 9999));
+  const flow = clamp(materiaFlowSmooth / 100, 0, 1);
+  const porosity = clamp(materiaPorositySmooth / 100, 0, 1);
+  const layersK = clamp(materiaLayersSmooth / 100, 0, 1);
+  const drift = clamp(materiaDriftSmooth / 100, 0, 1);
+  const contrast = clamp(materiaContrastSmooth / 100, 0, 1);
+  const audioOn = !liveMateriaAudio || liveMateriaAudio.checked;
+  const audioAmount = clamp(Number(liveMateriaAudioAmount ? liveMateriaAudioAmount.value : 66) / 100, 0, 1);
+  const preset = liveMateriaPreset ? (liveMateriaPreset.value || "mineral") : "mineral";
+
+  const audioState = getReactiveAudioState(settings, audioOn, audioAmount);
+  const bands = audioState.bands || [0, 0, 0, 0];
+  const smoothAR = (curr, target, att, rel) => curr + (target - curr) * (target > curr ? att : rel);
+  materiaAudioBassSmooth = smoothAR(materiaAudioBassSmooth, clamp(bands[1] * 1.2 + bands[0] * 0.5 + audioState.transient * 0.3, 0, 2), 0.2, 0.1);
+  materiaAudioMidSmooth = smoothAR(materiaAudioMidSmooth, clamp(bands[2] * 1.15 + bands[1] * 0.2, 0, 2), 0.17, 0.1);
+  materiaAudioHighSmooth = smoothAR(materiaAudioHighSmooth, clamp(bands[3] * 1.2 + bands[2] * 0.2, 0, 2), 0.2, 0.11);
+  materiaAudioEnergySmooth = smoothAR(materiaAudioEnergySmooth, clamp(audioState.level * 1.2 + audioState.transient * 0.42, 0, 2), 0.18, 0.1);
+  const bass = materiaAudioBassSmooth;
+  const mid = materiaAudioMidSmooth;
+  const high = materiaAudioHighSmooth;
+  const energy = materiaAudioEnergySmooth;
+
+  const aggression = clamp(0.2 + flow * 0.42 + drift * 0.36 + energy * 0.28, 0, 1.45);
+  materiaCamYawTarget += Math.sin(tSec * (0.08 + drift * 0.25)) * (0.001 + aggression * 0.0011);
+  materiaCamPitchTarget += Math.cos(tSec * (0.09 + flow * 0.21)) * (0.0009 + aggression * 0.001);
+  const distGoal = 0.7 + (1 - layersK) * 0.92 + Math.sin(tSec * (0.22 + drift * 0.32) + bass) * 0.13;
+  materiaCamDistTarget += (distGoal - materiaCamDistTarget) * (0.03 + drift * 0.02);
+  materiaCamPitchTarget = clamp(materiaCamPitchTarget, -1.1, 1.1);
+  materiaCamYaw += (materiaCamYawTarget - materiaCamYaw) * 0.08;
+  materiaCamPitch += (materiaCamPitchTarget - materiaCamPitch) * 0.08;
+  materiaCamDist += (materiaCamDistTarget - materiaCamDist) * 0.09;
+  materiaCamDist = clamp(materiaCamDist, 0.46, 2.4);
+
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, w, h);
+
+  const masterOn = Boolean(masterFxMode && (masterFxMode.value || "none") !== "none");
+  const kaleidoOn = isKaleidoFxActive();
+  const perfStress = clamp((30 - (fps || 30)) / 12, 0, 1);
+  const stackCut = (masterOn ? 0.12 : 0) + (kaleidoOn ? 0.08 : 0);
+  const qualityBudget = clamp(1 - perfStress * 0.48 - stackCut, 0.38, 1);
+  const layerCount = clamp(Math.round((4 + layersK * 9) * qualityBudget), 4, 12);
+  const blobsPerLayer = clamp(Math.round((10 + layersK * 28 + flow * 10) * qualityBudget), 8, 44);
+
+  const cyaw = Math.cos(materiaCamYaw);
+  const syaw = Math.sin(materiaCamYaw);
+  const cp = Math.cos(materiaCamPitch);
+  const sp = Math.sin(materiaCamPitch);
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const perspBase = 0.86 + materiaCamDist * 0.88;
+  const projectPoint = (x, y, z) => {
+    const rx = x * cyaw - z * syaw;
+    const rz = x * syaw + z * cyaw;
+    const ry = y * cp - rz * sp;
+    const rz2 = y * sp + rz * cp;
+    const p = 1 / Math.max(0.2, perspBase + rz2 * 0.92);
+    return [cx + rx * p * w * 0.44, cy + ry * p * h * 0.44, p];
+  };
+
+  for (let l = 0; l < layerCount; l++) {
+    const lN = layerCount <= 1 ? 0 : l / (layerCount - 1);
+    const zBase = (lN - 0.5) * (1.4 + flow * 1.15);
+    const hueBase = fract01((seed % 360) / 360 + lN * 0.11 + (preset === "ink" ? 0.56 : preset === "ash" ? 0.02 : 0.24));
+    for (let i = 0; i < blobsPerLayer; i++) {
+      const r1 = randHash(i * 31 + l * 107, seed, 1901 + l * 7);
+      const r2 = randHash(i * 43 + l * 127, seed + 17, 2003 + l * 11);
+      const r3 = randHash(i * 59 + l * 149, seed + 31, 2141 + l * 13);
+      const r4 = randHash(i * 71 + l * 163, seed + 53, 2251 + l * 17);
+      const angle = r4 * Math.PI * 2;
+      const spread = 0.5 + flow * 0.9;
+      const px = (r1 * 2 - 1) * spread;
+      const py = (r2 * 2 - 1) * spread * (0.74 + flow * 0.4);
+      const pz = zBase + (r3 * 2 - 1) * (0.3 + drift * 0.5) + Math.sin(tSec * (0.35 + drift * 1.3) + i * 0.2) * (0.08 + energy * 0.12);
+      const [sx, sy, spj] = projectPoint(px, py, pz);
+      if (!Number.isFinite(sx) || !Number.isFinite(sy) || spj <= 0 || spj > 4.2) continue;
+
+      const radius = (9 + r3 * 42 + flow * 38 + bass * 14) * spj * (0.58 + (1 - lN) * 0.84);
+      if (radius < 1) continue;
+      const nSeg = 8 + Math.floor(r4 * 10);
+      const hue = fract01(hueBase + r2 * 0.14 + Math.sin(tSec * (0.22 + drift * 0.4) + i * 0.03) * 0.04 + high * 0.02);
+      const sat = clamp(0.14 + flow * 0.3 + (preset === "ink" ? 0.08 : 0) + high * 0.07, 0.1, 0.84);
+      const lit = clamp(0.24 + contrast * 0.48 + (1 - lN) * 0.12 + bass * 0.12, 0.12, 0.94);
+      const [r, g, b] = hslToRgb(hue, sat, lit);
+
+      const fillA = clamp((0.022 + contrast * 0.09 + energy * 0.05) * (1 - lN * 0.58), 0.012, 0.24);
+      const strokeA = clamp((0.05 + contrast * 0.16 + high * 0.09 + porosity * 0.14) * (1 - lN * 0.5), 0.03, 0.78);
+      ctx.beginPath();
+      for (let s = 0; s <= nSeg; s++) {
+        const t = (s / nSeg) * Math.PI * 2;
+        const wob = Math.sin(t * (1.8 + r2 * 2.2) + tSec * (0.3 + drift * 0.8) + i * 0.1) * (0.18 + porosity * 0.34);
+        const rr = radius * (1 + wob * (0.34 + flow * 0.4));
+        const x = sx + Math.cos(t + angle) * rr;
+        const y = sy + Math.sin(t + angle) * rr * (0.72 + r1 * 0.58);
+        if (s === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${fillA})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${strokeA})`;
+      ctx.lineWidth = clamp(0.42 + spj * 1.22 + porosity * 1.7, 0.3, 3.1) * qualityBudget;
+      ctx.stroke();
+
+      // Pigment-like brush strokes
+      const trailN = 1 + Math.floor((porosity * 4 + drift * 3) * qualityBudget);
+      for (let t = 0; t < trailN; t++) {
+        const len = radius * (0.6 + r2 * 0.8);
+        const a = angle + tSec * (0.2 + drift * 0.8) + t * 0.7 + r4 * 2.2;
+        const tx0 = sx + Math.cos(a) * radius * 0.3;
+        const ty0 = sy + Math.sin(a) * radius * 0.22;
+        const tx1 = tx0 + Math.cos(a + 0.4) * len;
+        const ty1 = ty0 + Math.sin(a + 0.4) * len * (0.5 + flow * 0.7);
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${clamp(0.02 + porosity * 0.1 + high * 0.06, 0.02, 0.24)})`;
+        ctx.lineWidth = clamp(0.45 + r3 * 1.6, 0.4, 2.6) * qualityBudget;
+        ctx.beginPath();
+        ctx.moveTo(tx0, ty0);
+        ctx.lineTo(tx1, ty1);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Porous grain pass (paint / biological membrane feel)
+  const grainStep = clamp(Math.round(2 + (1 - qualityBudget) * 2 + (1 - porosity) * 4), 2, 7);
+  const grainAlpha = clamp(0.015 + porosity * 0.08 + energy * 0.05, 0.01, 0.14);
+  for (let y = 0; y < h; y += grainStep) {
+    for (let x = 0; x < w; x += grainStep) {
+      const n = randHash(x * 0.71 + tSec * 21, y * 0.43 - tSec * 17, seed + 409);
+      if (n > 0.24 + porosity * 0.62) continue;
+      const hue = fract01((seed % 360) / 360 + n * 0.07 + (preset === "ink" ? 0.52 : preset === "ash" ? 0.03 : 0.21));
+      const [gr, gg, gb] = hslToRgb(hue, clamp(0.12 + flow * 0.28, 0.08, 0.6), clamp(0.28 + contrast * 0.36 + n * 0.2, 0.16, 0.88));
+      ctx.fillStyle = `rgba(${gr}, ${gg}, ${gb}, ${grainAlpha})`;
+      const s = 1 + Math.floor(n * grainStep);
+      ctx.fillRect(x, y, s, s);
+    }
+  }
+
+  if (contrast > 0.52 || preset === "ink") {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = clamp(0.05 + contrast * 0.12 + energy * 0.08, 0.04, 0.28);
+    ctx.filter = `blur(${0.8 + (0.7 + contrast * 1.5) * qualityBudget}px)`;
+    ctx.drawImage(canvas, 0, 0, w, h);
+    ctx.restore();
+  }
+}
+
+function ensureCodeRainTextMask(w, h, tSec) {
+  if (!codeRainTextMaskCanvas) {
+    codeRainTextMaskCanvas = document.createElement("canvas");
+    codeRainTextMaskCtx = codeRainTextMaskCanvas.getContext("2d", { willReadFrequently: true });
+  }
+  if (!codeRainTextMaskCtx) return;
+  const mw = Math.max(2, Math.round(w * 0.46));
+  const mh = Math.max(2, Math.round(h * 0.22));
+  if (codeRainTextMaskW !== mw || codeRainTextMaskH !== mh) {
+    codeRainTextMaskW = mw;
+    codeRainTextMaskH = mh;
+    codeRainTextMaskCanvas.width = mw;
+    codeRainTextMaskCanvas.height = mh;
+  }
+  const mctx = codeRainTextMaskCtx;
+  mctx.clearRect(0, 0, mw, mh);
+  const pulse = 0.5 + 0.5 * Math.sin(tSec * 0.8);
+  const size = Math.max(20, Math.round(Math.min(mw, mh) * (0.34 + pulse * 0.06)));
+  mctx.font = `700 ${size}px Orbitron, Share Tech Mono, monospace`;
+  mctx.textAlign = "center";
+  mctx.textBaseline = "middle";
+  mctx.fillStyle = "#ffffff";
+  mctx.fillText("B.ZU.AL", mw * 0.5, mh * 0.52);
+}
+
+function ensureCodeRainColumns(count, h, speed, density) {
+  if (count === codeRainCols && codeRainDrops.length === count && codeRainSpeeds.length === count && codeRainSeeds.length === count) return;
+  codeRainCols = count;
+  codeRainDrops = new Float32Array(count);
+  codeRainSpeeds = new Float32Array(count);
+  codeRainSeeds = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    codeRainDrops[i] = Math.random() * h;
+    codeRainSpeeds[i] = (0.7 + Math.random() * 1.4) * (0.8 + speed * 1.35) * (0.86 + density * 0.36);
+    codeRainSeeds[i] = Math.random() * 10000;
+  }
+}
+
+function sampleCodeFigureMask(u, v, tSec, figureK, maskData, maskW, maskH) {
+  const x = (u - 0.5) * 2;
+  const y = (v - 0.5) * 2;
+  const r = Math.hypot(x, y);
+  const a = Math.atan2(y, x);
+  const ring = clamp(1 - Math.abs(r - (0.46 + Math.sin(tSec * 0.4) * 0.05)) * 13, 0, 1);
+  const helixLine = Math.sin(a * 3.6 + tSec * 1.3 + r * 9);
+  const helix = clamp(1 - Math.abs(y - helixLine * 0.35) * 7.5, 0, 1);
+  const lattice = clamp(1 - Math.min(Math.abs(Math.sin(x * 7 + tSec * 0.6)), Math.abs(Math.cos(y * 8 - tSec * 0.7))) * 2.8, 0, 1);
+  let textMask = 0;
+  if (maskData && maskW > 2 && maskH > 2) {
+    const tx = clamp(Math.round(u * (maskW - 1)), 0, maskW - 1);
+    const ty = clamp(Math.round(v * (maskH - 1)), 0, maskH - 1);
+    const mi = (ty * maskW + tx) * 4 + 3;
+    textMask = maskData[mi] / 255;
+  }
+  const shapeA = [ring, helix, lattice, textMask];
+  const shapeB = [helix, lattice, textMask, ring];
+  return clamp(shapeA[Math.floor(figureK * 3.99)] * (1 - (figureK * 3.99 % 1)) + shapeB[Math.floor(figureK * 3.99)] * (figureK * 3.99 % 1), 0, 1);
+}
+
+function renderCodeRainMode(baseImageData, tSec, settings) {
+  const w = canvas.width;
+  const h = canvas.height;
+  if (w <= 2 || h <= 2) return;
+  const camMode = liveCodeCameraMode ? (liveCodeCameraMode.value || "wide") : "wide";
+  const density = clamp(Number(liveCodeDensity ? liveCodeDensity.value : 58) / 100, 0, 1);
+  const speed = clamp(Number(liveCodeSpeed ? liveCodeSpeed.value : 44) / 100, 0, 1);
+  const zoom = clamp(Number(liveCodeZoom ? liveCodeZoom.value : 38) / 100, 0, 1);
+  const letters = clamp(Number(liveCodeLetters ? liveCodeLetters.value : 62) / 100, 0, 1);
+  const figure = clamp(Number(liveCodeFigure ? liveCodeFigure.value : 62) / 100, 0, 1);
+  const language = clamp(Number(liveCodeLanguage ? liveCodeLanguage.value : 66) / 100, 0, 1);
+  const glow = clamp(Number(liveCodeGlow ? liveCodeGlow.value : 54) / 100, 0, 1);
+  const audioOn = !liveCodeAudio || liveCodeAudio.checked;
+  const audioAmount = clamp(Number(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72) / 100, 0, 1);
+  const preset = liveCodePreset ? (liveCodePreset.value || "matrix") : "matrix";
+  const audioState = getReactiveAudioState(settings, audioOn, audioAmount);
+  const bands = audioState.bands || [0, 0, 0, 0];
+  const energy = clamp(audioState.level * 0.82 + audioState.transient * 1.1 + bands[2] * 0.42, 0, 2.1);
+  const webcamReactive = Boolean(
+    webcamActive &&
+    baseImageData &&
+    baseImageData.data &&
+    baseImageData.width > 2 &&
+    baseImageData.height > 2
+  );
+  const srcData = webcamReactive ? baseImageData.data : null;
+  const srcW = webcamReactive ? baseImageData.width : 0;
+  const srcH = webcamReactive ? baseImageData.height : 0;
+  const webcamMotion = webcamReactive ? clamp(visualFeatures.motion * 1.9, 0, 1.8) : 0;
+
+  let faceCx = 0.5;
+  let faceCy = 0.5;
+  if (webcamReactive && detectedFaces.length > 0) {
+    let fx = 0;
+    let fy = 0;
+    let fw = 0;
+    detectedFaces.forEach((f) => {
+      const area = clamp(f.width * f.height, 0.001, 1);
+      fx += (f.x + f.width * 0.5) * area;
+      fy += (f.y + f.height * 0.5) * area;
+      fw += area;
+    });
+    if (fw > 0.0001) {
+      faceCx = clamp(fx / fw, 0, 1);
+      faceCy = clamp(fy / fw, 0, 1);
+    }
+  }
+
+  codeRainCharStep = clamp(Math.round(20 - density * 6.5 - letters * 5 + zoom * 6), 8, 26);
+  codeRainFontPx = clamp(Math.round(codeRainCharStep * 0.92), 9, 17);
+  const colsBase = Math.floor(w / Math.max(7, codeRainCharStep * 0.86));
+  const camColsK = camMode === "macro" ? 0.52 : camMode === "chase" ? 0.74 : 1;
+  const cols = clamp(Math.round(colsBase * (0.46 + letters * 1.28) * camColsK), 14, 320);
+  ensureCodeRainColumns(cols, h, speed, density);
+
+  codeRainCamX += (codeRainCamXTarget - codeRainCamX) * 0.08;
+  codeRainCamY += (codeRainCamYTarget - codeRainCamY) * 0.08;
+  if (webcamReactive) {
+    codeRainCamXTarget = clamp(codeRainCamXTarget * 0.92 + (faceCx - 0.5) * (0.55 + webcamMotion * 0.22), -1, 1);
+    codeRainCamYTarget = clamp(codeRainCamYTarget * 0.92 + (faceCy - 0.5) * (0.58 + webcamMotion * 0.24), -1, 1);
+  }
+  const stepX = w / cols;
+  const chaseCol = clamp(Math.floor((tSec * (1.1 + speed * 3.3)) % cols), 0, cols - 1);
+  const chaseY = codeRainDrops[chaseCol] || 0;
+  const chaseX = chaseCol * stepX + stepX * 0.5;
+  const driftXBase =
+    Math.sin(tSec * (0.22 + speed * 0.42)) * (6 + figure * 12) +
+    codeRainCamX * 18 +
+    (webcamReactive ? (faceCx - 0.5) * (14 + webcamMotion * 20) : 0);
+  const driftYBase =
+    Math.cos(tSec * (0.18 + speed * 0.36)) * (4 + figure * 9) +
+    codeRainCamY * 14 +
+    (webcamReactive ? (faceCy - 0.5) * (10 + webcamMotion * 18) : 0);
+  const driftX = camMode === "chase" ? driftXBase + (w * 0.5 - chaseX) * (0.3 + zoom * 0.42) : driftXBase;
+  const driftY = camMode === "chase" ? driftYBase + (h * 0.42 - chaseY) * (0.22 + zoom * 0.46) : driftYBase;
+  codeRainFigurePhase = fract01(codeRainFigurePhase + (0.00085 + speed * 0.0014 + energy * 0.0009));
+
+  ensureCodeRainTextMask(w, h, tSec);
+  const maskData = codeRainTextMaskCtx ? codeRainTextMaskCtx.getImageData(0, 0, codeRainTextMaskW, codeRainTextMaskH).data : null;
+  const figureK = fract01(codeRainFigurePhase + figure * 0.74 + (preset === "glyph" ? 0.24 : preset === "oracle" ? 0.58 : 0));
+  const glyphSets = [
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    "あいうえおカキクケコサシスセソタチツテトナニヌネノ",
+    "абвгдежзийклмнопрстуфхцчшщъыьэюя",
+    "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ",
+    "ابتثجحخدذرزسشصضطظعغفقكلمنهوي",
+  ];
+  const phrase = "B.ZU.AL";
+
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, w, h);
+  ctx.save();
+  if (camMode === "macro") {
+    const k = 1 + zoom * 1.95;
+    const focusX = chaseX + Math.sin(tSec * 0.7) * w * 0.04;
+    const focusY = chaseY + Math.cos(tSec * 0.66) * h * 0.05;
+    ctx.translate(w * 0.5, h * 0.5);
+    ctx.scale(k, k);
+    ctx.translate(-focusX, -focusY);
+  } else if (camMode === "chase") {
+    const k = 1 + zoom * 0.86;
+    ctx.translate(w * 0.5, h * 0.5);
+    ctx.scale(k, k);
+    ctx.translate(-w * 0.5, -h * 0.5);
+  } else {
+    const k = 1 + zoom * 0.38;
+    ctx.translate(w * 0.5, h * 0.5);
+    ctx.scale(k, k);
+    ctx.translate(-w * 0.5, -h * 0.5);
+  }
+  ctx.translate(driftX, driftY);
+  ctx.font = `700 ${codeRainFontPx}px Share Tech Mono, Orbitron, monospace`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  const baseTrail = Math.round(6 + density * 11 + letters * 10 + glow * 10 + energy * 5);
+  const timeScale = 0.95 + speed * 2.2 + energy * 0.6;
+  for (let i = 0; i < cols; i++) {
+    const drop = codeRainDrops[i];
+    const colSpeed = codeRainSpeeds[i] * timeScale;
+    codeRainDrops[i] = drop + colSpeed;
+    if (codeRainDrops[i] > h + baseTrail * codeRainCharStep) {
+      codeRainDrops[i] = -Math.random() * h * 0.3;
+      codeRainSpeeds[i] = (0.7 + Math.random() * 1.4) * (0.8 + speed * 1.35 + energy * 0.18);
+      codeRainSeeds[i] = Math.random() * 10000;
+    }
+    const x = i * stepX + stepX * 0.5;
+    for (let j = 0; j < baseTrail; j++) {
+      const y = codeRainDrops[i] - j * codeRainCharStep;
+      if (y < -24 || y > h + 24) continue;
+      const u = clamp((x - driftX) / Math.max(1, w), 0, 1);
+      const v = clamp((y - driftY) / Math.max(1, h), 0, 1);
+      const figMask = sampleCodeFigureMask(u, v, tSec, figureK, maskData, codeRainTextMaskW, codeRainTextMaskH);
+      let webcamLum = 0.5;
+      let faceMask = 0;
+      if (webcamReactive && srcData) {
+        const sx = clamp(Math.round(u * (srcW - 1)), 0, srcW - 1);
+        const sy = clamp(Math.round(v * (srcH - 1)), 0, srcH - 1);
+        const si = (sy * srcW + sx) * 4;
+        webcamLum = clamp((srcData[si] * 0.299 + srcData[si + 1] * 0.587 + srcData[si + 2] * 0.114) / 255, 0, 1);
+        if (detectedFaces.length > 0) {
+          for (let fi = 0; fi < detectedFaces.length; fi++) {
+            const f = detectedFaces[fi];
+            const padX = f.width * 0.28;
+            const padY = f.height * 0.36;
+            if (u < f.x - padX || u > f.x + f.width + padX || v < f.y - padY || v > f.y + f.height + padY) continue;
+            const cx = f.x + f.width * 0.5;
+            const cy = f.y + f.height * 0.52;
+            const nx = (u - cx) / Math.max(0.001, f.width * 0.78);
+            const ny = (v - cy) / Math.max(0.001, f.height * 0.86);
+            const falloff = clamp(1 - Math.hypot(nx, ny), 0, 1);
+            faceMask = Math.max(faceMask, falloff * (0.82 + webcamMotion * 0.24));
+          }
+        }
+      }
+      const head = j === 0 ? 1 : 0;
+      const fade = Math.pow(1 - j / Math.max(1, baseTrail), 1.35);
+      const sig = clamp(
+        figMask * (0.48 + figure * 0.74) +
+        head * 0.34 +
+        (webcamReactive ? (webcamLum * 0.34 + faceMask * 0.86) * (0.45 + letters * 0.5) : 0),
+        0,
+        1.8
+      );
+      const alpha = clamp(fade * (0.12 + glow * 0.32 + sig * 0.46), 0.04, 0.98);
+      const langSelector = clamp(language + sig * 0.14 + Math.sin(tSec * 0.7 + i * 0.03) * 0.08, 0, 1);
+      const poolIndex = clamp(Math.floor(langSelector * glyphSets.length), 0, glyphSets.length - 1);
+      const pool = glyphSets[poolIndex];
+      const seed = codeRainSeeds[i] + j * 17 + tSec * (4.2 + speed * 8.2);
+      const ch = (faceMask > 0.52 || (figMask > 0.68 && figureK > 0.66))
+        ? phrase[Math.abs(Math.floor(seed * 1.37 + i + j)) % phrase.length]
+        : pool[Math.abs(Math.floor(seed * 2.13 + i * 3 + j * 5)) % pool.length];
+      // Pseudo depth map: face + webcam + figure signal => near/far layer.
+      const depthNear = clamp(
+        faceMask * 0.78 +
+        (webcamReactive ? webcamLum * 0.22 : 0) +
+        sig * 0.14 +
+        head * 0.1,
+        0,
+        1
+      );
+      const depthNoise = 0.5 + 0.5 * Math.sin(seed * 0.041 + tSec * (0.6 + speed));
+      const zN = clamp(depthNear * 0.84 + depthNoise * 0.16, 0, 1);
+      const persp = 0.62 + zN * 1.48;
+      const px = (x - w * 0.5) * persp + w * 0.5 + Math.sin(seed * 0.013 + tSec * 0.9) * (1 + zN * 8);
+      const py = (y - h * 0.5) * persp + h * 0.5 - zN * (8 + faceMask * 14);
+      const a3d = alpha * clamp(0.22 + zN * 0.96, 0.18, 1);
+      const g = clamp(74 + fade * 58 + sig * 86 + zN * 146 + energy * 34 + faceMask * 66, 46, 255);
+      const r = clamp(2 + sig * 12 + zN * 18 + (preset === "oracle" ? 8 : 0), 1, 64);
+      const b = clamp(3 + sig * 26 + (1 - zN) * 30 + (preset === "glyph" ? 10 : 0), 2, 90);
+      ctx.fillStyle = `rgba(${r},${g},${b},${a3d})`;
+      ctx.fillText(ch, px, py);
+      // Near chars get subtle halo so close depth feels neon in space.
+      if (zN > 0.64) {
+        ctx.fillStyle = `rgba(${Math.round(r * 0.4)},${Math.min(255, g + 35)},${Math.round(b * 0.5)},${clamp(a3d * 0.32, 0.04, 0.34)})`;
+        ctx.fillText(ch, px + 0.35 + zN * 0.6, py + 0.35 + zN * 0.4);
+      }
+    }
+  }
+  ctx.restore();
+
+  if (glow > 0.01) {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = clamp(0.1 + glow * 0.28 + energy * 0.08, 0.08, 0.52);
+    ctx.filter = `blur(${0.6 + glow * 2.8 + energy * 0.8}px)`;
+    ctx.drawImage(canvas, 0, 0, w, h);
+    ctx.restore();
+  }
+}
+
+function applyCodePreset(presetId, withRender = true) {
+  const id = String(presetId || "matrix");
+  if (id === "glyph") {
+    if (liveCodeCameraMode) liveCodeCameraMode.value = "wide";
+    if (liveCodeDensity) liveCodeDensity.value = "66";
+    if (liveCodeSpeed) liveCodeSpeed.value = "54";
+    if (liveCodeZoom) liveCodeZoom.value = "34";
+    if (liveCodeLetters) liveCodeLetters.value = "78";
+    if (liveCodeFigure) liveCodeFigure.value = "78";
+    if (liveCodeLanguage) liveCodeLanguage.value = "84";
+    if (liveCodeGlow) liveCodeGlow.value = "62";
+    if (liveCodeAudioAmount) liveCodeAudioAmount.value = "74";
+  } else if (id === "oracle") {
+    if (liveCodeCameraMode) liveCodeCameraMode.value = "macro";
+    if (liveCodeDensity) liveCodeDensity.value = "42";
+    if (liveCodeSpeed) liveCodeSpeed.value = "32";
+    if (liveCodeZoom) liveCodeZoom.value = "82";
+    if (liveCodeLetters) liveCodeLetters.value = "34";
+    if (liveCodeFigure) liveCodeFigure.value = "92";
+    if (liveCodeLanguage) liveCodeLanguage.value = "58";
+    if (liveCodeGlow) liveCodeGlow.value = "48";
+    if (liveCodeAudioAmount) liveCodeAudioAmount.value = "64";
+  } else {
+    if (liveCodeCameraMode) liveCodeCameraMode.value = "wide";
+    if (liveCodeDensity) liveCodeDensity.value = "58";
+    if (liveCodeSpeed) liveCodeSpeed.value = "44";
+    if (liveCodeZoom) liveCodeZoom.value = "38";
+    if (liveCodeLetters) liveCodeLetters.value = "62";
+    if (liveCodeFigure) liveCodeFigure.value = "62";
+    if (liveCodeLanguage) liveCodeLanguage.value = "66";
+    if (liveCodeGlow) liveCodeGlow.value = "54";
+    if (liveCodeAudioAmount) liveCodeAudioAmount.value = "72";
+  }
+  if (liveCodeAudio) liveCodeAudio.checked = true;
+  updateLiveQuickOutputs();
+  if (withRender) scheduleRender();
+}
+
 function ensureParticlesGpu() {
   if (particlesGpuForcedOff) return false;
   if (particlesGpuReady && particlesGpu) return true;
@@ -13572,11 +15020,17 @@ function ensureParticlesGpu() {
         vec3 p;
         if (uEmitter == 1) {
           p = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
-        } else {
+        } else if (uEmitter == 2) {
           p = vec3(uv * 2.0 - 1.0, (lum - 0.5) * 1.6);
-          if (uEmitter == 2) {
-            p.xy += vec2(s0 - 0.5, s1 - 0.5) * 0.3;
-          }
+          p.xy += vec2(s0 - 0.5, s1 - 0.5) * 0.3;
+        } else {
+          // Cloud emitter: volumetric spawn to avoid flat UV projection.
+          vec3 q = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
+          float invLen = inversesqrt(max(dot(q, q), 0.0005));
+          float rad = pow(s2, 0.72) * 1.08;
+          p = q * invLen * rad;
+          p.xy += (uv * 2.0 - 1.0) * 0.12;
+          p.z += (lum - 0.5) * 0.28;
         }
         vec3 v = vec3((s1 - 0.5) * 0.02, (s2 - 0.5) * 0.02, (s0 - 0.5) * 0.02);
         oPos = vec4(p, 0.55 + s0 * 0.45);
@@ -13603,6 +15057,11 @@ function ensureParticlesGpu() {
       uniform float uSpawn;
       uniform float uMotion;
       uniform float uAudio;
+      uniform float uFocus;
+      uniform vec3 uFocusA;
+      uniform vec3 uFocusB;
+      uniform vec3 uFocusC;
+      uniform vec3 uFocusD;
       uniform int uEmitter;
       float n3(vec3 p) { return fract(sin(dot(p, vec3(12.9898,78.233,35.425))) * 43758.5453) * 2.0 - 1.0; }
       void main() {
@@ -13618,9 +15077,21 @@ function ensureParticlesGpu() {
           n3(vec3(p.zx * 2.1, uTime * 0.67 + a4.z))
         ) * (0.002 + uNoise * 0.011 + uMotion * 0.003);
         vec3 fAttr = -p * (0.001 + uAttract * 0.008);
+        float sf = a4.z;
+        vec3 c0 = uFocusA;
+        vec3 c1 = uFocusB;
+        vec3 c2 = uFocusC;
+        vec3 c3 = uFocusD;
+        vec3 gA = sf < 0.5 ? c0 : c1;
+        vec3 gB = sf < 0.25 ? c1 : sf < 0.5 ? c2 : sf < 0.75 ? c3 : c0;
+        vec3 gCenter = mix(gA, gB, 0.22 + uAudio * 0.08);
+        vec3 gd = gCenter - p;
+        float gd2 = dot(gd, gd) + 0.045;
+        vec3 fFocus = gd * ((0.0006 + uFocus * (0.006 + uAudio * 0.004)) / gd2);
+        vec3 fOrbit = vec3(-gd.y, gd.x, 0.0) * ((0.0002 + uFocus * 0.0012) / sqrt(gd2 + 0.02));
         vec3 fVort = vec3(-p.y, p.x, 0.0) * ((0.001 + uVortex * 0.008) * (1.0 + uAudio * 0.42));
         vec3 fFlow = vec3(0.0, 0.0, uAudio * 0.0035) * (0.4 + uFlow * 0.8);
-        v += fNoise + fAttr + fVort + fFlow;
+        v += fNoise + fAttr + fFocus + fOrbit + fVort + fFlow;
         v *= uDamp;
         p += vec3(v.xy, v.z * (0.24 + uDepth * 1.85));
         life -= 0.0018 + (1.0 - uSpawn) * 0.0034;
@@ -13631,9 +15102,19 @@ function ensureParticlesGpu() {
           float s0 = fract(sin(dot(uv * 1.31, vec2(127.1,311.7)) + uTime * 0.37) * 43758.5453);
           float s1 = fract(sin(dot(uv * 2.17, vec2(127.1,311.7)) + uTime * 0.53) * 43758.5453);
           float s2 = fract(sin(dot(uv * 3.11, vec2(127.1,311.7)) + uTime * 0.71) * 43758.5453);
-          if (uEmitter == 1) p = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
-          else p = vec3(uv * 2.0 - 1.0, (lum - 0.5) * 1.6);
-          if (uEmitter == 2) p.xy += vec2(s0 - 0.5, s1 - 0.5) * (uMotion * 0.7);
+          if (uEmitter == 1) {
+            p = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
+          } else if (uEmitter == 2) {
+            p = vec3(uv * 2.0 - 1.0, (lum - 0.5) * 1.6);
+            p.xy += vec2(s0 - 0.5, s1 - 0.5) * (uMotion * 0.7);
+          } else {
+            vec3 q = vec3(s0 * 2.0 - 1.0, s1 * 2.0 - 1.0, s2 * 2.0 - 1.0);
+            float invLen = inversesqrt(max(dot(q, q), 0.0005));
+            float rad = pow(s2, 0.72) * 1.08;
+            p = q * invLen * rad;
+            p.xy += (uv * 2.0 - 1.0) * 0.12;
+            p.z += (lum - 0.5) * 0.28;
+          }
           v = vec3((s1 - 0.5) * 0.01, (s2 - 0.5) * 0.01, (s0 - 0.5) * 0.01);
           life = 0.45 + s0 * 0.55;
         }
@@ -13679,13 +15160,13 @@ function ensureParticlesGpu() {
         vec4 p4 = texture(uPos, uv);
         vec4 a4 = texture(uAttr, uv);
         vec3 p = p4.xyz;
-        vec3 pr = rotXYZ(radians(uCamDeg)) * vec3(p.xy * 170.0 + uPan, p.z * 132.0);
+        vec3 pr = rotXYZ(radians(uCamDeg)) * vec3(p.xy * 220.0 + uPan, p.z * 164.0);
         float fov = min(uCanvas.x, uCanvas.y) * 0.46;
         float pScale = fov / (fov + pr.z + 0.001);
         vec2 sp = vec2(uCanvas.x*0.5 + pr.x * pScale * uZoom, uCanvas.y*0.5 + pr.y * pScale * uZoom);
         vec2 ndc = vec2(sp.x / uCanvas.x * 2.0 - 1.0, 1.0 - sp.y / uCanvas.y * 2.0);
         gl_Position = vec4(ndc, 0.0, 1.0);
-        gl_PointSize = max(1.0, uPointSize * (0.65 + pScale * 1.1));
+        gl_PointSize = max(1.0, uPointSize * (0.72 + pScale * 1.3));
         vec3 col;
         if (uColorMode == 0) {
           vec3 srcCol = texture(uSource, a4.xy).rgb;
@@ -13847,6 +15328,9 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   const dst = g.ping === 0 ? g.dstPair : g.srcPair;
   const emitter = ps.emitter === "volume" ? 1 : ps.emitter === "motion" ? 2 : 0;
   const colorMode = ps.colorMode === "palette" ? 1 : ps.colorMode === "audio" ? 2 : 0;
+  const fxStyle = ps.fxStyle || "none";
+  const fxAmount = clamp((ps.fxAmount || 0) / 100, 0, 1);
+  const neonFx = fxStyle === "neon";
 
   const flowMotion = clamp(visualFeatures.motion * 1.2, 0, 1.2);
   const audioState = getReactiveAudioState(settings || getSettings(), ps.audioOn, (ps.audioAmount || 0) / 100);
@@ -13863,13 +15347,28 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   const camX = particlesCamXSmooth + motion.rxDeg;
   const camY = particlesCamYSmooth + motion.ryDeg;
   const camZ = particlesCamZSmooth + motion.rzDeg;
-  const zoom = ((settings && settings.cameraZoom ? settings.cameraZoom : 86) / 100) * motion.zoomMul;
+  const zoom = ((settings && settings.cameraZoom ? settings.cameraZoom : 86) / 100) * motion.zoomMul * 1.14;
   const panX = motion.panX * 120;
   const panY = motion.panY * 120;
   const dampBase = clamp(1 - ps.damping / 100 * 0.11, 0.82, 0.999);
   const damp = ps.audioOn
     ? clamp(dampBase * audioMotionGate + (1 - audioMotionGate) * 0.995, 0.92, 0.9995)
     : dampBase;
+  const focusA = clamp((ps.focus || 0) / 100, 0, 1);
+  const focusBase = 2 + Math.round(focusA * 2 + clamp(audioDrive * 0.55, 0, 1));
+  const focalCount = clamp(focusBase, 2, 4);
+  const focalPoints = [];
+  for (let fi = 0; fi < focalCount; fi++) {
+    const fn = fi / Math.max(1, focalCount - 1);
+    const baseAng = tSec * (0.18 + fi * 0.03 + (ps.flow / 100) * 0.24) + fi * (Math.PI * 0.7);
+    const r = 0.3 + fn * 0.32 + Math.sin(tSec * (0.12 + fi * 0.08) + fi) * (0.06 + audioDrive * 0.06);
+    focalPoints.push({
+      x: Math.cos(baseAng) * r,
+      y: Math.sin(baseAng * (0.9 + fi * 0.07)) * r * 0.74,
+      z: Math.sin(baseAng * (0.62 + fi * 0.08) + fn * 1.4) * (0.16 + audioDrive * 0.1),
+    });
+  }
+  while (focalPoints.length < 4) focalPoints.push(focalPoints[focalPoints.length - 1] || { x: 0, y: 0, z: 0 });
 
   gl.disable(gl.DEPTH_TEST);
   gl.bindVertexArray(g.vao);
@@ -13900,6 +15399,11 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   gl.uniform1f(gl.getUniformLocation(g.updateProg, "uSpawn"), ps.spawn / 100);
   gl.uniform1f(gl.getUniformLocation(g.updateProg, "uMotion"), flowMotion);
   gl.uniform1f(gl.getUniformLocation(g.updateProg, "uAudio"), audioDrive);
+  gl.uniform1f(gl.getUniformLocation(g.updateProg, "uFocus"), focusA);
+  gl.uniform3f(gl.getUniformLocation(g.updateProg, "uFocusA"), focalPoints[0].x, focalPoints[0].y, focalPoints[0].z);
+  gl.uniform3f(gl.getUniformLocation(g.updateProg, "uFocusB"), focalPoints[1].x, focalPoints[1].y, focalPoints[1].z);
+  gl.uniform3f(gl.getUniformLocation(g.updateProg, "uFocusC"), focalPoints[2].x, focalPoints[2].y, focalPoints[2].z);
+  gl.uniform3f(gl.getUniformLocation(g.updateProg, "uFocusD"), focalPoints[3].x, focalPoints[3].y, focalPoints[3].z);
   gl.uniform1i(gl.getUniformLocation(g.updateProg, "uEmitter"), emitter);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -13913,7 +15417,7 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.blendFunc(gl.SRC_ALPHA, neonFx ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
   gl.useProgram(g.drawProg);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, drawSrc.pos);
@@ -13929,7 +15433,8 @@ function renderParticlesModeGpu(baseImageData, tSec, settings) {
   gl.uniform3f(gl.getUniformLocation(g.drawProg, "uCamDeg"), camX, camY, camZ);
   gl.uniform1f(gl.getUniformLocation(g.drawProg, "uZoom"), zoom);
   gl.uniform2f(gl.getUniformLocation(g.drawProg, "uPan"), panX, panY);
-  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uPointSize"), 0.8 + (ps.size / 100) * 2.2);
+  const pointSize = (1.0 + (ps.size / 100) * 2.6) * (neonFx ? (1 + fxAmount * 0.38) : 1);
+  gl.uniform1f(gl.getUniformLocation(g.drawProg, "uPointSize"), pointSize);
   gl.uniform1f(gl.getUniformLocation(g.drawProg, "uHue"), ps.hue);
   gl.uniform1i(gl.getUniformLocation(g.drawProg, "uColorMode"), colorMode);
   gl.uniform1f(gl.getUniformLocation(g.drawProg, "uAudio"), audioDrive);
@@ -14006,13 +15511,20 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
   const ry = (particlesCamYSmooth + motion.ryDeg) * (Math.PI / 180);
   const rz = (particlesCamZSmooth + motion.rzDeg) * (Math.PI / 180);
   const fov = Math.min(w, h) * 0.46;
-  const zoom = ((settings && settings.cameraZoom ? settings.cameraZoom : 86) / 100) * motion.zoomMul;
+  const zoom = ((settings && settings.cameraZoom ? settings.cameraZoom : 86) / 100) * motion.zoomMul * 1.14;
   const panX = motion.panX * 120;
   const panY = motion.panY * 120;
-  const worldScale = 170;
-  const sizePx = 0.8 + (ps.size / 100) * 2.2;
+  const worldScale = 205 + (ps.size / 100) * 34;
+  const sizePx = 1.0 + (ps.size / 100) * 2.7;
   const trailA = clamp((ps.trail || 0) / 100, 0, 1);
   const trailLen = Math.round(trailA * 10);
+  const fxStyle = ps.fxStyle || "none";
+  const fxAmount = clamp((ps.fxAmount || 0) / 100, 0, 1);
+  const neonFx = fxStyle === "neon";
+  const datamoshFx = fxStyle === "datamosh";
+  const neonGlow = neonFx ? clamp(0.1 + fxAmount * 0.46, 0, 0.7) : 0;
+  const datamoshLen = datamoshFx ? Math.round(2 + fxAmount * 8) : 0;
+  const datamoshSkip = datamoshFx && particlesDrawStride < 2 ? 2 : 1;
   const thr = ps.motionThreshold / 100;
   const splitMode = ps.audioSplit || "basic";
   const structureMode = ps.structure || "cloud";
@@ -14023,16 +15535,19 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
   const gradientSpread = 0.38 + clamp((ps.gradientSpread || 0) / 100, 0, 1) * 1.95;
   const gradA = hexToRgb(ps.gradientA || "#00d8ff");
   const gradB = hexToRgb(ps.gradientB || "#ff2ea6");
-  const focal1 = {
-    x: Math.cos(tSec * 0.23) * 0.54,
-    y: Math.sin(tSec * 0.17) * 0.38,
-    z: Math.sin(tSec * 0.13) * 0.22,
-  };
-  const focal2 = {
-    x: Math.sin(tSec * 0.21 + 1.7) * 0.48,
-    y: Math.cos(tSec * 0.19 + 0.8) * 0.33,
-    z: Math.cos(tSec * 0.11 + 0.4) * 0.2,
-  };
+  const focusBase = 2 + Math.round(focusA * 2 + clamp(audioDrive * 0.55, 0, 1));
+  const focalCount = clamp(focusBase, 2, 4);
+  const focalPoints = [];
+  for (let fi = 0; fi < focalCount; fi++) {
+    const fn = fi / Math.max(1, focalCount - 1);
+    const baseAng = tSec * (0.18 + fi * 0.03 + flowA * 0.24) + fi * (Math.PI * 0.7);
+    const r = 0.3 + fn * 0.32 + Math.sin(tSec * (0.12 + fi * 0.08) + fi) * (0.06 + audioDrive * 0.06);
+    focalPoints.push({
+      x: Math.cos(baseAng) * r,
+      y: Math.sin(baseAng * (0.9 + fi * 0.07)) * r * 0.74,
+      z: Math.sin(baseAng * (0.62 + fi * 0.08) + fn * 1.4) * (0.16 + audioDrive * 0.1),
+    });
+  }
   const faceEnabled = Boolean(faceTrace && faceTrace.points && faceTrace.points.length > 0);
   const faceAssignN = faceEnabled ? Math.min(n, Math.floor(n * faceTrace.assignRatio)) : 0;
   const facePoints = faceEnabled ? faceTrace.points : null;
@@ -14095,11 +15610,26 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
     }
 
     if (focusA > 0.001 && !isFaceParticle) {
-      const focal = seed < 0.5 ? focal1 : focal2;
-      const focusBoost = focusA * (0.001 + audioDrive * 0.0028 + split.transient * 0.0019);
-      vx += (focal.x - x) * focusBoost;
-      vy += (focal.y - y) * focusBoost;
-      vz += (focal.z - z) * (focusBoost * 0.82);
+      // Multi-center gravity: each particle binds to a primary core with a secondary blend.
+      const aIdx = Math.floor(seed * focalCount) % focalCount;
+      const bIdx = (aIdx + 1 + (i % Math.max(1, focalCount - 1))) % focalCount;
+      const aF = focalPoints[aIdx];
+      const bF = focalPoints[bIdx];
+      const blend = 0.24 + split.transient * 0.14;
+      const gx = aF.x * (1 - blend) + bF.x * blend;
+      const gy = aF.y * (1 - blend) + bF.y * blend;
+      const gz = aF.z * (1 - blend) + bF.z * blend;
+      const dx = gx - x;
+      const dy = gy - y;
+      const dz = gz - z;
+      const dist2 = dx * dx + dy * dy + dz * dz + 0.035;
+      const gravity = focusA * (0.00085 + audioDrive * 0.0015 + split.transient * 0.0012) / dist2;
+      vx += dx * gravity;
+      vy += dy * gravity;
+      vz += dz * gravity * 0.9;
+      const orbit = (0.00024 + split.angular * 0.0007 + vort * 0.0006) / Math.sqrt(dist2 + 0.02);
+      vx += -dy * orbit;
+      vy += dx * orbit;
     }
 
     if (isFaceParticle) {
@@ -14141,9 +15671,20 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
         z = randHash(i, 107, randomSeed + 809) * 2 - 1;
       } else {
         const mBoost = ps.emitter === "motion" && visualFeatures.motion > thr ? 0.35 : 0.14;
-        x = (u * 2 - 1) * 0.9 + (randHash(i, 109, randomSeed + 811) * 2 - 1) * mBoost;
-        y = (v * 2 - 1) * 0.9 + (randHash(i, 113, randomSeed + 813) * 2 - 1) * mBoost;
-        z = (randHash(i, 127, randomSeed + 815) * 2 - 1) * 0.6;
+        if (structureMode === "cloud") {
+          const qx = randHash(i, 223, randomSeed + 947) * 2 - 1;
+          const qy = randHash(i, 227, randomSeed + 953) * 2 - 1;
+          const qz = randHash(i, 229, randomSeed + 967) * 2 - 1;
+          const invLen = 1 / Math.max(0.001, Math.hypot(qx, qy, qz));
+          const rad = Math.pow(randHash(i, 233, randomSeed + 971), 0.72) * 1.06;
+          x = qx * invLen * rad + (u * 2 - 1) * 0.1;
+          y = qy * invLen * rad + (v * 2 - 1) * 0.1;
+          z = qz * invLen * rad;
+        } else {
+          x = (u * 2 - 1) * 0.9 + (randHash(i, 109, randomSeed + 811) * 2 - 1) * mBoost;
+          y = (v * 2 - 1) * 0.9 + (randHash(i, 113, randomSeed + 813) * 2 - 1) * mBoost;
+          z = (randHash(i, 127, randomSeed + 815) * 2 - 1) * 0.6;
+        }
       }
       const spawnVel = 0.003 + driftA * 0.01;
       vx = (randHash(i, 131, randomSeed + 817) * 2 - 1) * spawnVel;
@@ -14221,15 +15762,16 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
 
     const alpha = clamp((0.45 + life * 0.55 + audioDrive * 0.2) * 255, 0, 255);
     const radius = Math.max(1, Math.round(sizePx * (0.6 + persp * 0.95)));
-    const drawPx = (px, py, blend = 1) => {
+    const drawPxColor = (px, py, rr, gg, bb, blend = 1) => {
       if (px < 0 || py < 0 || px >= w || py >= h) return;
       const pi = (py * w + px) * 4;
       const k = clamp((alpha / 255) * blend, 0.08, 1);
-      od[pi] = clamp(od[pi] * (1 - k) + r * k, 0, 255);
-      od[pi + 1] = clamp(od[pi + 1] * (1 - k) + g * k, 0, 255);
-      od[pi + 2] = clamp(od[pi + 2] * (1 - k) + b * k, 0, 255);
+      od[pi] = clamp(od[pi] * (1 - k) + rr * k, 0, 255);
+      od[pi + 1] = clamp(od[pi + 1] * (1 - k) + gg * k, 0, 255);
+      od[pi + 2] = clamp(od[pi + 2] * (1 - k) + bb * k, 0, 255);
       od[pi + 3] = 255;
     };
+    const drawPx = (px, py, blend = 1) => drawPxColor(px, py, r, g, b, blend);
     drawPx(sx, sy, 1);
     if (radius > 1) {
       drawPx(sx - 1, sy, 0.46);
@@ -14253,6 +15795,33 @@ function renderParticlesModeCpu(baseImageData, tSec, settings) {
         drawPx(tx, ty, (0.18 + f * 0.3) * trailA);
       }
     }
+    if (neonGlow > 0.001) {
+      drawPx(sx - 2, sy, 0.34 * neonGlow);
+      drawPx(sx + 2, sy, 0.34 * neonGlow);
+      drawPx(sx, sy - 2, 0.34 * neonGlow);
+      drawPx(sx, sy + 2, 0.34 * neonGlow);
+      drawPx(sx - 3, sy - 1, 0.2 * neonGlow);
+      drawPx(sx + 3, sy + 1, 0.2 * neonGlow);
+      drawPx(sx + 3, sy - 1, 0.2 * neonGlow);
+      drawPx(sx - 3, sy + 1, 0.2 * neonGlow);
+    }
+    if (datamoshLen > 0 && (i % datamoshSkip === 0)) {
+      const pxStep = vx * worldScale * 0.34;
+      const pyStep = vy * worldScale * 0.34;
+      for (let ti = 1; ti <= datamoshLen; ti++) {
+        const f = 1 - ti / (datamoshLen + 1);
+        const q = 2 + ((ti + (i & 1)) % 3);
+        const tx0 = sx - pxStep * ti;
+        const ty0 = sy - pyStep * ti;
+        const tx = Math.round(tx0 / q) * q + ((ti & 1) ? 1 : 0);
+        const ty = Math.round(ty0 / q) * q;
+        const chan = (ti % 3) - 1;
+        const dk = (0.14 + f * 0.36) * fxAmount;
+        drawPxColor(tx + chan, ty, clamp(r + 42, 0, 255), g, b, dk * 0.9);
+        drawPxColor(tx - chan, ty, r, clamp(g + 34, 0, 255), b, dk * 0.72);
+        drawPxColor(tx, ty + chan, r, g, clamp(b + 46, 0, 255), dk * 0.64);
+      }
+    }
   }
   ctx.putImageData(out, 0, 0);
 }
@@ -14262,9 +15831,10 @@ function renderParticlesMode(baseImageData, tSec, settings) {
   const forceCpuStructured = ps.structure && ps.structure !== "cloud";
   const forceCpuSplit = ps.audioSplit === "zones";
   const forceCpuTrail = (ps.trail || 0) > 0;
+  const forceCpuFx = (ps.fxStyle || "none") === "datamosh";
   const forceCpuFaceTrace = Boolean(ps.faceTrack && webcamActive);
   const forceCpuWarmup = performance.now() < particlesWarmupUntil;
-  const shouldForceCpu = forceCpuStructured || forceCpuSplit || forceCpuTrail || forceCpuFaceTrace || forceCpuWarmup;
+  const shouldForceCpu = forceCpuStructured || forceCpuSplit || forceCpuTrail || forceCpuFx || forceCpuFaceTrace || forceCpuWarmup;
   if (!shouldForceCpu && !particlesGpuForcedOff && renderParticlesModeGpu(baseImageData, tSec, settings)) return;
   renderParticlesModeCpu(baseImageData, tSec, settings);
 }
@@ -14309,6 +15879,27 @@ function renderFrame() {
     !hasAudioReactiveInput()
   ) {
     activateAudioFileSource();
+  }
+
+  // "No Input" should keep a consistent base animation (green mesh),
+  // independent of the currently selected visual module.
+  if (noInputModeActive && !webcamActive && !loadedImage) {
+    updateAudioAnalysis();
+    ctx.putImageData(sourceImage, 0, 0);
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    finalizeFrameStats();
+    if (
+      hasAudioReactiveInput() ||
+      isAudioPlaybackActive() ||
+      isDomeAutoRotateActive() ||
+      isMasterFxAnimated() ||
+      Boolean(kaleidoMorphTween)
+    )
+      scheduleRender();
+    return;
   }
 
   if (mode === "none") {
@@ -14393,8 +15984,9 @@ function renderFrame() {
   }
 
   if (mode === "particles") {
-    const lightDir = getLightDirection(s);
-    drawSceneBackground(base.width, base.height, lightDir, s, tSec);
+    // Matte black background for particles to avoid projection-like backplates.
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, base.width, base.height);
     renderParticlesMode(base, tSec, s);
     applyMasterFxGlobal(tSec);
     applyKaleidoFxGlobal(tSec);
@@ -14423,6 +16015,89 @@ function renderFrame() {
       Number(liveLinesCamDrift ? liveLinesCamDrift.value : 0) > 0 ||
       Number(liveLinesStringVibe ? liveLinesStringVibe.value : 0) > 0;
     if (linesAlwaysOn) scheduleRender();
+    return;
+  }
+
+  if (mode === "atlas") {
+    try {
+      renderAtlasMode(base, tSec, s);
+    } catch (_err) {
+      // Safety fallback: avoid black frame if Morpho render path throws.
+      const w = base.width;
+      const h = base.height;
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, w, h);
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      const rings = 24;
+      for (let i = 0; i < rings; i++) {
+        const k = i / Math.max(1, rings - 1);
+        const r = (0.08 + k * 0.84) * Math.min(w, h) * 0.42;
+        const a = 0.12 + (1 - k) * 0.44;
+        ctx.strokeStyle = `rgba(106, 220, 255, ${a})`;
+        ctx.lineWidth = 0.8 + (1 - k) * 1.8;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r, r * (0.7 + Math.sin(tSec * 0.7 + k * 5) * 0.08), tSec * 0.08 + k * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    finalizeFrameStats();
+    const atlasAlwaysOn =
+      hasAudioReactiveInput() ||
+      isAudioPlaybackActive() ||
+      webcamActive ||
+      recordingActive ||
+      isDomeAutoRotateActive() ||
+      isMasterFxAnimated() ||
+      Boolean(kaleidoMorphTween) ||
+      Boolean(atlasMorphTween) ||
+      Number(liveAtlasMotion ? liveAtlasMotion.value : 0) > 0;
+    if (atlasAlwaysOn) scheduleRender();
+    return;
+  }
+
+  if (mode === "materia") {
+    renderMateriaMode(base, tSec, s);
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    finalizeFrameStats();
+    const materiaAlwaysOn =
+      hasAudioReactiveInput() ||
+      isAudioPlaybackActive() ||
+      webcamActive ||
+      recordingActive ||
+      isDomeAutoRotateActive() ||
+      isMasterFxAnimated() ||
+      Boolean(kaleidoMorphTween) ||
+      Boolean(materiaMorphTween) ||
+      Number(liveMateriaDrift ? liveMateriaDrift.value : 0) > 0;
+    if (materiaAlwaysOn) scheduleRender();
+    return;
+  }
+
+  if (mode === "code") {
+    renderCodeRainMode(base, tSec, s);
+    applyMasterFxGlobal(tSec);
+    applyKaleidoFxGlobal(tSec);
+    applyOutputViewWarp();
+    syncCleanOutput();
+    finalizeFrameStats();
+    const codeAlwaysOn =
+      hasAudioReactiveInput() ||
+      isAudioPlaybackActive() ||
+      webcamActive ||
+      recordingActive ||
+      isDomeAutoRotateActive() ||
+      isMasterFxAnimated() ||
+      Boolean(kaleidoMorphTween) ||
+      Number(liveCodeSpeed ? liveCodeSpeed.value : 0) > 0;
+    if (codeAlwaysOn) scheduleRender();
     return;
   }
 
@@ -14795,6 +16470,30 @@ function randomizeActiveMode() {
     scheduleRender();
     return;
   }
+  if (mode === "code") {
+    const pick = (min, max) => Math.round(min + Math.random() * (max - min));
+    const presets = ["matrix", "glyph", "oracle"];
+    const cams = ["wide", "chase", "macro"];
+    const p = presets[Math.floor(Math.random() * presets.length)];
+    if (liveCodePreset) liveCodePreset.value = p;
+    applyCodePreset(p, false);
+    if (liveCodeCameraMode) liveCodeCameraMode.value = cams[Math.floor(Math.random() * cams.length)];
+    if (liveCodeDensity) liveCodeDensity.value = String(clamp(Number(liveCodeDensity.value) + pick(-20, 20), 0, 100));
+    if (liveCodeSpeed) liveCodeSpeed.value = String(clamp(Number(liveCodeSpeed.value) + pick(-22, 24), 0, 100));
+    if (liveCodeZoom) liveCodeZoom.value = String(clamp(Number(liveCodeZoom.value) + pick(-24, 24), 0, 100));
+    if (liveCodeLetters) liveCodeLetters.value = String(clamp(Number(liveCodeLetters.value) + pick(-24, 24), 0, 100));
+    if (liveCodeFigure) liveCodeFigure.value = String(clamp(Number(liveCodeFigure.value) + pick(-26, 26), 0, 100));
+    if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(Number(liveCodeLanguage.value) + pick(-20, 24), 0, 100));
+    if (liveCodeGlow) liveCodeGlow.value = String(clamp(Number(liveCodeGlow.value) + pick(-20, 20), 0, 100));
+    if (liveCodeAudio) liveCodeAudio.checked = Math.random() > 0.08;
+    if (liveCodeAudioAmount) liveCodeAudioAmount.value = String(clamp(Number(liveCodeAudioAmount.value) + pick(-24, 24), 0, 100));
+    codeRainFigurePhase = fract01(codeRainFigurePhase + Math.random() * 0.8);
+    codeRainCamXTarget = clamp((Math.random() * 2 - 1) * 0.8, -1, 1);
+    codeRainCamYTarget = clamp((Math.random() * 2 - 1) * 0.8, -1, 1);
+    updateLiveQuickOutputs();
+    scheduleRender();
+    return;
+  }
   if (mode === "lines") {
     const pick = (min, max) => Math.round(min + Math.random() * (max - min));
     const isMinimal = true;
@@ -14824,7 +16523,7 @@ function randomizeActiveMode() {
     if (liveLinesCamDrift) liveLinesCamDrift.value = String(clamp(Number(liveLinesCamDrift.value) + pick(isMinimal ? -6 : -12, isMinimal ? 7 : 12), 0, 100));
     if (liveLinesInsideDepth) liveLinesInsideDepth.value = String(clamp(Number(liveLinesInsideDepth.value) + pick(isMinimal ? -12 : -20, isMinimal ? 12 : 20), 0, 100));
     if (liveLinesStringVibe) liveLinesStringVibe.value = String(clamp(Number(liveLinesStringVibe.value) + pick(isMinimal ? -14 : -24, isMinimal ? 18 : 32), 0, 200));
-    if (liveLinesConstellation) liveLinesConstellation.value = String(clamp(Number(liveLinesConstellation.value) + pick(isMinimal ? -12 : -22, isMinimal ? 12 : 30), 0, 100));
+    if (liveLinesConstellation) liveLinesConstellation.value = String(clamp(Number(liveLinesConstellation.value) + pick(isMinimal ? -6 : -12, isMinimal ? 24 : 34), 0, 100));
     randomizeLinesCameraViewSmooth();
     updateLiveQuickOutputs();
     scheduleRender();
@@ -14877,6 +16576,47 @@ function randomizeActiveMode() {
     scheduleRender();
     return;
   }
+  if (mode === "atlas") {
+    const pick = (min, max) => Math.round(min + Math.random() * (max - min));
+    const presets = ["ribbon", "orbital", "shard"];
+    const p = presets[Math.floor(Math.random() * presets.length)];
+    if (liveAtlasPreset) liveAtlasPreset.value = p;
+    applyAtlasPreset(p, false);
+    if (liveAtlasSeed) liveAtlasSeed.value = String(clamp(Number(liveAtlasSeed.value) + pick(-22, 22), 0, 100));
+    if (liveAtlasVariation) liveAtlasVariation.value = String(clamp(Number(liveAtlasVariation.value) + pick(-18, 24), 0, 100));
+    if (liveAtlasComposition) liveAtlasComposition.value = String(clamp(Number(liveAtlasComposition.value) + pick(-22, 20), 0, 100));
+    if (liveAtlasComplexity) liveAtlasComplexity.value = String(clamp(Number(liveAtlasComplexity.value) + pick(-8, 10), 0, 30));
+    if (liveAtlasMotion) liveAtlasMotion.value = String(clamp(Number(liveAtlasMotion.value) + pick(-20, 24), 0, 100));
+    if (liveAtlasContrast) liveAtlasContrast.value = String(clamp(Number(liveAtlasContrast.value) + pick(-16, 18), 0, 100));
+    if (liveAtlasColorMod) liveAtlasColorMod.value = String(clamp(Number(liveAtlasColorMod.value) + pick(-18, 20), 0, 100));
+    if (liveAtlasMesh) liveAtlasMesh.value = String(clamp(Number(liveAtlasMesh.value) + pick(-18, 20), 0, 100));
+    if (liveAtlasSpheres) liveAtlasSpheres.value = String(clamp(Number(liveAtlasSpheres.value) + pick(-20, 20), 0, 100));
+    if (liveAtlasAudio) liveAtlasAudio.checked = Math.random() > 0.08;
+    if (liveAtlasAudioAmount) liveAtlasAudioAmount.value = String(clamp(Number(liveAtlasAudioAmount.value) + pick(-24, 20), 0, 100));
+    randomizeAtlasCameraViewSmooth();
+    updateLiveQuickOutputs();
+    scheduleRender();
+    return;
+  }
+  if (mode === "materia") {
+    const pick = (min, max) => Math.round(min + Math.random() * (max - min));
+    const presets = ["mineral", "ink", "ash"];
+    const p = presets[Math.floor(Math.random() * presets.length)];
+    if (liveMateriaPreset) liveMateriaPreset.value = p;
+    applyMateriaPreset(p, false);
+    if (liveMateriaSeed) liveMateriaSeed.value = String(Math.round(1 + Math.random() * 9998));
+    if (liveMateriaFlow) liveMateriaFlow.value = String(clamp(Number(liveMateriaFlow.value) + pick(-24, 24), 0, 100));
+    if (liveMateriaPorosity) liveMateriaPorosity.value = String(clamp(Number(liveMateriaPorosity.value) + pick(-22, 22), 0, 100));
+    if (liveMateriaLayers) liveMateriaLayers.value = String(clamp(Number(liveMateriaLayers.value) + pick(-24, 22), 0, 100));
+    if (liveMateriaDrift) liveMateriaDrift.value = String(clamp(Number(liveMateriaDrift.value) + pick(-22, 26), 0, 100));
+    if (liveMateriaContrast) liveMateriaContrast.value = String(clamp(Number(liveMateriaContrast.value) + pick(-20, 20), 0, 100));
+    if (liveMateriaAudio) liveMateriaAudio.checked = Math.random() > 0.08;
+    if (liveMateriaAudioAmount) liveMateriaAudioAmount.value = String(clamp(Number(liveMateriaAudioAmount.value) + pick(-24, 22), 0, 100));
+    randomizeMateriaCameraViewSmooth();
+    updateLiveQuickOutputs();
+    scheduleRender();
+    return;
+  }
   if (mode === "particles") {
     // Keep particle count stable on random to avoid performance spikes.
     const keepParticlesCount = liveParticlesCount ? liveParticlesCount.value : null;
@@ -14889,44 +16629,66 @@ function randomizeActiveMode() {
       liveParticlesColorMode.value = opts[Math.floor(Math.random() * opts.length)];
     }
     if (liveParticlesStructure) {
-      const opts = ["grid", "ring", "helix", "mandala", "cloud"];
-      liveParticlesStructure.value = opts[Math.floor(Math.random() * opts.length)];
+      const nextStructure = weightedPick([
+        { v: "cloud", w: 1.1 },
+        { v: "grid", w: 0.75 },
+        { v: "ring", w: 0.95 },
+        { v: "helix", w: 0.95 },
+        { v: "mandala", w: 0.95 },
+        { v: "torus", w: 1.2 },
+        { v: "lissajous", w: 1.15 },
+        { v: "attractor", w: 1.05 },
+      ]);
+      liveParticlesStructure.value = nextStructure || "cloud";
     }
     if (liveParticlesAudioSplit) {
       const opts = ["basic", "zones", "off"];
       liveParticlesAudioSplit.value = opts[Math.floor(Math.random() * opts.length)];
     }
-    if (liveParticlesSize) liveParticlesSize.value = String(Math.round(18 + Math.random() * 72));
-    if (liveParticlesDepth) liveParticlesDepth.value = String(Math.round(22 + Math.random() * 70));
-    if (liveParticlesNoise) liveParticlesNoise.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesAttractor) liveParticlesAttractor.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesFlow) liveParticlesFlow.value = String(Math.round(Math.random() * 100));
+    tuneParticlesStructureProfile(liveParticlesStructure ? liveParticlesStructure.value : "cloud", { withJitter: true });
+    if (liveParticlesSize) liveParticlesSize.value = String(clamp(Number(liveParticlesSize.value), 42, 96));
+    if (liveParticlesDepth) liveParticlesDepth.value = String(clamp(Number(liveParticlesDepth.value), 40, 98));
+    if (liveParticlesNoise) liveParticlesNoise.value = String(clamp(Number(liveParticlesNoise.value), 4, 84));
+    if (liveParticlesAttractor) liveParticlesAttractor.value = String(clamp(Number(liveParticlesAttractor.value), 10, 88));
+    if (liveParticlesFlow) liveParticlesFlow.value = String(clamp(Number(liveParticlesFlow.value), 8, 92));
     if (liveParticlesCamMode) {
-      // Bias towards camera motion inside/through the field.
-      const opts = ["orbit", "sweep", "helix", "inside", "inside"];
-      liveParticlesCamMode.value = opts[Math.floor(Math.random() * opts.length)];
+      const sMode = liveParticlesStructure ? liveParticlesStructure.value : "cloud";
+      const camByStructure = sMode === "attractor" || sMode === "torus"
+        ? ["inside", "inside", "orbit", "helix"]
+        : sMode === "lissajous" || sMode === "helix"
+          ? ["sweep", "helix", "orbit", "inside"]
+          : ["orbit", "sweep", "inside", "helix"];
+      liveParticlesCamMode.value = camByStructure[Math.floor(Math.random() * camByStructure.length)];
     }
-    if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = String(Math.round(28 + Math.random() * 57));
+    if (liveParticlesCamSpeed) liveParticlesCamSpeed.value = String(Math.round(22 + Math.random() * 60));
     if (liveParticlesCamX) liveParticlesCamX.value = String(Math.round(-24 + Math.random() * 48));
     if (liveParticlesCamY) liveParticlesCamY.value = String(Math.round(-50 + Math.random() * 100));
     if (liveParticlesCamZ) liveParticlesCamZ.value = String(Math.round(-35 + Math.random() * 70));
     if (liveParticlesHue) liveParticlesHue.value = String(Math.round(Math.random() * 360));
-    if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesTrail) liveParticlesTrail.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesOrder) liveParticlesOrder.value = String(Math.round(30 + Math.random() * 70));
+    if (liveParticlesAudioAmount) liveParticlesAudioAmount.value = String(clamp(Math.round(28 + Math.random() * 68), 28, 96));
+    if (liveParticlesTrail) liveParticlesTrail.value = String(clamp(Number(liveParticlesTrail.value), 0, 48));
+    if (liveParticlesFxStyle) {
+      const opts = ["none", "neon", "neon", "datamosh"];
+      liveParticlesFxStyle.value = opts[Math.floor(Math.random() * opts.length)];
+    }
+    if (liveParticlesFxAmount) {
+      const baseFx = liveParticlesFxStyle && liveParticlesFxStyle.value === "datamosh" ? 44 : 58;
+      liveParticlesFxAmount.value = String(Math.round(clamp(baseFx + (Math.random() * 2 - 1) * 26, 0, 100)));
+    }
+    if (liveParticlesOrder) liveParticlesOrder.value = String(clamp(Number(liveParticlesOrder.value), 32, 92));
     if (liveParticlesAudio) liveParticlesAudio.checked = Math.random() > 0.2;
-    if (liveParticlesDamping) liveParticlesDamping.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesVortex) liveParticlesVortex.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesSpawn) liveParticlesSpawn.value = String(Math.round(20 + Math.random() * 80));
-    if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = String(Math.round(Math.random() * 100));
-    if (liveParticlesDrift) liveParticlesDrift.value = String(Math.round(12 + Math.random() * 64));
-    if (liveParticlesFocus) liveParticlesFocus.value = String(Math.round(10 + Math.random() * 75));
+    if (liveParticlesDamping) liveParticlesDamping.value = String(clamp(Number(liveParticlesDamping.value), 22, 62));
+    if (liveParticlesVortex) liveParticlesVortex.value = String(clamp(Number(liveParticlesVortex.value), 6, 82));
+    if (liveParticlesSpawn) liveParticlesSpawn.value = String(Math.round(32 + Math.random() * 64));
+    if (liveParticlesMotionThreshold) liveParticlesMotionThreshold.value = String(Math.round(8 + Math.random() * 72));
+    if (liveParticlesDrift) liveParticlesDrift.value = String(clamp(Number(liveParticlesDrift.value), 4, 64));
+    if (liveParticlesFocus) liveParticlesFocus.value = String(clamp(Number(liveParticlesFocus.value), 18, 86));
     if (liveParticlesGradientMode) {
       const opts = ["radial", "axis-x", "axis-y", "spiral"];
       liveParticlesGradientMode.value = opts[Math.floor(Math.random() * opts.length)];
     }
-    if (liveParticlesColorMix) liveParticlesColorMix.value = String(Math.round(20 + Math.random() * 75));
-    if (liveParticlesGradientSpread) liveParticlesGradientSpread.value = String(Math.round(20 + Math.random() * 80));
+    if (liveParticlesColorMix) liveParticlesColorMix.value = String(Math.round(24 + Math.random() * 68));
+    if (liveParticlesGradientSpread) liveParticlesGradientSpread.value = String(Math.round(22 + Math.random() * 72));
     if (liveParticlesCount && keepParticlesCount) liveParticlesCount.value = keepParticlesCount;
     particlesBufferN = 0;
     updateOutputs();
@@ -15150,6 +16912,14 @@ function cancelMorphTweensForCurrentMode() {
     interiorMorphTween = null;
     return;
   }
+  if (mode === "atlas") {
+    atlasMorphTween = null;
+    return;
+  }
+  if (mode === "materia") {
+    materiaMorphTween = null;
+    return;
+  }
   if (mode === "depth" || mode === "mix") {
     depthMorphTween = null;
   }
@@ -15330,9 +17100,14 @@ function triggerParticlesDynamicRandomTween() {
   pushEntry(liveParticlesHue, 0, 360);
   pushEntry(liveParticlesAudioAmount, 28, 100);
   pushEntry(liveParticlesTrail, 0, 64);
+  pushEntry(liveParticlesFxAmount, 22, 92);
   pushEntry(liveParticlesColorMix, 18, 92);
   pushEntry(liveParticlesGradientSpread, 20, 95);
   pushEntry(liveParticlesOrder, 28, 88);
+  if (liveParticlesFxStyle && Math.random() > 0.35) {
+    const opts = ["neon", "datamosh", "neon"];
+    liveParticlesFxStyle.value = opts[Math.floor(Math.random() * opts.length)];
+  }
 
   particlesRandomTween = {
     startMs: performance.now(),
@@ -15731,7 +17506,7 @@ function setMode(newMode) {
   }
   syncLiveModeTabsFromMode();
   syncModeUi();
-  if (newMode !== "depth" && newMode !== "mix" && newMode !== "particles" && newMode !== "lines" && newMode !== "tunnel" && newMode !== "interior") {
+  if (newMode !== "depth" && newMode !== "mix" && newMode !== "particles" && newMode !== "lines" && newMode !== "tunnel" && newMode !== "interior" && newMode !== "atlas" && newMode !== "materia" && newMode !== "code") {
     isDragging3D = false;
     canvas.classList.remove("dragging");
     cameraPanX = 0;
@@ -15781,6 +17556,9 @@ function setMode(newMode) {
     if (liveParticlesFaceDelay && Number(liveParticlesFaceDelay.value) > 38) liveParticlesFaceDelay.value = "24";
     if (liveParticlesEmitter) liveParticlesEmitter.value = "grid";
     if (liveParticlesStructure) liveParticlesStructure.value = "cloud";
+    tuneParticlesStructureProfile("cloud", { withJitter: false });
+    if (liveParticlesFxStyle && !liveParticlesFxStyle.value) liveParticlesFxStyle.value = "neon";
+    if (liveParticlesFxAmount && Number(liveParticlesFxAmount.value) < 20) liveParticlesFxAmount.value = "58";
     if (liveParticlesNoise && Number(liveParticlesNoise.value) > 35) liveParticlesNoise.value = "24";
     if (liveParticlesFlow && Number(liveParticlesFlow.value) > 40) liveParticlesFlow.value = "28";
     if (liveParticlesDamping && Number(liveParticlesDamping.value) < 26) liveParticlesDamping.value = "34";
@@ -15822,12 +17600,13 @@ function setMode(newMode) {
     linesBeatCooldown = 0;
     linesBeatPulse = 0;
     linesInvertSign = 1;
+    linesInvertBlend = 1;
     if (liveLinesStyle && !liveLinesStyle.value) liveLinesStyle.value = "minimal";
     if (liveLinesPattern && !liveLinesPattern.value) liveLinesPattern.value = "flow";
     if (liveLinesPreset && !liveLinesPreset.value) liveLinesPreset.value = "ambient";
     if (liveLinesGeometry && !liveLinesGeometry.value) liveLinesGeometry.value = "ribbon";
     if (liveLinesCameraMode && !liveLinesCameraMode.value) liveLinesCameraMode.value = "orbit";
-    if (liveLinesConstellation && !liveLinesConstellation.value) liveLinesConstellation.value = "32";
+    if (liveLinesConstellation && !liveLinesConstellation.value) liveLinesConstellation.value = "56";
     if (liveLinesInsideDepth && !liveLinesInsideDepth.value) liveLinesInsideDepth.value = "62";
     if (liveLinesBeatFlip) liveLinesBeatFlip.checked = true;
     applyLinesPreset(liveLinesPreset ? liveLinesPreset.value : "ambient", false);
@@ -15904,6 +17683,101 @@ function setMode(newMode) {
     if (bgMode) bgMode.value = "black";
     setCameraMode("static", { instant: true });
   }
+  if (newMode === "atlas" && previousMode !== "atlas") {
+    atlasCamYaw = 0;
+    atlasCamPitch = 0;
+    atlasCamDist = 1.04;
+    atlasCamYawTarget = 0;
+    atlasCamPitchTarget = 0;
+    atlasCamDistTarget = 1.04;
+    atlasMorphTween = null;
+    atlasAudioBassSmooth = 0;
+    atlasAudioMidSmooth = 0;
+    atlasAudioHighSmooth = 0;
+    atlasAudioEnergySmooth = 0;
+    atlasCamRig = 0;
+    atlasCamRigTarget = 0;
+    if (liveAtlasPreset && !liveAtlasPreset.value) liveAtlasPreset.value = "ribbon";
+    if (liveAtlasSeed && !liveAtlasSeed.value) liveAtlasSeed.value = "52";
+    if (liveAtlasVariation && !liveAtlasVariation.value) liveAtlasVariation.value = "58";
+    if (liveAtlasComposition && !liveAtlasComposition.value) liveAtlasComposition.value = "58";
+    if (liveAtlasComplexity && !liveAtlasComplexity.value) liveAtlasComplexity.value = "22";
+    if (liveAtlasMotion && !liveAtlasMotion.value) liveAtlasMotion.value = "46";
+    if (liveAtlasContrast && !liveAtlasContrast.value) liveAtlasContrast.value = "56";
+    if (liveAtlasColorMod && !liveAtlasColorMod.value) liveAtlasColorMod.value = "62";
+    if (liveAtlasMesh && !liveAtlasMesh.value) liveAtlasMesh.value = "46";
+    if (liveAtlasSpheres && !liveAtlasSpheres.value) liveAtlasSpheres.value = "36";
+    if (liveAtlasAudioAmount && !liveAtlasAudioAmount.value) liveAtlasAudioAmount.value = "72";
+    if (liveAtlasAudio) liveAtlasAudio.checked = true;
+    applyAtlasPreset(liveAtlasPreset ? liveAtlasPreset.value : "ribbon", false);
+    atlasSeedSmooth = Number(liveAtlasSeed ? liveAtlasSeed.value : 52);
+    atlasVariationSmooth = Number(liveAtlasVariation ? liveAtlasVariation.value : 58);
+    atlasCompositionSmooth = Number(liveAtlasComposition ? liveAtlasComposition.value : 58);
+    atlasComplexitySmooth = Number(liveAtlasComplexity ? liveAtlasComplexity.value : 22);
+    atlasMotionSmooth = Number(liveAtlasMotion ? liveAtlasMotion.value : 46);
+    atlasContrastSmooth = Number(liveAtlasContrast ? liveAtlasContrast.value : 56);
+    atlasColorModSmooth = Number(liveAtlasColorMod ? liveAtlasColorMod.value : 62);
+    atlasMeshSmooth = Number(liveAtlasMesh ? liveAtlasMesh.value : 46);
+    atlasSpheresSmooth = Number(liveAtlasSpheres ? liveAtlasSpheres.value : 36);
+    if (bgMode) bgMode.value = "black";
+    setCameraMode("static", { instant: true });
+  }
+  if (newMode === "materia" && previousMode !== "materia") {
+    materiaCamYaw = 0;
+    materiaCamPitch = 0;
+    materiaCamDist = 1.02;
+    materiaCamYawTarget = 0;
+    materiaCamPitchTarget = 0;
+    materiaCamDistTarget = 1.02;
+    materiaMorphTween = null;
+    materiaAudioBassSmooth = 0;
+    materiaAudioMidSmooth = 0;
+    materiaAudioHighSmooth = 0;
+    materiaAudioEnergySmooth = 0;
+    if (liveMateriaPreset && !liveMateriaPreset.value) liveMateriaPreset.value = "mineral";
+    if (liveMateriaSeed && !liveMateriaSeed.value) liveMateriaSeed.value = "2424";
+    if (liveMateriaFlow && !liveMateriaFlow.value) liveMateriaFlow.value = "58";
+    if (liveMateriaPorosity && !liveMateriaPorosity.value) liveMateriaPorosity.value = "48";
+    if (liveMateriaLayers && !liveMateriaLayers.value) liveMateriaLayers.value = "52";
+    if (liveMateriaDrift && !liveMateriaDrift.value) liveMateriaDrift.value = "42";
+    if (liveMateriaContrast && !liveMateriaContrast.value) liveMateriaContrast.value = "54";
+    if (liveMateriaAudioAmount && !liveMateriaAudioAmount.value) liveMateriaAudioAmount.value = "66";
+    if (liveMateriaAudio) liveMateriaAudio.checked = true;
+    applyMateriaPreset(liveMateriaPreset ? liveMateriaPreset.value : "mineral", false);
+    materiaSeedSmooth = Number(liveMateriaSeed ? liveMateriaSeed.value : 2424);
+    materiaFlowSmooth = Number(liveMateriaFlow ? liveMateriaFlow.value : 58);
+    materiaPorositySmooth = Number(liveMateriaPorosity ? liveMateriaPorosity.value : 48);
+    materiaLayersSmooth = Number(liveMateriaLayers ? liveMateriaLayers.value : 52);
+    materiaDriftSmooth = Number(liveMateriaDrift ? liveMateriaDrift.value : 42);
+    materiaContrastSmooth = Number(liveMateriaContrast ? liveMateriaContrast.value : 54);
+    if (bgMode) bgMode.value = "black";
+    setCameraMode("static", { instant: true });
+  }
+  if (newMode === "code" && previousMode !== "code") {
+    codeRainCamX = 0;
+    codeRainCamY = 0;
+    codeRainCamXTarget = 0;
+    codeRainCamYTarget = 0;
+    codeRainFigurePhase = 0;
+    codeRainCols = 0;
+    codeRainDrops = new Float32Array(0);
+    codeRainSpeeds = new Float32Array(0);
+    codeRainSeeds = new Float32Array(0);
+    if (liveCodePreset && !liveCodePreset.value) liveCodePreset.value = "matrix";
+    if (liveCodeCameraMode && !liveCodeCameraMode.value) liveCodeCameraMode.value = "wide";
+    if (liveCodeDensity && !liveCodeDensity.value) liveCodeDensity.value = "58";
+    if (liveCodeSpeed && !liveCodeSpeed.value) liveCodeSpeed.value = "44";
+    if (liveCodeZoom && !liveCodeZoom.value) liveCodeZoom.value = "38";
+    if (liveCodeLetters && !liveCodeLetters.value) liveCodeLetters.value = "62";
+    if (liveCodeFigure && !liveCodeFigure.value) liveCodeFigure.value = "62";
+    if (liveCodeLanguage && !liveCodeLanguage.value) liveCodeLanguage.value = "66";
+    if (liveCodeGlow && !liveCodeGlow.value) liveCodeGlow.value = "54";
+    if (liveCodeAudioAmount && !liveCodeAudioAmount.value) liveCodeAudioAmount.value = "72";
+    if (liveCodeAudio) liveCodeAudio.checked = true;
+    applyCodePreset(liveCodePreset ? liveCodePreset.value : "matrix", false);
+    if (bgMode) bgMode.value = "black";
+    setCameraMode("static", { instant: true });
+  }
   if (newMode === "synth" && previousMode !== "synth") {
     setCameraMode("static", { instant: true });
     synthEchoSmooth = 0;
@@ -15921,7 +17795,7 @@ function setMode(newMode) {
 
 function updateCameraDeckVisibility() {
   if (!cameraDeckControls) return;
-  const hideCamAnim = mode === "glitch" || mode === "fractal" || mode === "lines" || mode === "synth" || mode === "tunnel" || mode === "interior";
+  const hideCamAnim = mode === "glitch" || mode === "fractal" || mode === "lines" || mode === "synth" || mode === "tunnel" || mode === "interior" || mode === "atlas" || mode === "materia" || mode === "code";
   if (cameraControlsDetails) {
     cameraControlsDetails.hidden = hideCamAnim;
     if (!hideCamAnim && !cameraControlsDetails.open) {
@@ -16055,6 +17929,8 @@ function resetAll() {
   if (liveParticlesFaceDelay) liveParticlesFaceDelay.value = "24";
   if (liveParticlesFaceAmount) liveParticlesFaceAmount.value = "68";
   if (liveParticlesTrail) liveParticlesTrail.value = "0";
+  if (liveParticlesFxStyle) liveParticlesFxStyle.value = "neon";
+  if (liveParticlesFxAmount) liveParticlesFxAmount.value = "58";
   if (liveParticlesOrder) liveParticlesOrder.value = "48";
   if (liveParticlesDamping) liveParticlesDamping.value = "18";
   if (liveParticlesVortex) liveParticlesVortex.value = "22";
@@ -16623,7 +18499,7 @@ if (moduleRouteButtons.length > 0) {
     btn.addEventListener("click", () => {
       const route = btn.dataset.moduleRoute || "glitch";
       setWorkspacePanel("live");
-      setLiveModeTab(route === "depth" || route === "particles" || route === "fractal" || route === "lines" || route === "tunnel" || route === "interior" ? route : "glitch");
+      setLiveModeTab(route === "depth" || route === "particles" || route === "fractal" || route === "lines" || route === "tunnel" || route === "interior" || route === "atlas" || route === "materia" || route === "code" ? route : "glitch");
       scheduleRender();
     });
   });
@@ -17552,12 +19428,20 @@ if (liveParticlesColorMode) {
 }
 if (liveParticlesStructure) {
   liveParticlesStructure.addEventListener("change", () => {
+    tuneParticlesStructureProfile(liveParticlesStructure.value, { withJitter: false });
     particlesBufferN = 0;
+    updateLiveQuickOutputs();
     scheduleRender();
   });
 }
 if (liveParticlesAudioSplit) {
   liveParticlesAudioSplit.addEventListener("change", () => {
+    scheduleRender();
+  });
+}
+if (liveParticlesFxStyle) {
+  liveParticlesFxStyle.addEventListener("change", () => {
+    updateLiveQuickOutputs();
     scheduleRender();
   });
 }
@@ -17648,6 +19532,7 @@ if (liveParticlesBgColorB) {
   liveParticlesFaceDelay,
   liveParticlesFaceAmount,
   liveParticlesTrail,
+  liveParticlesFxAmount,
   liveParticlesOrder,
   liveParticlesDamping,
   liveParticlesVortex,
@@ -17801,6 +19686,94 @@ if (liveInteriorAudio) {
     scheduleRender();
   });
 });
+if (liveAtlasPreset) {
+  liveAtlasPreset.addEventListener("change", () => {
+    applyAtlasPreset(liveAtlasPreset.value, true);
+  });
+}
+if (liveAtlasAudio) {
+  liveAtlasAudio.addEventListener("change", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+[
+  liveAtlasSeed,
+  liveAtlasVariation,
+  liveAtlasComposition,
+  liveAtlasComplexity,
+  liveAtlasMotion,
+  liveAtlasContrast,
+  liveAtlasColorMod,
+  liveAtlasMesh,
+  liveAtlasSpheres,
+  liveAtlasAudioAmount,
+].forEach((control) => {
+  if (!control) return;
+  control.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+});
+if (liveMateriaPreset) {
+  liveMateriaPreset.addEventListener("change", () => {
+    applyMateriaPreset(liveMateriaPreset.value, true);
+  });
+}
+if (liveMateriaAudio) {
+  liveMateriaAudio.addEventListener("change", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+[
+  liveMateriaSeed,
+  liveMateriaFlow,
+  liveMateriaPorosity,
+  liveMateriaLayers,
+  liveMateriaDrift,
+  liveMateriaContrast,
+  liveMateriaAudioAmount,
+].forEach((control) => {
+  if (!control) return;
+  control.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+});
+if (liveCodePreset) {
+  liveCodePreset.addEventListener("change", () => {
+    applyCodePreset(liveCodePreset.value, true);
+  });
+}
+if (liveCodeCameraMode) {
+  liveCodeCameraMode.addEventListener("change", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+if (liveCodeAudio) {
+  liveCodeAudio.addEventListener("change", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+}
+[
+  liveCodeDensity,
+  liveCodeSpeed,
+  liveCodeZoom,
+  liveCodeLetters,
+  liveCodeFigure,
+  liveCodeLanguage,
+  liveCodeGlow,
+  liveCodeAudioAmount,
+].forEach((control) => {
+  if (!control) return;
+  control.addEventListener("input", () => {
+    updateLiveQuickOutputs();
+    scheduleRender();
+  });
+});
 if (liveOutputView) {
   liveOutputView.addEventListener("change", () => {
     domeWarpScaleSmooth = 1;
@@ -17933,7 +19906,7 @@ if (liveCameraMode) {
 if (modCurve) modCurve.addEventListener("change", scheduleRender);
 
 canvas.addEventListener("mousemove", (e) => {
-  if (!originalImageData && !webcamActive && mode !== "lines" && mode !== "tunnel" && mode !== "interior") return;
+  if (!originalImageData && !webcamActive && mode !== "lines" && mode !== "tunnel" && mode !== "interior" && mode !== "atlas" && mode !== "materia" && mode !== "code") return;
   if (isDraggingDome && isGlitchDomePanMode()) {
     const dx = e.clientX - lastDomeDragX;
     const dy = e.clientY - lastDomeDragY;
@@ -17944,7 +19917,7 @@ canvas.addEventListener("mousemove", (e) => {
     scheduleRender();
     return;
   }
-  if (mode !== "depth" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior") return;
+  if (mode !== "depth" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior" && mode !== "atlas" && mode !== "materia" && mode !== "code") return;
   if (isDragging3D) {
     const dx = e.clientX - lastDragX;
     const dy = e.clientY - lastDragY;
@@ -17962,6 +19935,15 @@ canvas.addEventListener("mousemove", (e) => {
     } else if (mode === "interior") {
       interiorCamYawTarget += dx * 0.0064;
       interiorCamPitchTarget = clamp(interiorCamPitchTarget + dy * 0.0046, -0.86, 0.86);
+    } else if (mode === "atlas") {
+      atlasCamYawTarget += dx * 0.0063;
+      atlasCamPitchTarget = clamp(atlasCamPitchTarget + dy * 0.0048, -0.9, 0.9);
+    } else if (mode === "materia") {
+      materiaCamYawTarget += dx * 0.0064;
+      materiaCamPitchTarget = clamp(materiaCamPitchTarget + dy * 0.0051, -1.1, 1.1);
+    } else if (mode === "code") {
+      codeRainCamXTarget = clamp(codeRainCamXTarget + dx * 0.0018, -1, 1);
+      codeRainCamYTarget = clamp(codeRainCamYTarget + dy * 0.0018, -1, 1);
     } else {
       dragRotateY += dx * 0.18;
       dragRotateX += dy * 0.18;
@@ -17970,7 +19952,7 @@ canvas.addEventListener("mousemove", (e) => {
     scheduleRender();
     return;
   }
-  if (mode === "tunnel" || mode === "interior") {
+  if (mode === "tunnel" || mode === "interior" || mode === "atlas" || mode === "materia" || mode === "code") {
     const rect = canvas.getBoundingClientRect();
     if (rect.width > 2 && rect.height > 2) {
       const nx = clamp((e.clientX - rect.left) / rect.width, 0, 1);
@@ -17979,10 +19961,17 @@ canvas.addEventListener("mousemove", (e) => {
         // X controls tunnel diameter, Y adds subtle compensation.
         tunnelDiameterTarget = clamp(0.62 + nx * 1.15 + (0.5 - ny) * 0.16, 0.55, 2.2);
         tunnelDiameterCursorActive = true;
-      } else {
+      } else if (mode === "interior") {
         interiorCursorXTarget = nx;
         interiorCursorYTarget = ny;
         interiorCamDistTarget = clamp(0.74 + nx * 1.1 + (0.5 - ny) * 0.2, 0.68, 2.2);
+      } else if (mode === "atlas") {
+        atlasCamDistTarget = clamp(0.72 + nx * 1.02 + (0.5 - ny) * 0.22, 0.62, 2.2);
+      } else if (mode === "code") {
+        codeRainCamXTarget = clamp((nx - 0.5) * 2, -1, 1);
+        codeRainCamYTarget = clamp((ny - 0.5) * 2, -1, 1);
+      } else {
+        materiaCamDistTarget = clamp(0.56 + nx * 1.16 + (0.5 - ny) * 0.24, 0.46, 2.4);
       }
       scheduleRender();
     }
@@ -17992,7 +19981,7 @@ canvas.addEventListener("mousemove", (e) => {
 canvas.addEventListener(
   "wheel",
   (e) => {
-    if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior") return;
+    if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior" && mode !== "atlas" && mode !== "materia" && mode !== "code") return;
     e.preventDefault();
     if (mode === "fractal") {
       const next = clamp((liveFractalDistance ? Number(liveFractalDistance.value) : 76) - e.deltaY * 0.03, 20, 180);
@@ -18002,7 +19991,7 @@ canvas.addEventListener(
       return;
     }
     if (mode === "lines") {
-      linesCamDistTarget = clamp(linesCamDistTarget + e.deltaY * 0.0009, 0.66, 2.2);
+      linesCamDistTarget = clamp(linesCamDistTarget + e.deltaY * 0.0009, 0.78, 2.2);
       scheduleRender();
       return;
     }
@@ -18016,6 +20005,21 @@ canvas.addEventListener(
       scheduleRender();
       return;
     }
+    if (mode === "atlas") {
+      atlasCamDistTarget = clamp(atlasCamDistTarget + e.deltaY * 0.0009, 0.62, 2.2);
+      scheduleRender();
+      return;
+    }
+    if (mode === "materia") {
+      materiaCamDistTarget = clamp(materiaCamDistTarget + e.deltaY * 0.0009, 0.46, 2.4);
+      scheduleRender();
+      return;
+    }
+    if (mode === "code") {
+      codeRainCamYTarget = clamp(codeRainCamYTarget + e.deltaY * 0.0008, -1, 1);
+      scheduleRender();
+      return;
+    }
     const speed = e.ctrlKey ? 0.06 : 0.025;
     adjustCanvasZoom(-e.deltaY, speed);
   },
@@ -18023,7 +20027,7 @@ canvas.addEventListener(
 );
 
 canvas.addEventListener("gesturestart", (e) => {
-  if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior") return;
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior" && mode !== "atlas" && mode !== "materia" && mode !== "code") return;
   e.preventDefault();
   if (mode === "fractal") {
     gestureBaseZoom = liveFractalDistance ? Number(liveFractalDistance.value) : 76;
@@ -18041,11 +20045,23 @@ canvas.addEventListener("gesturestart", (e) => {
     gestureBaseZoom = interiorCamDistTarget;
     return;
   }
+  if (mode === "atlas") {
+    gestureBaseZoom = atlasCamDistTarget;
+    return;
+  }
+  if (mode === "materia") {
+    gestureBaseZoom = materiaCamDistTarget;
+    return;
+  }
+  if (mode === "code") {
+    gestureBaseZoom = codeRainCamYTarget;
+    return;
+  }
   gestureBaseZoom = Number(controls.cameraZoom ? controls.cameraZoom.value : 86);
 });
 
 canvas.addEventListener("gesturechange", (e) => {
-  if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior") return;
+  if (mode !== "depth" && mode !== "mix" && mode !== "particles" && mode !== "fractal" && mode !== "lines" && mode !== "tunnel" && mode !== "interior" && mode !== "atlas" && mode !== "materia" && mode !== "code") return;
   e.preventDefault();
   if (mode === "fractal") {
     if (gestureBaseZoom === null) gestureBaseZoom = liveFractalDistance ? Number(liveFractalDistance.value) : 76;
@@ -18059,7 +20075,7 @@ canvas.addEventListener("gesturechange", (e) => {
   if (mode === "lines") {
     if (gestureBaseZoom === null) gestureBaseZoom = linesCamDistTarget;
     const scale = clamp(Number(e.scale || 1), 0.3, 4);
-    linesCamDistTarget = clamp(gestureBaseZoom / scale, 0.66, 2.2);
+    linesCamDistTarget = clamp(gestureBaseZoom / scale, 0.78, 2.2);
     scheduleRender();
     return;
   }
@@ -18074,6 +20090,27 @@ canvas.addEventListener("gesturechange", (e) => {
     if (gestureBaseZoom === null) gestureBaseZoom = interiorCamDistTarget;
     const scale = clamp(Number(e.scale || 1), 0.3, 4);
     interiorCamDistTarget = clamp(gestureBaseZoom / scale, 0.68, 2.2);
+    scheduleRender();
+    return;
+  }
+  if (mode === "atlas") {
+    if (gestureBaseZoom === null) gestureBaseZoom = atlasCamDistTarget;
+    const scale = clamp(Number(e.scale || 1), 0.3, 4);
+    atlasCamDistTarget = clamp(gestureBaseZoom / scale, 0.62, 2.2);
+    scheduleRender();
+    return;
+  }
+  if (mode === "materia") {
+    if (gestureBaseZoom === null) gestureBaseZoom = materiaCamDistTarget;
+    const scale = clamp(Number(e.scale || 1), 0.3, 4);
+    materiaCamDistTarget = clamp(gestureBaseZoom / scale, 0.46, 2.4);
+    scheduleRender();
+    return;
+  }
+  if (mode === "code") {
+    if (gestureBaseZoom === null) gestureBaseZoom = codeRainCamYTarget;
+    const scale = clamp(Number(e.scale || 1), 0.3, 4);
+    codeRainCamYTarget = clamp(gestureBaseZoom / scale, -1, 1);
     scheduleRender();
     return;
   }
@@ -18769,13 +20806,20 @@ window.addEventListener("keydown", (e) => {
     cycle3dFxMode();
     return;
   }
-  if (e.code === "KeyO" && (mode === "depth" || mode === "mix" || mode === "particles" || mode === "fractal" || mode === "tunnel" || mode === "interior")) {
+  if (e.code === "KeyO" && (mode === "depth" || mode === "mix" || mode === "particles" || mode === "fractal" || mode === "tunnel" || mode === "interior" || mode === "atlas" || mode === "materia" || mode === "code")) {
     e.preventDefault();
     if (e.repeat) return;
     if (mode === "particles") triggerParticlesDynamicRandomTween();
     else if (mode === "fractal") triggerFractalMorphTween();
     else if (mode === "tunnel") triggerTunnelMorphTween();
     else if (mode === "interior") triggerInteriorMorphTween();
+    else if (mode === "atlas") triggerAtlasMorphTween();
+    else if (mode === "materia") triggerMateriaMorphTween();
+    else if (mode === "code") {
+      codeRainFigurePhase = fract01(codeRainFigurePhase + 0.25 + Math.random() * 0.35);
+      if (liveCodeFigure) liveCodeFigure.value = String(clamp(Number(liveCodeFigure.value) + (Math.random() * 40 - 20), 0, 100));
+      updateLiveQuickOutputs();
+    }
     else triggerDepthMorphTween();
     return;
   }
@@ -18797,6 +20841,13 @@ window.addEventListener("keydown", (e) => {
     else if (mode === "lines") randomizeLinesCameraViewSmooth();
     else if (mode === "tunnel") randomizeTunnelCameraViewSmooth();
     else if (mode === "interior") randomizeInteriorCameraViewSmooth();
+    else if (mode === "atlas") randomizeAtlasCameraViewSmooth();
+    else if (mode === "materia") randomizeMateriaCameraViewSmooth();
+    else if (mode === "code") {
+      codeRainCamXTarget = clamp(codeRainCamXTarget + (Math.random() * 2 - 1) * 0.7, -1, 1);
+      codeRainCamYTarget = clamp(codeRainCamYTarget + (Math.random() * 2 - 1) * 0.7, -1, 1);
+      scheduleRender();
+    }
     else randomize3dCameraViewSmooth();
     return;
   }
@@ -18807,6 +20858,13 @@ window.addEventListener("keydown", (e) => {
     else if (mode === "lines") randomizeLinesCameraView();
     else if (mode === "tunnel") randomizeTunnelCameraView();
     else if (mode === "interior") randomizeInteriorCameraView();
+    else if (mode === "atlas") randomizeAtlasCameraView();
+    else if (mode === "materia") randomizeMateriaCameraView();
+    else if (mode === "code") {
+      codeRainCamXTarget = (Math.random() * 2 - 1);
+      codeRainCamYTarget = (Math.random() * 2 - 1);
+      scheduleRender();
+    }
     else randomize3dCameraView();
     return;
   }
