@@ -2497,7 +2497,13 @@ body.mobile-live-enabled #canvas {
 }
 
 .mobile-live-phone.sheet-collapsed .mobile-bottom-sheet {
-  transform: translateY(calc(100% - 56px));
+  display: none;
+  pointer-events: none;
+}
+
+.mobile-live-tablet.sheet-collapsed .mobile-bottom-sheet {
+  display: none;
+  pointer-events: none;
 }
 
 .mobile-sheet-head {
@@ -2619,17 +2625,16 @@ body.mobile-live-enabled #canvas {
 }
 
 .mobile-live-tablet .mobile-module-strip {
-  position: static;
-  left: auto;
-  right: auto;
-  bottom: auto;
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: calc(184px + env(safe-area-inset-bottom));
 }
 
 .mobile-live-tablet .mobile-quick-actions {
-  position: static;
-  left: auto;
-  right: auto;
-  bottom: auto;
+  position: absolute;
+  right: calc(10px + env(safe-area-inset-right));
+  bottom: calc(74px + env(safe-area-inset-bottom));
 }
 
 .tablet-col {

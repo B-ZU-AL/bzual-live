@@ -32,12 +32,10 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 - `MacrosPanel`: 8 dynamic macros + 2 XY pads.
 
 ## iPad (landscape)
-- `TabletLiveShell` with 3-column layout:
+- `TabletLiveShell` now uses the same minimal overlay shell as iPhone (canvas-first):
   - Same `SELECT INPUT` overlay and compact `QuickControls`.
-  - Left: Scenes.
-  - Center: Canvas + quick actions + optional Builder panel.
-    - Includes same collapsible `Module Switcher` near shortcuts.
-  - Right: Macros.
+  - No large full-screen setup/columns blocking the canvas.
+  - Same collapsible `Module Switcher` + bottom dock/sheet.
 
 ## iOS behavior
 - Safe areas applied with `env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`.

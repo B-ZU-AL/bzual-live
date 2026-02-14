@@ -4128,6 +4128,7 @@ function createBottomDock() {
     btn.dataset.tab = key;
     btn.addEventListener("click", () => {
       mobileLiveActiveTab = key;
+      if (mobileLiveRootNode) mobileLiveRootNode.classList.remove("sheet-collapsed");
       syncMobileDock();
       renderMobileSheetPanel();
     });
@@ -4149,7 +4150,7 @@ function createBottomSheet() {
   mobileLiveSheetTitle = el("h3", "mobile-sheet-title", "Scenes");
   const closeBtn = el("button", "btn mini", "Close");
   closeBtn.addEventListener("click", () => {
-    mobileLiveRootNode.classList.toggle("sheet-collapsed");
+    if (mobileLiveRootNode) mobileLiveRootNode.classList.add("sheet-collapsed");
   });
   head.append(mobileLiveSheetTitle, closeBtn);
   mobileLiveSheetBody = el("div", "mobile-sheet-body");
@@ -4194,39 +4195,17 @@ function createMobileLiveShell() {
 
 function createTabletLiveShell() {
   const root = el("section", "mobile-live-shell mobile-live-tablet");
+  root.classList.add("sheet-collapsed");
   root.classList.add("modules-collapsed");
-  const grid = el("div", "tablet-live-grid");
-  const left = el("aside", "tablet-col tablet-scenes");
-  left.append(el("h3", "tablet-col-title", "Scenes"), createScenesGrid(true));
-  const center = el("section", "tablet-col tablet-canvas-overlay");
+  const stage = el("div", "mobile-canvas-stage");
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
-  const tabs = el("div", "tablet-tabs");
-  mobileLiveTabs = [];
-  [["scenes", "Scenes"], ["macros", "Macros"], ["fx", "FX"], ["audio", "Audio"], ["settings", "Settings"]].forEach(([key, label]) => {
-    const b = el("button", "btn mini", label);
-    b.dataset.tab = key;
-    b.addEventListener("click", () => {
-      mobileLiveActiveTab = key;
-      mobileLiveTabs.forEach((x) => x.classList.toggle("active", x.dataset.tab === key));
-      renderTabletBuilder();
-    });
-    mobileLiveTabs.push(b);
-    tabs.appendChild(b);
-  });
-  mobileLiveBuilderToggle = el("button", "btn mini mobile-live-builder-toggle", "Builder");
-  mobileLiveBuilderToggle.addEventListener("click", () => {
-    if (!mobileLiveBuilderPanel) return;
-    mobileLiveBuilderPanel.hidden = !mobileLiveBuilderPanel.hidden;
-  });
-  mobileLiveBuilderPanel = el("div", "tablet-builder");
-  center.append(modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
-  const right = el("aside", "tablet-col tablet-macros");
-  right.append(el("h3", "tablet-col-title", "Macros"), createMacrosPanel(true));
-  grid.append(left, center, right);
-  root.appendChild(grid);
-  mobileLiveTabs.forEach((x) => x.classList.toggle("active", x.dataset.tab === mobileLiveActiveTab));
-  renderTabletBuilder();
+  const dock = createBottomDock();
+  const sheet = createBottomSheet();
+  stage.append(modules, quick, dock, sheet);
+  root.appendChild(stage);
+  syncMobileDock();
+  renderMobileSheetPanel();
   return root;
 }
 
