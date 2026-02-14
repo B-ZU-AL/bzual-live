@@ -1426,12 +1426,6 @@ let mobileLiveForcedValue = "auto";
 let mobileLiveKeyboardInset = 0;
 let mobileLiveMountedKind = "";
 let mobileLiveViewportBound = false;
-let mobileLiveStartupCard = null;
-let mobileLiveStartupSelect = null;
-let mobileLiveStartupContinue = null;
-let mobileLiveStartupSourceDone = false;
-let mobileLiveStartupAspectDone = false;
-let mobileLiveStartupCompleted = false;
 
 const i18n = {
   es: {
@@ -3750,14 +3744,6 @@ function syncMobileModuleSwitcher() {
   }
 }
 
-function hasMobileStartupSourceReady() {
-  return Boolean(hasAudioReactiveInput() || micActive || audioFileActive || loadedImage || webcamActive);
-}
-
-function syncMobileStartupStateFromRuntime() {
-  if (hasMobileStartupSourceReady()) mobileLiveStartupSourceDone = true;
-}
-
 function vibrateTap(ms = 12) {
   if (!navigator.vibrate) return;
   try {
@@ -3840,65 +3826,80 @@ function createMobileModuleSwitcher() {
   return bar;
 }
 
-function updateMobileStartupUi() {
-  if (!mobileLiveRootNode) return;
-  const ready = mobileLiveStartupSourceDone && mobileLiveStartupAspectDone;
-  const completed = mobileLiveStartupCompleted || ready;
-  mobileLiveRootNode.classList.toggle("mobile-startup-required", !completed);
-  if (mobileLiveStartupCard) mobileLiveStartupCard.hidden = completed;
-  if (mobileLiveStartupContinue) mobileLiveStartupContinue.disabled = !ready;
+function openMobileSetupPanel() {
+  mobileLiveActiveTab = "settings";
+  syncMobileDock();
+  renderMobileSheetPanel();
+  if (mobileLiveRootNode) mobileLiveRootNode.classList.remove("sheet-collapsed");
+  if (mobileLiveTabs.length) {
+    mobileLiveTabs.forEach((x) => x.classList.toggle("active", x.dataset.tab === "settings"));
+    if (mobileLiveBuilderPanel) mobileLiveBuilderPanel.hidden = false;
+    renderTabletBuilder();
+  }
 }
 
-function createMobileStartupCard() {
-  const card = el("section", "mobile-startup-card");
-  const title = el("h3", "mobile-startup-title", "Live Start");
-  const subtitle = el("p", "mobile-startup-subtitle", "1) Audio o Imagen · 2) Relacion de aspecto");
-  const sourceWrap = el("div", "mobile-startup-step");
-  const sourceLabel = el("div", "mobile-field-label", "Paso 1: fuente");
-  const sourceButtons = el("div", "mobile-startup-actions");
-  const audioBtn = el("button", "btn mobile-startup-btn", "Audio");
-  const imageBtn = el("button", "btn mobile-startup-btn", "Imagen");
+function createMobilePriorityBar() {
+  const bar = el("section", "mobile-priority-bar");
+  const rowEntry = el("div", "mobile-priority-row");
+  rowEntry.appendChild(el("span", "mobile-priority-label", "Entrada"));
+  const imgBtn = el("button", "btn mini mobile-priority-btn", "Imagen");
+  imgBtn.addEventListener("click", () => {
+    if (canvasOverlayImageBtn) canvasOverlayImageBtn.click();
+    vibrateTap();
+  });
+  const camBtn = el("button", "btn mini mobile-priority-btn", "Webcam");
+  camBtn.addEventListener("click", () => {
+    if (canvasOverlayWebcamBtn) canvasOverlayWebcamBtn.click();
+    vibrateTap();
+  });
+  const noInputBtn = el("button", "btn mini mobile-priority-btn", "N/I");
+  noInputBtn.addEventListener("click", () => {
+    if (canvasOverlayNoInputBtn) canvasOverlayNoInputBtn.click();
+    vibrateTap();
+  });
+  rowEntry.append(imgBtn, camBtn, noInputBtn);
+
+  const rowAudio = el("div", "mobile-priority-row");
+  rowAudio.appendChild(el("span", "mobile-priority-label", "Audio"));
+  const audioBtn = el("button", "btn mini mobile-priority-btn", "Audio");
   audioBtn.addEventListener("click", () => {
     if (liveAudioStartBtn) liveAudioStartBtn.click();
-    mobileLiveStartupSourceDone = true;
-    updateMobileStartupUi();
     vibrateTap();
   });
-  imageBtn.addEventListener("click", () => {
-    if (canvasOverlayImageBtn) canvasOverlayImageBtn.click();
-    mobileLiveStartupSourceDone = true;
-    updateMobileStartupUi();
+  const loadBtn = el("button", "btn mini mobile-priority-btn", "Load");
+  loadBtn.addEventListener("click", () => {
+    if (liveAudioPauseBtn) liveAudioPauseBtn.click();
     vibrateTap();
   });
-  sourceButtons.append(audioBtn, imageBtn);
-  sourceWrap.append(sourceLabel, sourceButtons);
+  const skipBtn = el("button", "btn mini mobile-priority-btn", "Skip");
+  skipBtn.addEventListener("click", () => {
+    stopAudioFileInput();
+    if (audioInputSource) {
+      audioInputSource.value = "mic";
+      audioInputSource.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    vibrateTap();
+  });
+  rowAudio.append(audioBtn, loadBtn, skipBtn);
 
-  const aspectWrap = el("div", "mobile-startup-step");
-  const aspectLabel = el("div", "mobile-field-label", "Paso 2: relacion de aspecto");
-  const aspect = el("select", "mobile-select");
+  const rowControls = el("div", "mobile-priority-row mobile-priority-controls");
+  rowControls.appendChild(el("span", "mobile-priority-label", "Aspect"));
+  const aspect = el("select", "mobile-select mobile-priority-aspect");
   copySelectOptions(aspectRatioSelect, aspect);
   aspect.addEventListener("change", () => {
     if (!aspectRatioSelect) return;
     aspectRatioSelect.value = aspect.value;
     aspectRatioSelect.dispatchEvent(new Event("change", { bubbles: true }));
-    mobileLiveStartupAspectDone = true;
-    updateMobileStartupUi();
   });
-  mobileLiveStartupSelect = aspect;
-  aspectWrap.append(aspectLabel, aspect);
+  const setupBtn = el("button", "btn mini mobile-priority-setup", "Setup");
+  setupBtn.addEventListener("click", () => {
+    openMobileSetupPanel();
+    vibrateTap();
+  });
+  rowControls.append(aspect, setupBtn);
 
-  const enterBtn = el("button", "btn mobile-startup-enter", "Entrar controles");
-  enterBtn.disabled = true;
-  enterBtn.addEventListener("click", () => {
-    mobileLiveStartupCompleted = true;
-    updateMobileStartupUi();
-  });
-  mobileLiveStartupContinue = enterBtn;
-  card.append(title, subtitle, sourceWrap, aspectWrap, enterBtn);
-  mobileLiveStartupCard = card;
-  syncMobileStartupStateFromRuntime();
-  updateMobileStartupUi();
-  return card;
+  bar.append(rowEntry, rowAudio, rowControls);
+  return bar;
 }
 
 function createScenesGrid(register = true) {
@@ -4213,17 +4214,17 @@ function renderMobileSheetPanel() {
 
 function createMobileLiveShell() {
   const root = el("section", "mobile-live-shell mobile-live-phone");
+  root.classList.add("sheet-collapsed");
   const canvasStage = el("div", "mobile-canvas-stage");
-  const startup = createMobileStartupCard();
+  const priorityBar = createMobilePriorityBar();
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const dock = createBottomDock();
   const sheet = createBottomSheet();
-  canvasStage.append(startup, modules, quick, dock, sheet);
+  canvasStage.append(priorityBar, modules, quick, dock, sheet);
   root.appendChild(canvasStage);
   syncMobileDock();
   renderMobileSheetPanel();
-  updateMobileStartupUi();
   return root;
 }
 
@@ -4233,7 +4234,7 @@ function createTabletLiveShell() {
   const left = el("aside", "tablet-col tablet-scenes");
   left.append(el("h3", "tablet-col-title", "Scenes"), createScenesGrid(true));
   const center = el("section", "tablet-col tablet-canvas-overlay");
-  const startup = createMobileStartupCard();
+  const priorityBar = createMobilePriorityBar();
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const tabs = el("div", "tablet-tabs");
@@ -4255,14 +4256,13 @@ function createTabletLiveShell() {
     mobileLiveBuilderPanel.hidden = !mobileLiveBuilderPanel.hidden;
   });
   mobileLiveBuilderPanel = el("div", "tablet-builder");
-  center.append(startup, modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
+  center.append(priorityBar, modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
   const right = el("aside", "tablet-col tablet-macros");
   right.append(el("h3", "tablet-col-title", "Macros"), createMacrosPanel(true));
   grid.append(left, center, right);
   root.appendChild(grid);
   mobileLiveTabs.forEach((x) => x.classList.toggle("active", x.dataset.tab === mobileLiveActiveTab));
   renderTabletBuilder();
-  updateMobileStartupUi();
   return root;
 }
 
@@ -4300,16 +4300,10 @@ function unmountMobileLiveUi() {
   mobileLiveModuleButtons = [];
   mobileLiveKaleidoBtn = null;
   mobileLiveMountedKind = "";
-  mobileLiveStartupCard = null;
-  mobileLiveStartupSelect = null;
-  mobileLiveStartupContinue = null;
 }
 
 function mountMobileLiveUi(profile) {
   if (!mobileLiveRoot) return;
-  mobileLiveStartupSourceDone = hasMobileStartupSourceReady();
-  mobileLiveStartupAspectDone = false;
-  mobileLiveStartupCompleted = false;
   if (mobileLiveRootNode && mobileLiveRootNode.parentNode) mobileLiveRootNode.parentNode.removeChild(mobileLiveRootNode);
   mobileLiveRootNode = profile.isPhone ? createMobileLiveShell() : createTabletLiveShell();
   mobileLiveRoot.innerHTML = "";
@@ -4347,8 +4341,6 @@ function syncMobileLiveUi() {
     syncMobileMacroPanel();
     syncMobileRecordingUi();
     syncMobileModuleSwitcher();
-    syncMobileStartupStateFromRuntime();
-    updateMobileStartupUi();
   }
 }
 
