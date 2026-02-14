@@ -4,6 +4,7 @@ const canvasEntryOverlay = document.getElementById("canvasEntryOverlay");
 const canvasOverlayImageBtn = document.getElementById("canvasOverlayImageBtn");
 const canvasOverlayWebcamBtn = document.getElementById("canvasOverlayWebcamBtn");
 const canvasOverlayNoInputBtn = document.getElementById("canvasOverlayNoInputBtn");
+const canvasFullscreenBtn = document.getElementById("canvasFullscreenBtn");
 const moduleRouteHint = document.getElementById("moduleRouteHint");
 const moduleRouteButtons = [...document.querySelectorAll(".module-route-btn")];
 const quickInputSelect = document.getElementById("quickInputSelect");
@@ -914,6 +915,8 @@ let linesInvertSign = 1;
 let linesConstellationNodes = [];
 let linesConstellationCacheKey = "";
 let linesConstellationTick = 0;
+let linesGlowSmooth = 0;
+let linesNeonSmooth = 0;
 let tunnelCamYaw = 0;
 let tunnelCamPitch = 0;
 let tunnelCamDist = 1.08;
@@ -7209,10 +7212,21 @@ function updateCanvasDisplaySize() {
   const w = canvas.width || 1;
   const h = canvas.height || 1;
   const ar = w / h;
-  const parentW = Math.max(220, canvas.parentElement.clientWidth || w);
-  const vpH = Math.max(220, Math.floor((window.visualViewport ? window.visualViewport.height : window.innerHeight) || 220));
-  const hFactor = runtimeIsPhone ? 0.56 : runtimeIsTablet ? 0.62 : 0.68;
-  const maxH = Math.max(220, Math.floor(vpH * hFactor));
+  const shell = getCanvasShellElement();
+  const fullscreenActive = isCanvasShellFullscreen();
+  let parentW;
+  let maxH;
+  if (fullscreenActive && shell) {
+    const rect = shell.getBoundingClientRect();
+    // In fullscreen, always fit to the real fullscreen viewport box.
+    parentW = Math.max(220, Math.floor(rect.width || window.innerWidth || w));
+    maxH = Math.max(220, Math.floor(rect.height || window.innerHeight || h));
+  } else {
+    parentW = Math.max(220, canvas.parentElement.clientWidth || w);
+    const vpH = Math.max(220, Math.floor((window.visualViewport ? window.visualViewport.height : window.innerHeight) || 220));
+    const hFactor = runtimeIsPhone ? 0.56 : runtimeIsTablet ? 0.62 : 0.68;
+    maxH = Math.max(220, Math.floor(vpH * hFactor));
+  }
   let drawW = parentW;
   let drawH = Math.round(drawW / ar);
   if (drawH > maxH) {
@@ -7221,6 +7235,77 @@ function updateCanvasDisplaySize() {
   }
   canvas.style.width = `${drawW}px`;
   canvas.style.height = `${drawH}px`;
+}
+
+function getCanvasShellElement() {
+  return canvas ? canvas.parentElement : null;
+}
+
+function isCanvasShellFullscreen() {
+  const shell = getCanvasShellElement();
+  if (!shell) return false;
+  return (
+    document.fullscreenElement === shell ||
+    document.webkitFullscreenElement === shell
+  );
+}
+
+function updateCanvasFullscreenButtonUi() {
+  if (!canvasFullscreenBtn) return;
+  const active = isCanvasShellFullscreen();
+  // Hard lock: do not show button unless canvas shell is actually fullscreen.
+  canvasFullscreenBtn.hidden = !active;
+  canvasFullscreenBtn.classList.toggle("is-active", active);
+  const label = active ? "EXIT" : "FS";
+  const hint = active ? "Salir pantalla completa (Shift + F)" : "Pantalla completa (Shift + F)";
+  const labelNode = canvasFullscreenBtn.querySelector(".canvas-fullscreen-label");
+  if (labelNode) labelNode.textContent = label;
+  canvasFullscreenBtn.setAttribute("aria-label", hint);
+  canvasFullscreenBtn.title = hint;
+}
+
+function requestElementFullscreen(target) {
+  if (!target) return Promise.resolve(false);
+  try {
+    if (target.requestFullscreen) {
+      const result = target.requestFullscreen();
+      return result && typeof result.then === "function" ? result.then(() => true).catch(() => false) : Promise.resolve(true);
+    }
+    if (target.webkitRequestFullscreen) {
+      target.webkitRequestFullscreen();
+      return Promise.resolve(true);
+    }
+  } catch {
+    return Promise.resolve(false);
+  }
+  return Promise.resolve(false);
+}
+
+function exitAnyFullscreen() {
+  try {
+    if (document.exitFullscreen) {
+      const result = document.exitFullscreen();
+      return result && typeof result.then === "function" ? result.then(() => true).catch(() => false) : Promise.resolve(true);
+    }
+    if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+      return Promise.resolve(true);
+    }
+  } catch {
+    return Promise.resolve(false);
+  }
+  return Promise.resolve(false);
+}
+
+function toggleCanvasFullscreen() {
+  const shell = getCanvasShellElement();
+  if (!shell) return;
+  const action = isCanvasShellFullscreen() ? exitAnyFullscreen() : requestElementFullscreen(shell);
+  Promise.resolve(action).finally(() => {
+    updateCanvasFullscreenButtonUi();
+    updateCanvasDisplaySize();
+    scheduleRender();
+  });
 }
 
 function getLiveCanvasLimits() {
@@ -10162,9 +10247,27 @@ function applyMasterFxGlobal(tSec) {
     fxMode === "neon" ||
     fxMode === "neongrad";
   const perfStress = clamp((24 - fps) / 8, 0, 1);
-  const skipEvery = mode === "fractal" ? 1 : perfStress > 0.75 ? 3 : perfStress > 0.35 ? 2 : 1;
+  let skipEvery = mode === "fractal" ? 1 : perfStress > 0.75 ? 3 : perfStress > 0.35 ? 2 : 1;
+  if (mode === "lines") {
+    // In lines mode prioritize temporal continuity to avoid visible FX flicker.
+    skipEvery = Math.min(skipEvery, 2);
+  }
   const canReusePrev = expensiveMode && skipEvery > 1 && !recordingActive;
   if (canReusePrev && postFxFrameCounter % skipEvery !== 0) {
+    if (mode === "lines") {
+      // Blend current raw frame and previous processed frame for a smoother hold frame.
+      masterFxCtx.clearRect(0, 0, w, h);
+      masterFxCtx.drawImage(canvas, 0, 0, w, h);
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.globalAlpha = 0.46;
+      ctx.drawImage(masterFxCanvas, 0, 0, w, h, 0, 0, outW, outH);
+      ctx.globalAlpha = 0.54;
+      ctx.drawImage(masterPrevCanvas, 0, 0, w, h, 0, 0, outW, outH);
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
@@ -10657,6 +10760,39 @@ function applyMasterFxGlobal(tSec) {
     masterFxCtx.filter = `blur(${0.6 + amount * 2.8}px)`;
     masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
     masterFxCtx.restore();
+  }
+
+  if (mode === "lines") {
+    // Keep Lines background matte-black even with aggressive FX color drift.
+    const matteCut = clamp(
+      10 +
+        amount * 22 +
+        ((fxMode === "neon" || fxMode === "neongrad" || fxMode === "psygrad" || fxMode === "psychedelic") ? 6 : 0),
+      8,
+      40
+    );
+    const matteSoft = 24;
+    const frame = masterFxCtx.getImageData(0, 0, w, h);
+    const d = frame.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i];
+      const g = d[i + 1];
+      const b = d[i + 2];
+      const m = Math.max(r, g, b);
+      if (m <= matteCut) {
+        d[i] = 0;
+        d[i + 1] = 0;
+        d[i + 2] = 0;
+        continue;
+      }
+      if (m < matteCut + matteSoft) {
+        const k = (m - matteCut) / matteSoft;
+        d[i] = Math.round(r * k);
+        d[i + 1] = Math.round(g * k);
+        d[i + 2] = Math.round(b * k);
+      }
+    }
+    masterFxCtx.putImageData(frame, 0, 0);
   }
 
   ctx.save();
@@ -11667,10 +11803,11 @@ function renderLinesMode(baseImageData, tSec, settings) {
   const camDrift = clamp(Number(liveLinesCamDrift ? liveLinesCamDrift.value : 28), 0, 100) / 100;
   const insideDepth = clamp(Number(liveLinesInsideDepth ? liveLinesInsideDepth.value : 62), 0, 100) / 100;
   const stringVibeSensitivity = clamp(Number(liveLinesStringVibe ? liveLinesStringVibe.value : 58), 0, 200) / 100;
-  const geometry = liveLinesGeometry ? liveLinesGeometry.value : "ribbon";
+  const lineGlowControl = clamp(Number(liveLinesConstellation ? liveLinesConstellation.value : 32), 0, 100) / 100;
+  const linesPresetId = liveLinesPreset ? (liveLinesPreset.value || "ambient") : "ambient";
+  const linesPatternId = liveLinesPattern ? (liveLinesPattern.value || "flow") : "flow";
   const cameraModeLocal = liveLinesCameraMode ? liveLinesCameraMode.value : "orbit";
   const beatFlipEnabled = !liveLinesBeatFlip || liveLinesBeatFlip.checked;
-  const constellationMix = clamp(Number(liveLinesConstellation ? liveLinesConstellation.value : 32), 0, 100) / 100;
   const macroPunch = 0.6 + macro * 1.1;
   const macroChaos = 0.4 + macro * 0.95;
 
@@ -11691,6 +11828,13 @@ function renderLinesMode(baseImageData, tSec, settings) {
   const mid = linesAudioMidSmooth;
   const high = linesAudioHighSmooth;
   const energy = linesAudioEnergySmooth;
+  const glowTarget = clamp(lineGlowControl * (0.64 + energy * 0.46), 0, 1.2);
+  linesGlowSmooth = smoothAR(linesGlowSmooth, glowTarget, clamp(0.14 + dt * 1.8, 0.1, 0.28), clamp(0.06 + dt * 1.1, 0.05, 0.14));
+  const lineGlow = clamp(linesGlowSmooth, 0, 1.2);
+  const neonTargetBase = linesPresetId === "techno" ? 1 : linesPresetId === "vocal" ? 0.45 : 0.18;
+  const neonTarget = clamp(neonTargetBase + lineGlowControl * 0.28, 0, 1.2);
+  linesNeonSmooth = smoothAR(linesNeonSmooth, neonTarget, clamp(0.1 + dt * 1.2, 0.08, 0.22), clamp(0.05 + dt * 0.9, 0.04, 0.14));
+  const neonAmt = clamp(linesNeonSmooth, 0, 1.2);
   const audioSens = controls.audioSensitivity ? clamp(Number(controls.audioSensitivity.value) / 120, 0, 1.6) : 0.43;
   const audioTolInv = controls.audioTolerance ? clamp(1 - Number(controls.audioTolerance.value) / 120, 0, 1.2) : 0.74;
   const padReactiveDrive = clamp(0.25 + audioSens * 1.25 + audioTolInv * 0.95, 0.2, 2.35);
@@ -11732,32 +11876,44 @@ function renderLinesMode(baseImageData, tSec, settings) {
   linesCamDist += (linesCamDistTarget - linesCamDist) * 0.09;
   linesCamDist = clamp(linesCamDist, 0.66, 2.2);
 
-  ctx.fillStyle = "#000";
+  // Matte black background, fixed and clean.
+  ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, w, h);
 
   const isMinimal = true;
   const masterOn = Boolean(masterFxMode && (masterFxMode.value || "none") !== "none");
+  const masterFxVal = masterFxMode ? (masterFxMode.value || "none") : "none";
+  const masterHeavy =
+    masterFxVal === "datamosh" ||
+    masterFxVal === "interlace" ||
+    masterFxVal === "chromatic" ||
+    masterFxVal === "pixelart" ||
+    masterFxVal === "neon" ||
+    masterFxVal === "neongrad";
   const kaleidoOn = isKaleidoFxActive();
   const domeOn = Boolean(liveOutputView && liveOutputView.value === "dome");
   const heavyStackCount = (masterOn ? 1 : 0) + (kaleidoOn ? 1 : 0) + (domeOn ? 1 : 0);
+  const perfStress = clamp((30 - (fps || 30)) / 12, 0, 1);
   const fpsLod = fps < 18 ? 0.42 : fps < 24 ? 0.58 : fps < 30 ? 0.74 : fps < 36 ? 0.88 : 1;
   const stackLod = heavyStackCount >= 2 ? 0.7 : heavyStackCount === 1 ? 0.85 : 1;
+  const fxLod = masterHeavy ? 0.76 : masterOn || kaleidoOn ? 0.9 : 1;
   const hiResK = heavyStackCount === 0 && fps > 34 ? 1.15 : fps > 28 ? 1 : 0.86;
-  const perfK = fpsLod * stackLod;
+  const perfK = fpsLod * stackLod * fxLod;
+  const qualityBudget = clamp(1 - perfStress * 0.54 - (masterHeavy ? 0.16 : 0) - (kaleidoOn ? 0.1 : 0), 0.42, 1);
   const lineCount = clamp(
-    Math.round(density * 2.8 * perfK * (0.86 + macro * 0.18)),
+    Math.round(density * 2.45 * perfK * qualityBudget * (0.84 + macro * 0.18)),
     10,
-    72
+    56
   );
   const layerCount = clamp(
-    Math.round((2 + layerOffset * 3.6) * (fps < 24 ? 0.75 : 1) * stackLod),
+    Math.round((2 + layerOffset * 2.8) * (fps < 24 ? 0.68 : 1) * stackLod * qualityBudget),
     2,
-    5
+    4
   );
   const segCount = clamp(
-    Math.round((26 + density * 0.9) * (fps < 18 ? 0.55 : fps < 24 ? 0.72 : fps < 32 ? 0.9 : 1) * stackLod * hiResK),
+    Math.round((22 + density * 0.78) * (fps < 18 ? 0.5 : fps < 24 ? 0.66 : fps < 32 ? 0.84 : 1) * stackLod * hiResK * qualityBudget),
     14,
-    88
+    72
   );
   const baseThick = (0.58 + thickness * 0.065) * (0.88 + macro * 0.28);
 
@@ -11788,42 +11944,51 @@ function renderLinesMode(baseImageData, tSec, settings) {
     return [cx + rx * persp * w * 0.46, cy + ry * persp * h * 0.46, persp];
   };
 
-  const drawHorizontal = geometry !== "constellation" || constellationMix < 0.88;
-  const drawVertical = geometry === "grid" || (geometry === "constellation" && constellationMix > 0.44);
-  const famGainH = geometry === "grid" ? 0.88 : 1;
-  const famGainV = geometry === "grid" ? 0.95 : 0.58;
-  const linesTextureOn = false;
+  // Keep Lines focused on one elegant family (no crossed mesh/grid overlays).
+  const drawHorizontal = true;
+  const drawVertical = false;
+  const famGainH = 1;
+  const famGainV = 0;
 
   const renderFamily = (vertical, famGain) => {
     for (let l = 0; l < layerCount; l++) {
       const layerN = layerCount <= 1 ? 0 : l / (layerCount - 1);
       const zLayer = (layerN - 0.5) * layerOffset * 1.2;
-      const layerPhase = phaseBase * (0.8 + layerN * 0.7) + layerN * Math.PI * 1.9 + (vertical ? 1.07 : 0);
-      const hueLayer = fract01(colorShift + layerN * 0.12 + tSec * 0.025 + (vertical ? 0.05 : 0));
+      const patternShape = linesPatternId === "flow" ? 1 : linesPatternId === "pulse" ? 1.18 : 0.9;
+      const layerPhase = phaseBase * (0.8 + layerN * 0.7) * patternShape + layerN * Math.PI * 1.9 + (vertical ? 1.07 : 0);
+      const hueLayer = fract01(colorShift + layerN * 0.08 + (vertical ? 0.04 : 0));
       for (let i = 0; i < lineCount; i++) {
         const yN = lineCount <= 1 ? 0 : i / (lineCount - 1);
         const y = (yN * 2 - 1) * 0.96;
-        const hue = fract01(hueLayer + yN * 0.12 + high * 0.045);
+        const hue = fract01(hueLayer + yN * 0.06);
         const sat = isMinimal
-          ? clamp(0.26 + mid * 0.12 + layerN * 0.06 + energy * 0.04, 0.14, 0.62)
-          : clamp(0.72 + mid * 0.36 + layerN * 0.14 + energy * 0.1, 0.52, 1);
+          ? clamp(0.06 + mid * 0.07 + layerN * 0.03 + energy * 0.03 + neonAmt * 0.2, 0.04, 0.36)
+          : clamp(0.2 + mid * 0.18 + layerN * 0.1 + energy * 0.08 + neonAmt * 0.22, 0.14, 0.66);
         const lit = isMinimal
-          ? clamp(0.76 + (1 - yN) * 0.14 + bass * 0.08, 0.52, 0.98)
-          : clamp(0.38 + (1 - yN) * 0.28 + bass * 0.18 + high * 0.08, 0.18, 0.92);
+          ? clamp(0.62 + (1 - yN) * 0.12 + bass * 0.06 + neonAmt * 0.12, 0.4, 0.94)
+          : clamp(0.34 + (1 - yN) * 0.22 + bass * 0.14 + high * 0.06 + neonAmt * 0.16, 0.16, 0.92);
         const [rr, gg, bb] = hslToRgb(hue, sat, lit);
         const alpha = clamp(
-          ((isMinimal ? 0.12 : 0.19) + (1 - Math.abs(y)) * (isMinimal ? 0.26 : 0.44) + high * 0.14 + beat * 0.05 * macroPunch) *
+          ((isMinimal ? 0.14 : 0.2) + (1 - Math.abs(y)) * (isMinimal ? 0.3 : 0.44) + high * 0.16 + beat * 0.05 * macroPunch + lineGlow * 0.12) *
             famGain,
           isMinimal ? 0.05 : 0.08,
-          isMinimal ? 0.64 : 0.9
+          isMinimal ? 0.9 : 0.94
         );
         ctx.strokeStyle = `rgba(${rr}, ${gg}, ${bb}, ${alpha})`;
-        ctx.lineWidth = baseThick * (0.72 + layerN * 0.62) * (1 + high * 0.24 + beat * 0.06) * famGain;
+        ctx.lineWidth = baseThick * (0.72 + layerN * 0.62) * (1 + high * 0.24 + beat * 0.06 + lineGlow * 0.18) * famGain;
         ctx.lineCap = "butt";
         ctx.lineJoin = "miter";
-        if (linesTextureOn) {
-          ctx.shadowColor = `rgba(${rr}, ${gg}, ${bb}, ${clamp(0.22 + high * 0.24, 0.16, 0.52)})`;
-          ctx.shadowBlur = clamp(1.2 + thickness * 0.12 + energy * 2.6, 0.6, 7);
+        const glowStrength = lineGlow * (0.76 + neonAmt * 0.46);
+        const glowAlpha = clamp(0.06 + glowStrength * 0.24 + high * 0.1, 0.03, 0.42);
+        const allowShadow =
+          fps > 24 &&
+          !recordingActive &&
+          !(masterHeavy && fps < 34) &&
+          !(kaleidoOn && fps < 32) &&
+          glowStrength > 0.06;
+        if (allowShadow) {
+          ctx.shadowColor = `rgba(${rr}, ${gg}, ${bb}, ${glowAlpha})`;
+          ctx.shadowBlur = clamp(0.6 + thickness * 0.12 + glowStrength * 9 + energy * 1.8, 0, 14);
         } else {
           ctx.shadowColor = "rgba(0,0,0,0)";
           ctx.shadowBlur = 0;
@@ -11886,65 +12051,26 @@ function renderLinesMode(baseImageData, tSec, settings) {
   if (drawHorizontal) renderFamily(false, famGainH);
   if (drawVertical) renderFamily(true, famGainV);
 
-  const showConstellation = geometry === "constellation" && constellationMix > 0.08;
-  if (showConstellation && baseImageData && baseImageData.data) {
-    const srcW = Math.max(1, baseImageData.width || w);
-    const srcH = Math.max(1, baseImageData.height || h);
-    const src = baseImageData.data;
-    const pointCap = clamp(Math.round((16 + density * 1.9 + constellationMix * 34) * (fps < 24 ? 0.66 : 1) * stackLod), 12, 72);
-    const stride = clamp(Math.round(Math.max(7, Math.sqrt((srcW * srcH) / Math.max(20, pointCap * 1.7)))), 7, 48);
-    const gate = clamp(0.26 - constellationMix * 0.11 + energy * 0.04, 0.1, 0.42);
-    const cacheKey = `${srcW}x${srcH}|${stride}|${pointCap}|${Math.round(gate * 100)}`;
-    const refreshSpan = fps < 22 ? 4 : fps < 30 ? 3 : 2;
-    linesConstellationTick = (linesConstellationTick + 1) % refreshSpan;
-    if (cacheKey !== linesConstellationCacheKey || linesConstellationTick === 0 || linesConstellationNodes.length === 0) {
-      const rebuilt = [];
-      for (let sy = 0; sy < srcH && rebuilt.length < pointCap; sy += stride) {
-        for (let sx = 0; sx < srcW && rebuilt.length < pointCap; sx += stride) {
-          const i4 = (sy * srcW + sx) * 4;
-          const luma = (src[i4] * 0.2126 + src[i4 + 1] * 0.7152 + src[i4 + 2] * 0.0722) / 255;
-          if (luma < gate) continue;
-          const nx = (sx / Math.max(1, srcW - 1)) * 2 - 1;
-          const ny = (sy / Math.max(1, srcH - 1)) * 2 - 1;
-          rebuilt.push({ nx, ny, luma });
-        }
-      }
-      linesConstellationNodes = rebuilt;
-      linesConstellationCacheKey = cacheKey;
-    }
-    const nodes = linesConstellationNodes;
-    if (nodes.length > 2) {
-      const hopA = clamp(Math.round(2 + constellationMix * 8), 2, 10);
-      const hopB = clamp(Math.round(5 + constellationMix * 12), 5, 18);
-      const nodeAlpha = clamp(0.26 + constellationMix * 0.42 + high * 0.08, 0.18, 0.78);
-      const lineAlpha = clamp(0.14 + constellationMix * 0.32 + mid * 0.08, 0.1, 0.6);
-      const extraLink = geometry === "constellation" && fps > 28;
-      for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        const nz = (n.luma - 0.5) * (0.35 + depthGlobal * 1.2) + Math.sin(n.nx * 3.2 + n.ny * 2.8 + tSec * (0.6 + speed * 1.4)) * 0.05;
-        const [ax, ay, ap] = projectLinePoint(n.nx, n.ny, nz);
-        const baseHue = fract01(colorShift + n.luma * 0.18 + i * 0.003 + tSec * 0.01);
-        const [nr, ng, nb] = hslToRgb(baseHue, clamp(0.58 + high * 0.28, 0.4, 1), clamp(0.46 + n.luma * 0.38, 0.28, 0.92));
-        const drawLink = (j, gain = 1) => {
-          const m = nodes[j % nodes.length];
-          const mz = (m.luma - 0.5) * (0.35 + depthGlobal * 1.2) + Math.sin(m.nx * 3.2 + m.ny * 2.8 + tSec * (0.6 + speed * 1.4)) * 0.05;
-          const [bx, by] = projectLinePoint(m.nx, m.ny, mz);
-          ctx.strokeStyle = `rgba(${nr}, ${ng}, ${nb}, ${lineAlpha * gain})`;
-          ctx.lineWidth = clamp((0.5 + ap * 3.4 + constellationMix * 1.2) * gain, 0.35, 2.5);
-          ctx.beginPath();
-          ctx.moveTo(ax, ay);
-          ctx.lineTo(bx, by);
-          ctx.stroke();
-        };
-        drawLink(i + hopA, 1);
-        drawLink(i + hopB, 0.8);
-        if (extraLink) drawLink(i + hopA + hopB, 0.58);
-        const nodeSize = clamp(0.8 + ap * 3.6 + constellationMix * 1.5, 0.7, 4.4);
-        ctx.fillStyle = `rgba(${nr}, ${ng}, ${nb}, ${nodeAlpha})`;
-        ctx.fillRect(ax - nodeSize * 0.5, ay - nodeSize * 0.5, nodeSize, nodeSize);
-      }
-    }
-  }
+  // Subtle gradient tint over existing lines only.
+  const gradA = hslToRgb(fract01(colorShift), 0.16, 0.52);
+  const gradB = hslToRgb(fract01(colorShift + 0.12), 0.18, 0.5);
+  const gradC = hslToRgb(fract01(colorShift + 0.24), 0.16, 0.48);
+  const lineGradient = ctx.createLinearGradient(0, 0, w, h);
+  lineGradient.addColorStop(0, `rgb(${gradA[0]}, ${gradA[1]}, ${gradA[2]})`);
+  lineGradient.addColorStop(0.5, `rgb(${gradB[0]}, ${gradB[1]}, ${gradB[2]})`);
+  lineGradient.addColorStop(1, `rgb(${gradC[0]}, ${gradC[1]}, ${gradC[2]})`);
+  ctx.save();
+  ctx.globalCompositeOperation = "source-atop";
+  ctx.globalAlpha = clamp(0.06 + lineGlow * 0.08 + high * 0.05, 0.05, 0.16);
+  ctx.fillStyle = lineGradient;
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+
+  // Constellation image/webcam overlay disabled in Lines mode to keep
+  // composition focused on elegant line families only.
+  linesConstellationNodes = [];
+  linesConstellationCacheKey = "";
+  linesConstellationTick = 0;
   ctx.shadowBlur = 0;
   ctx.shadowColor = "rgba(0,0,0,0)";
 }
@@ -12297,9 +12423,9 @@ function applyInteriorPreset(presetId, withRender = true) {
 
 function randomizeInteriorCameraView() {
   if (mode !== "interior") return;
-  interiorCamYaw += (Math.random() * 2 - 1) * 0.95;
-  interiorCamPitch = clamp(interiorCamPitch + (Math.random() * 2 - 1) * 0.52, -1.15, 1.15);
-  interiorCamDist = clamp(interiorCamDist + (Math.random() * 2 - 1) * 0.3, 0.56, 2.2);
+  interiorCamYaw += (Math.random() * 2 - 1) * 0.78;
+  interiorCamPitch = clamp(interiorCamPitch + (Math.random() * 2 - 1) * 0.38, -0.86, 0.86);
+  interiorCamDist = clamp(interiorCamDist + (Math.random() * 2 - 1) * 0.24, 0.68, 2.2);
   interiorCamYawTarget = interiorCamYaw;
   interiorCamPitchTarget = interiorCamPitch;
   interiorCamDistTarget = interiorCamDist;
@@ -12308,9 +12434,9 @@ function randomizeInteriorCameraView() {
 
 function randomizeInteriorCameraViewSmooth() {
   if (mode !== "interior") return;
-  interiorCamYawTarget += (Math.random() * 2 - 1) * 1.2;
-  interiorCamPitchTarget = clamp(interiorCamPitchTarget + (Math.random() * 2 - 1) * 0.62, -1.15, 1.15);
-  interiorCamDistTarget = clamp(interiorCamDistTarget + (Math.random() * 2 - 1) * 0.34, 0.56, 2.2);
+  interiorCamYawTarget += (Math.random() * 2 - 1) * 0.9;
+  interiorCamPitchTarget = clamp(interiorCamPitchTarget + (Math.random() * 2 - 1) * 0.46, -0.86, 0.86);
+  interiorCamDistTarget = clamp(interiorCamDistTarget + (Math.random() * 2 - 1) * 0.28, 0.68, 2.2);
   scheduleRender();
 }
 
@@ -12416,19 +12542,20 @@ function renderInteriorBlackMode(baseImageData, tSec, settings) {
   interiorCursorY += (interiorCursorYTarget - interiorCursorY) * 0.08;
 
   if (camMode === "dive") {
-    interiorCamDistTarget += ((0.72 + (1 - depthAmt) * 0.16) - interiorCamDistTarget) * 0.08;
-    interiorCamYawTarget += (0.006 + speedAmt * 0.026) * (1 + bass * 0.25);
-    interiorCamPitchTarget += (Math.sin(tSec * (0.66 + speedAmt * 0.96)) * 0.2 - interiorCamPitchTarget) * 0.08;
+    interiorCamDistTarget += ((0.8 + (1 - depthAmt) * 0.18) - interiorCamDistTarget) * 0.08;
+    interiorCamYawTarget += (0.0038 + speedAmt * 0.015) * (1 + bass * 0.18);
+    interiorCamPitchTarget += (Math.sin(tSec * (0.62 + speedAmt * 0.74)) * 0.14 - interiorCamPitchTarget) * 0.08;
   } else if (camMode === "static") {
-    interiorCamDistTarget += (1.16 - interiorCamDistTarget) * 0.08;
-    interiorCamYawTarget *= 0.95;
+    interiorCamDistTarget += (1.12 - interiorCamDistTarget) * 0.08;
+    interiorCamYawTarget += Math.sin(tSec * 0.18) * 0.00065;
     interiorCamPitchTarget += (0 - interiorCamPitchTarget) * 0.08;
   } else {
-    interiorCamDistTarget += ((0.94 + (1 - depthAmt) * 0.34) - interiorCamDistTarget) * 0.046;
-    interiorCamYawTarget += 0.0022 + Math.sin(tSec * (0.24 + speedAmt * 0.42)) * 0.0013;
-    interiorCamPitchTarget += (Math.cos(tSec * (0.22 + speedAmt * 0.3)) * 0.12 - interiorCamPitchTarget) * 0.04;
+    interiorCamDistTarget += ((0.98 + (1 - depthAmt) * 0.32) - interiorCamDistTarget) * 0.05;
+    interiorCamYawTarget += 0.00145 + Math.sin(tSec * (0.21 + speedAmt * 0.34)) * 0.0009;
+    interiorCamPitchTarget += (Math.cos(tSec * (0.2 + speedAmt * 0.25)) * 0.09 - interiorCamPitchTarget) * 0.04;
   }
-  interiorCamPitchTarget = clamp(interiorCamPitchTarget, -0.8, 0.8);
+  interiorCamPitchTarget = clamp(interiorCamPitchTarget, -0.72, 0.72);
+  interiorCamDistTarget = clamp(interiorCamDistTarget, 0.68, 2.2);
   interiorCamYaw += (interiorCamYawTarget - interiorCamYaw) * 0.09;
   interiorCamPitch += (interiorCamPitchTarget - interiorCamPitch) * 0.09;
   interiorCamDist += (interiorCamDistTarget - interiorCamDist) * 0.09;
@@ -12454,8 +12581,8 @@ function renderInteriorBlackMode(baseImageData, tSec, settings) {
     3.4
   );
   const separationBoost = clamp(1 + waveAmt * 0.28 + separationAudio * 0.42, 1, 2.4);
-  const gridGap = (3.1 - depthAmt * 0.95) * separationBoost;
-  const layerStep = clamp(3.0 - depthAmt * 1.12, 1.3, 3.2);
+  const gridGap = (3.35 - depthAmt * 0.78) * separationBoost;
+  const layerStep = clamp(3.8 - depthAmt * 1.34, 1.55, 4.15);
   const fly = tSec * (16 + speedAmt * 66 + energy * 6);
   const fov = Math.max(w, h) * 0.88;
   const zoom = 0.92 + (2 - interiorCamDist) * 0.38 + energy * 0.05;
@@ -12464,8 +12591,8 @@ function renderInteriorBlackMode(baseImageData, tSec, settings) {
   const syaw = Math.sin(interiorCamYaw);
   const cp = Math.cos(interiorCamPitch * 0.75);
   const sp = Math.sin(interiorCamPitch * 0.75);
-  const camX = Math.sin(tSec * (0.22 + speedAmt * 0.46)) * (1.6 + waveAmt * 4.4);
-  const camY = Math.cos(tSec * (0.19 + speedAmt * 0.32)) * (1.2 + waveAmt * 3.1) + bass * 1.6;
+  const camX = Math.sin(tSec * (0.2 + speedAmt * 0.34)) * (1.1 + waveAmt * 2.35);
+  const camY = Math.cos(tSec * (0.18 + speedAmt * 0.24)) * (0.9 + waveAmt * 1.7) + bass * 1.08;
   const camZ = fly;
   const projectLocal = (x, y, z) => {
     const dx = x - camX;
@@ -12475,10 +12602,10 @@ function renderInteriorBlackMode(baseImageData, tSec, settings) {
     const rz = dx * syaw + dz * cyaw;
     const ry = dy * cp - rz * sp;
     const rz2 = dy * sp + rz * cp;
-    if (rz2 < 0.25) return null;
+    if (rz2 < 0.14 || rz2 > 180) return null;
     const [sx, sy, p] = projectPoint3D(rx * 24, -ry * 24, rz2 * 18, w, h, fov, zoom);
     if (!Number.isFinite(sx) || !Number.isFinite(sy)) return null;
-    if (sx < -w * 0.3 || sx > w * 1.3 || sy < -h * 0.3 || sy > h * 1.3) return null;
+    if (sx < -w * 0.55 || sx > w * 1.55 || sy < -h * 0.55 || sy > h * 1.55) return null;
     return { sx, sy, p, rz: rz2 };
   };
   const texturePhase = tSec * (0.22 + speedAmt * 0.34 + high * 0.08);
@@ -12546,10 +12673,11 @@ function renderInteriorBlackMode(baseImageData, tSec, settings) {
         const alphaGate = smooth01((Math.sin(tSec * (0.42 + speedAmt * 0.26) + gx * 0.22 + gy * 0.19 + li * 0.17) - 0.16) / 0.84);
         const seeThrough = 1 - alphaGate * (0.58 + waveAmt * 0.22 + glitchAmt * 0.16);
 
-        const p0 = projectLocal(cx - gridGap * 0.42, cy - gridGap * 0.42, zCell);
-        const p1 = projectLocal(cx + gridGap * 0.42, cy - gridGap * 0.42, zCell);
-        const p2 = projectLocal(cx + gridGap * 0.42, cy + gridGap * 0.42, zCell);
-        const p3 = projectLocal(cx - gridGap * 0.42, cy + gridGap * 0.42, zCell);
+        const cellHalf = gridGap * clamp(0.44 + depthAmt * 0.18 + waveAmt * 0.06, 0.38, 0.68);
+        const p0 = projectLocal(cx - cellHalf, cy - cellHalf, zCell);
+        const p1 = projectLocal(cx + cellHalf, cy - cellHalf, zCell);
+        const p2 = projectLocal(cx + cellHalf, cy + cellHalf, zCell);
+        const p3 = projectLocal(cx - cellHalf, cy + cellHalf, zCell);
         if (!p0 || !p1 || !p2 || !p3) continue;
 
         const hue = fract01(hueBase + tex * 0.12 + depthN * 0.2 + bass * 0.05);
@@ -12604,16 +12732,11 @@ function renderInteriorBlackMode(baseImageData, tSec, settings) {
     }
   }
 
-  if (drawCount < 6) {
-    const hue = fract01(hueBase + tSec * 0.04);
-    const [r, g, b] = hslToRgb(hue, 0.72, 0.58);
-    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.46)`;
-    ctx.lineWidth = 1.6;
-    const cx = w * 0.5;
-    const cy = h * 0.5;
-    const sz = Math.min(w, h) * 0.06;
-    ctx.strokeRect(cx - sz, cy - sz, sz * 2, sz * 2);
-    ctx.strokeRect(cx - sz * 0.62, cy - sz * 0.62, sz * 1.24, sz * 1.24);
+  // Stabilize next frames if we hit a projection dead-zone (never draw a 2D fallback box).
+  if (drawCount < 10) {
+    interiorCamDistTarget = clamp(Math.max(interiorCamDistTarget, 0.84), 0.68, 2.2);
+    interiorCamPitchTarget *= 0.85;
+    interiorCamYawTarget += 0.0024;
   }
 
   if (glowAmt > 0.01) {
@@ -14292,7 +14415,6 @@ function renderFrame() {
     const linesAlwaysOn =
       hasAudioReactiveInput() ||
       isAudioPlaybackActive() ||
-      webcamActive ||
       recordingActive ||
       isDomeAutoRotateActive() ||
       isMasterFxAnimated() ||
@@ -16465,6 +16587,11 @@ if (canvasOverlayNoInputBtn) {
     activateNoInputMode();
   });
 }
+if (canvasFullscreenBtn) {
+  canvasFullscreenBtn.addEventListener("click", () => {
+    toggleCanvasFullscreen();
+  });
+}
 function applyQuickInputSelection() {
   if (!quickInputSelect) return;
   const v = quickInputSelect.value;
@@ -17646,7 +17773,7 @@ if (liveInteriorCameraMode) {
     interiorCamYawTarget = interiorCamYaw;
     interiorCamPitchTarget = clamp(interiorCamPitch * 0.4, -0.4, 0.4);
     const modeVal = liveInteriorCameraMode.value || "orbit";
-    if (modeVal === "dive") interiorCamDistTarget = 0.72;
+    if (modeVal === "dive") interiorCamDistTarget = 0.8;
     else if (modeVal === "static") interiorCamDistTarget = 1.16;
     else interiorCamDistTarget = 0.96;
     updateLiveQuickOutputs();
@@ -17834,7 +17961,7 @@ canvas.addEventListener("mousemove", (e) => {
       tunnelCamPitchTarget = clamp(tunnelCamPitchTarget + dy * 0.0052, -1.15, 1.15);
     } else if (mode === "interior") {
       interiorCamYawTarget += dx * 0.0064;
-      interiorCamPitchTarget = clamp(interiorCamPitchTarget + dy * 0.0051, -1.15, 1.15);
+      interiorCamPitchTarget = clamp(interiorCamPitchTarget + dy * 0.0046, -0.86, 0.86);
     } else {
       dragRotateY += dx * 0.18;
       dragRotateX += dy * 0.18;
@@ -17855,7 +17982,7 @@ canvas.addEventListener("mousemove", (e) => {
       } else {
         interiorCursorXTarget = nx;
         interiorCursorYTarget = ny;
-        interiorCamDistTarget = clamp(0.62 + nx * 1.25 + (0.5 - ny) * 0.24, 0.56, 2.2);
+        interiorCamDistTarget = clamp(0.74 + nx * 1.1 + (0.5 - ny) * 0.2, 0.68, 2.2);
       }
       scheduleRender();
     }
@@ -17885,7 +18012,7 @@ canvas.addEventListener(
       return;
     }
     if (mode === "interior") {
-      interiorCamDistTarget = clamp(interiorCamDistTarget + e.deltaY * 0.0009, 0.56, 2.2);
+      interiorCamDistTarget = clamp(interiorCamDistTarget + e.deltaY * 0.0009, 0.68, 2.2);
       scheduleRender();
       return;
     }
@@ -17946,7 +18073,7 @@ canvas.addEventListener("gesturechange", (e) => {
   if (mode === "interior") {
     if (gestureBaseZoom === null) gestureBaseZoom = interiorCamDistTarget;
     const scale = clamp(Number(e.scale || 1), 0.3, 4);
-    interiorCamDistTarget = clamp(gestureBaseZoom / scale, 0.56, 2.2);
+    interiorCamDistTarget = clamp(gestureBaseZoom / scale, 0.68, 2.2);
     scheduleRender();
     return;
   }
@@ -18487,6 +18614,17 @@ if (window.visualViewport && window.visualViewport.addEventListener) {
   });
 }
 
+document.addEventListener("fullscreenchange", () => {
+  updateCanvasFullscreenButtonUi();
+  updateCanvasDisplaySize();
+  scheduleRender();
+});
+document.addEventListener("webkitfullscreenchange", () => {
+  updateCanvasFullscreenButtonUi();
+  updateCanvasDisplaySize();
+  scheduleRender();
+});
+
 window.addEventListener("keydown", (e) => {
   const active = document.activeElement;
   const tag = (active && active.tagName) || "";
@@ -18562,6 +18700,12 @@ window.addEventListener("keydown", (e) => {
     cancelMorphTweensForCurrentMode();
     randomizeActiveMode();
     scheduleRender();
+    return;
+  }
+  if (e.code === "KeyF" && e.shiftKey) {
+    e.preventDefault();
+    if (e.repeat) return;
+    toggleCanvasFullscreen();
     return;
   }
   if (e.code === "KeyF") {
@@ -18726,6 +18870,7 @@ updateLiveAudioPadDot();
 updateLiveAudioPadVisual();
 updateCameraDeckVisibility();
 updateDomeControlsVisibility();
+updateCanvasFullscreenButtonUi();
 {
   const k = clamp((cameraMoveSpeed ? Number(cameraMoveSpeed.value) : 28) / 100, 0, 1);
   smoothCameraModeSpeed = 0.08 + Math.pow(k, 2.6) * 0.82;
