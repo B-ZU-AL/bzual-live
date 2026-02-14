@@ -238,7 +238,6 @@ const live3dAudioSync = document.getElementById("live3dAudioSync");
 const live3dAnaglyph = document.getElementById("live3dAnaglyph");
 const live3dAnaglyphStrength = document.getElementById("live3dAnaglyphStrength");
 const liveModeRandomBtn = document.getElementById("liveModeRandomBtn");
-const liveModeSafeBtn = document.getElementById("liveModeSafeBtn");
 const masterFxDetails = document.getElementById("masterFxDetails");
 const masterFxMode = document.getElementById("masterFxMode");
 const masterFxSummaryStatus = document.getElementById("masterFxSummaryStatus");
@@ -1199,6 +1198,10 @@ let lastRenderTs = performance.now();
 let perfScale = 1;
 let adaptivePostFxScale = 1;
 let postFxFrameCounter = 0;
+let masterFxAmountSmooth = 0;
+let masterFxSpeedSmooth = 0;
+let masterFxColorSmooth = 0;
+let masterFxSmoothMode = "";
 let depthRenderEngine = "gpu";
 let depthGpuAvailable = false;
 let gpu3dWarned = false;
@@ -2581,6 +2584,21 @@ const extendedLocaleTexts = {
         flatfx: "Plano",
         neon: "Neón",
       },
+      masterFxMode: {
+        none: "Ninguno",
+        chromatic: "Cromático",
+        interlace: "Deriva Interlace",
+        datamosh: "Datamosh Trail",
+        pixelart: "Pixel Art",
+        crt: "CRT",
+        trail: "Estela acentuada",
+        psychedelic: "Psicodélico",
+        psygrad: "Gradiente Psy",
+        luminous: "Flujo Luminoso",
+        visionpass: "Paso Alto Visionario",
+        neon: "Neón Glow",
+        neongrad: "Neón Gradiente",
+      },
       liveParticlesCount: {
         low: "Baja",
         med: "Media",
@@ -3077,6 +3095,21 @@ const extendedLocaleTexts = {
         flatfx: "Flat",
         neon: "Neon",
       },
+      masterFxMode: {
+        none: "None",
+        chromatic: "Chromatic",
+        interlace: "Interlace Drift",
+        datamosh: "Datamosh Trail",
+        pixelart: "Pixel Art",
+        crt: "CRT",
+        trail: "Trail (Accented)",
+        psychedelic: "Psychedelic",
+        psygrad: "Psy Gradient",
+        luminous: "Luminous Flux",
+        visionpass: "Visionary High Pass",
+        neon: "Neon Glow",
+        neongrad: "Neon Gradient",
+      },
       liveParticlesCount: {
         low: "Low",
         med: "Med",
@@ -3288,6 +3321,10 @@ function setSelectOptionTexts(selectId, mapping) {
   });
 }
 
+function ensureMasterFxOptions() {
+  // Keep option list stable from HTML; dynamic rebuilding caused runtime UX issues.
+}
+
 function applyExtendedLocaleTexts() {
   const pack = extendedLocaleTexts[locale] || extendedLocaleTexts.es;
   if (pack.selectors) {
@@ -3334,7 +3371,7 @@ function applyThemeMode(nextMode, persist = true) {
 }
 
 function loadSavedThemeMode() {
-  let mode = "light";
+  let mode = "dark";
   try {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
     if (saved === "dark" || saved === "light") mode = saved;
@@ -6961,10 +6998,29 @@ function renderFractalLive(tSec, sourceImageData = null) {
   const camDistTarget = clamp(fs.camDistance, 1.2, 8);
   fractalCamDistSmooth += (camDistTarget - fractalCamDistSmooth) * 0.075;
   const audioState = getReactiveAudioState(getSettings(), fs.useAudio, fs.audioGain);
-  const bass = clamp(audioState.bands[0] * 0.85 + audioState.bands[1] * 0.75, 0, 1);
-  const mid = clamp(audioState.bands[1] * 0.4 + audioState.bands[2] * 0.7, 0, 1);
-  const high = clamp(audioState.bands[3] * 0.9 + audioState.transient * 0.35, 0, 1);
-  const energy = clamp(audioState.level * 0.8 + audioState.transient * 0.28, 0, 1);
+  const bassTarget = clamp(audioState.bands[0] * 0.85 + audioState.bands[1] * 0.75, 0, 1);
+  const midTarget = clamp(audioState.bands[1] * 0.4 + audioState.bands[2] * 0.7, 0, 1);
+  const highTarget = clamp(audioState.bands[3] * 0.9 + audioState.transient * 0.35, 0, 1);
+  const energyTarget = clamp(audioState.level * 0.8 + audioState.transient * 0.28, 0, 1);
+  const audioFollow = fs.useAudio ? 0.08 : 0.18;
+  fractalAudioBassSmooth += (bassTarget - fractalAudioBassSmooth) * audioFollow;
+  fractalAudioMidSmooth += (midTarget - fractalAudioMidSmooth) * audioFollow;
+  fractalAudioHighSmooth += (highTarget - fractalAudioHighSmooth) * audioFollow;
+  fractalAudioEnergySmooth += (energyTarget - fractalAudioEnergySmooth) * audioFollow;
+  const bass = clamp(fractalAudioBassSmooth, 0, 1);
+  const mid = clamp(fractalAudioMidSmooth, 0, 1);
+  const high = clamp(fractalAudioHighSmooth, 0, 1);
+  const energy = clamp(fractalAudioEnergySmooth, 0, 1);
+  const audioMode = liveFractalAudioMode ? liveFractalAudioMode.value : "balanced";
+  const organicAudio = fs.useAudio ? energy : 0;
+  const morphBias = audioMode === "spectral" ? 1.18 : audioMode === "bass" ? 1.04 : audioMode === "rhythmic" ? 0.9 : 1.0;
+  const flowBias = audioMode === "spectral" ? 1.16 : audioMode === "rhythmic" ? 1.08 : audioMode === "bass" ? 0.95 : 1.0;
+  const spinBias = audioMode === "rhythmic" ? 0.72 : audioMode === "bass" ? 0.78 : 0.84;
+  const fractalPower = clamp(fs.power + organicAudio * 0.42 * morphBias + bass * 0.18, 6.0, 12.0);
+  const fractalBreath = clamp(fs.breath * 0.48 + organicAudio * 0.62 * morphBias + mid * 0.12, 0, 1.25);
+  const fractalFlow = clamp(fs.flow * (0.78 + organicAudio * 0.28 * flowBias) + mid * 0.18, 0, 1.25);
+  const fractalSpin = clamp(fs.spin * (0.28 + spinBias * 0.28) + high * 0.08, 0, 0.55);
+  const fractalCamSpeed = clamp(fs.camSpeed * (0.74 + organicAudio * 0.06), 0, 1);
   const visualState = getFractalInputReactiveState(sourceImageData);
 
   gl.viewport(0, 0, fractalGlCanvas.width, fractalGlCanvas.height);
@@ -6984,7 +7040,7 @@ function renderFractalLive(tSec, sourceImageData = null) {
   gl.uniform1f(uniforms.uVisualContrast, visualState.contrast);
   gl.uniform3f(uniforms.uInputColor, visualState.color[0], visualState.color[1], visualState.color[2]);
   gl.uniform1f(uniforms.uSymmetry, fs.symmetry);
-  gl.uniform1f(uniforms.uFractalPower, fs.power);
+  gl.uniform1f(uniforms.uFractalPower, fractalPower);
   gl.uniform1f(uniforms.uIter, fs.iter);
   gl.uniform1f(uniforms.uSteps, fs.steps);
   gl.uniform1f(uniforms.uMaxDist, fs.maxDist);
@@ -6992,14 +7048,14 @@ function renderFractalLive(tSec, sourceImageData = null) {
   gl.uniform1f(uniforms.uFogDensity, fs.fog);
   gl.uniform1f(uniforms.uGlow, fs.glow);
   gl.uniform1f(uniforms.uLightIntensity, fs.light);
-  gl.uniform1f(uniforms.uSpin, fs.spin);
-  gl.uniform1f(uniforms.uBreath, fs.breath);
+  gl.uniform1f(uniforms.uSpin, fractalSpin);
+  gl.uniform1f(uniforms.uBreath, fractalBreath);
   gl.uniform1f(uniforms.uColorWarmth, fs.warmth);
   gl.uniform1f(uniforms.uCamMode, fs.camMode === "inside" ? 1 : 0);
   gl.uniform1f(uniforms.uCamYaw, fractalCamYaw);
   gl.uniform1f(uniforms.uCamPitch, fractalCamPitch);
   gl.uniform1f(uniforms.uCamDist, fractalCamDistSmooth);
-  gl.uniform1f(uniforms.uCamSpeed, fs.camSpeed);
+  gl.uniform1f(uniforms.uCamSpeed, fractalCamSpeed);
   gl.uniform1f(uniforms.uShapeMode, fs.shapeModeCode);
   gl.uniform1f(uniforms.uShapeModeB, fs.shapeModeBCode);
   gl.uniform1f(uniforms.uShapeMorph, fs.shapeMorph);
@@ -7008,7 +7064,7 @@ function renderFractalLive(tSec, sourceImageData = null) {
   gl.uniform1f(uniforms.uTexture2Mix, fs.texture2Mix);
   gl.uniform1f(uniforms.uRenderMode, fs.renderModeCode);
   gl.uniform1f(uniforms.uFractalVariant, fs.variantCode);
-  gl.uniform1f(uniforms.uFlow, fs.flow);
+  gl.uniform1f(uniforms.uFlow, fractalFlow);
   gl.uniform1f(uniforms.uPaletteMode, fs.paletteModeCode);
   gl.uniform1f(uniforms.uBgMode, fs.bgModeCode);
   gl.uniform1f(uniforms.uFlatMode, fs.flatMode);
@@ -7901,7 +7957,19 @@ function shouldRunTracking(settings) {
 function isMasterFxAnimated() {
   if (!masterFxMode) return false;
   const v = masterFxMode.value || "none";
-  return v === "trail" || v === "chromatic" || v === "psychedelic" || v === "neon" || v === "simsecho";
+  return (
+    v === "trail" ||
+    v === "chromatic" ||
+    v === "interlace" ||
+    v === "datamosh" ||
+    v === "pixelart" ||
+    v === "psychedelic" ||
+    v === "psygrad" ||
+    v === "luminous" ||
+    v === "visionpass" ||
+    v === "neon" ||
+    v === "neongrad"
+  );
 }
 
 function shouldKeepAnimating(s, keyPanMoved, smoothCameraMoved) {
@@ -10035,7 +10103,20 @@ function apply3dStageFilter(tSec) {
 
 function applyMasterFxGlobal(tSec) {
   if (!masterFxMode || !masterFxAmount) return;
-  const fxMode = masterFxMode.value || "none";
+  let fxMode = masterFxMode.value || "none";
+  if (![...masterFxMode.options].some((opt) => opt.value === fxMode)) {
+    fxMode = "none";
+    masterFxMode.value = "none";
+  }
+  if (fxMode === "bloom") fxMode = "psygrad";
+  else if (fxMode === "flatfx") fxMode = "interlace";
+  else if (fxMode === "simsecho") fxMode = "neongrad";
+  else if (fxMode === "animatrix") fxMode = "pixelart";
+  if (masterFxMode.value !== fxMode) {
+    masterFxMode.value = fxMode;
+    updateMasterFxSummaryStatus();
+    updateMasterFxPadDot();
+  }
   if (fxMode === "none") {
     if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
       masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
@@ -10048,9 +10129,22 @@ function applyMasterFxGlobal(tSec) {
   const fxScale = getAdaptivePostFxScale();
   const w = Math.max(2, Math.round(outW * fxScale));
   const h = Math.max(2, Math.round(outH * fxScale));
-  const amount = clamp(Number(masterFxAmount.value) / 100, 0, 1);
-  const speed = clamp(Number(masterFxSpeed ? masterFxSpeed.value : 42) / 100, 0, 1);
-  const colorDrive = clamp(Number(masterFxColor ? masterFxColor.value : 52) / 100, 0, 1);
+  const amountTarget = clamp(Number(masterFxAmount.value) / 100, 0, 1);
+  const speedTarget = clamp(Number(masterFxSpeed ? masterFxSpeed.value : 42) / 100, 0, 1);
+  const colorTarget = clamp(Number(masterFxColor ? masterFxColor.value : 52) / 100, 0, 1);
+  if (masterFxSmoothMode !== fxMode) {
+    masterFxSmoothMode = fxMode;
+    masterFxAmountSmooth = amountTarget;
+    masterFxSpeedSmooth = speedTarget;
+    masterFxColorSmooth = colorTarget;
+  } else {
+    masterFxAmountSmooth += (amountTarget - masterFxAmountSmooth) * 0.14;
+    masterFxSpeedSmooth += (speedTarget - masterFxSpeedSmooth) * 0.14;
+    masterFxColorSmooth += (colorTarget - masterFxColorSmooth) * 0.14;
+  }
+  const amount = clamp(masterFxAmountSmooth, 0, 1);
+  const speed = clamp(masterFxSpeedSmooth, 0, 1);
+  const colorDrive = clamp(masterFxColorSmooth, 0, 1);
   if (masterFxCanvas.width !== w || masterFxCanvas.height !== h) {
     masterFxCanvas.width = w;
     masterFxCanvas.height = h;
@@ -10060,7 +10154,13 @@ function applyMasterFxGlobal(tSec) {
     masterPrevCanvas.height = h;
     masterPrevCtx.clearRect(0, 0, w, h);
   }
-  const expensiveMode = fxMode === "chromatic" || fxMode === "psychedelic" || fxMode === "flatfx" || fxMode === "neon" || fxMode === "simsecho";
+  const expensiveMode =
+    fxMode === "chromatic" ||
+    fxMode === "interlace" ||
+    fxMode === "datamosh" ||
+    fxMode === "pixelart" ||
+    fxMode === "neon" ||
+    fxMode === "neongrad";
   const perfStress = clamp((24 - fps) / 8, 0, 1);
   const skipEvery = mode === "fractal" ? 1 : perfStress > 0.75 ? 3 : perfStress > 0.35 ? 2 : 1;
   const canReusePrev = expensiveMode && skipEvery > 1 && !recordingActive;
@@ -10106,6 +10206,141 @@ function applyMasterFxGlobal(tSec) {
       }
     }
     masterFxCtx.putImageData(out, 0, 0);
+  } else if (fxMode === "interlace" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const shiftAmp = 0.35 + amount * (1.2 + speed * 1.8);
+    const phase = tSec * (1.2 + speed * 2.4);
+    const colorMix = 0.06 + colorDrive * 0.24;
+    const scanDark = 0.03 + amount * 0.1;
+    for (let y = 0; y < h; y++) {
+      const linePhase = phase + y * 0.072;
+      const xShift =
+        Math.sin(linePhase) * shiftAmp +
+        Math.sin(linePhase * 0.47 + 1.37) * shiftAmp * 0.52 +
+        Math.sin(tSec * 0.82 + y * 0.2) * shiftAmp * 0.24;
+      const channelShift = 0.32 + amount * (0.9 + colorDrive * 0.9);
+      const lineDark = (y & 1) === 0 ? 1 : (1 - scanDark);
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const sR = sampleClampBilinear(sd, w, h, x - xShift - channelShift, y);
+        const sG = sampleClampBilinear(sd, w, h, x - xShift * 0.24, y);
+        const sB = sampleClampBilinear(sd, w, h, x - xShift + channelShift, y);
+        od[i] = clamp(sR[0] * (1 - colorMix * 0.5) + sG[0] * colorMix * 0.25, 0, 255);
+        od[i + 1] = clamp(sG[1] * lineDark, 0, 255);
+        od[i + 2] = clamp(sB[2] * (1 - colorMix * 0.18) + sG[2] * colorMix * 0.34, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.06 + amount * 0.22, 0.06, 0.34);
+    masterFxCtx.filter = `blur(${0.4 + amount * 1.6}px)`;
+    masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "datamosh" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const prev = masterPrevCtx.getImageData(0, 0, w, h);
+    const sd = src.data;
+    const pd = prev.data;
+    const od = out.data;
+    const block = Math.max(4, Math.round(4 + amount * 24 + speed * 6));
+    const driftBase = 0.8 + amount * (5.6 + speed * 8.4);
+    const threshold = clamp(18 - amount * 10, 6, 22);
+    const trailMixBase = clamp(0.18 + amount * 0.56, 0.18, 0.84);
+    const keepBase = 1 - trailMixBase;
+    const t = tSec * (0.6 + speed * 1.8);
+    for (let by = 0; by < h; by += block) {
+      for (let bx = 0; bx < w; bx += block) {
+        const cx = clamp(bx + (block >> 1), 0, w - 1);
+        const cy = clamp(by + (block >> 1), 0, h - 1);
+        const ci = (cy * w + cx) * 4;
+        const lumNow = sd[ci] * 0.299 + sd[ci + 1] * 0.587 + sd[ci + 2] * 0.114;
+        const lumPrev = pd[ci] * 0.299 + pd[ci + 1] * 0.587 + pd[ci + 2] * 0.114;
+        const motion = Math.abs(lumNow - lumPrev);
+        const motionK = clamp((motion - threshold) / (56 + amount * 96), 0, 1);
+        const flowA = Math.sin(t + bx * 0.041 + by * 0.023);
+        const flowB = Math.cos(t * 0.82 + bx * 0.018 - by * 0.034);
+        const dx = Math.round(flowA * driftBase * (0.2 + motionK * 1.2));
+        const dy = Math.round(flowB * driftBase * (0.16 + motionK * 0.82));
+        const trailMix = clamp(trailMixBase * (0.62 + motionK * 0.9), 0.08, 0.92);
+        const keep = clamp(keepBase + (1 - motionK) * 0.16, 0.06, 0.9);
+        const yMax = Math.min(h, by + block);
+        const xMax = Math.min(w, bx + block);
+        for (let y = by; y < yMax; y++) {
+          for (let x = bx; x < xMax; x++) {
+            const i = (y * w + x) * 4;
+            const sPrev = sampleClampBilinear(pd, w, h, x + dx, y + dy);
+            const noise = (Math.sin((x * 0.15 + y * 0.11 + t * 5.4)) * 0.5 + 0.5) * (amount * 22);
+            od[i] = clamp(sd[i] * keep + sPrev[0] * trailMix + noise * 0.08, 0, 255);
+            od[i + 1] = clamp(sd[i + 1] * keep + sPrev[1] * trailMix + noise * 0.05, 0, 255);
+            od[i + 2] = clamp(sd[i + 2] * keep + sPrev[2] * trailMix + noise * 0.12, 0, 255);
+            od[i + 3] = 255;
+          }
+        }
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.08 + amount * 0.24, 0.08, 0.36);
+    masterFxCtx.filter = `blur(${0.5 + amount * 1.9 + speed * 1.3}px)`;
+    masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "pixelart" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const block = Math.max(2, Math.round(2 + amount * 14 + speed * 6));
+    const levels = Math.max(3, Math.round(10 - amount * 6 - colorDrive * 2));
+    const q = 255 / Math.max(1, levels - 1);
+    const t = tSec * (1 + speed * 2.2);
+    for (let by = 0; by < h; by += block) {
+      for (let bx = 0; bx < w; bx += block) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let c = 0;
+        const yMax = Math.min(h, by + block);
+        const xMax = Math.min(w, bx + block);
+        for (let y = by; y < yMax; y++) {
+          for (let x = bx; x < xMax; x++) {
+            const i = (y * w + x) * 4;
+            r += sd[i];
+            g += sd[i + 1];
+            b += sd[i + 2];
+            c += 1;
+          }
+        }
+        if (c < 1) continue;
+        const jitter = (Math.sin(t + bx * 0.08 + by * 0.11) * 0.5 + 0.5) * (12 + amount * 44);
+        const qr = Math.round(clamp(r / c + jitter * 0.22, 0, 255) / q) * q;
+        const qg = Math.round(clamp(g / c + jitter * 0.08, 0, 255) / q) * q;
+        const qb = Math.round(clamp(b / c - jitter * 0.18, 0, 255) / q) * q;
+        for (let y = by; y < yMax; y++) {
+          for (let x = bx; x < xMax; x++) {
+            const i = (y * w + x) * 4;
+            od[i] = clamp(qr, 0, 255);
+            od[i + 1] = clamp(qg, 0, 255);
+            od[i + 2] = clamp(qb, 0, 255);
+            od[i + 3] = 255;
+          }
+        }
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "overlay";
+    masterFxCtx.globalAlpha = clamp(0.1 + amount * 0.24, 0.1, 0.34);
+    const lineStep = Math.max(2, Math.round(block * 0.4));
+    masterFxCtx.fillStyle = "rgba(132,228,255,0.18)";
+    for (let y = 0; y < h; y += lineStep) masterFxCtx.fillRect(0, y, w, 1);
+    masterFxCtx.restore();
   } else if (fxMode === "trail" && amount > 0.001) {
     masterFxCtx.save();
     masterFxCtx.globalCompositeOperation = "screen";
@@ -10161,6 +10396,154 @@ function applyMasterFxGlobal(tSec) {
     masterFxCtx.filter = `blur(${1 + amount * 3 + speed * 2.2}px)`;
     masterFxCtx.drawImage(masterPrevCanvas, 0, 0, w, h);
     masterFxCtx.restore();
+  } else if (fxMode === "psygrad" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const t = tSec * (0.64 + speed * 0.9);
+    const hA = fract01(0.62 + colorDrive * 0.22 + Math.sin(tSec * 0.24) * 0.08);
+    const hB = fract01(hA + 0.28 + Math.sin(tSec * 0.3) * 0.11);
+    const cA = hslToRgb(hA, 0.9, 0.58);
+    const cB = hslToRgb(hB, 0.88, 0.54);
+    const gradMix = clamp(0.16 + amount * 0.44, 0.16, 0.68);
+    const amp = 0.42 + amount * (1.35 + speed * 0.7);
+    for (let y = 0; y < h; y++) {
+      const v = y / Math.max(1, h - 1);
+      for (let x = 0; x < w; x++) {
+        const u = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const g1 = 0.5 + 0.5 * Math.sin((u - v) * (7 + amount * 10) + t * 1.2);
+        const g2 = 0.5 + 0.5 * Math.cos((u * 1.4 + v * 1.1) * (6 + amount * 8) - t * 1.05);
+        const g = clamp(g1 * 0.65 + g2 * 0.35, 0, 1);
+        const gr = cA[0] * (1 - g) + cB[0] * g;
+        const gg = cA[1] * (1 - g) + cB[1] * g;
+        const gb = cA[2] * (1 - g) + cB[2] * g;
+        const waveA = 0.5 + 0.5 * Math.sin(t * 1.2 + u * 9.8 + v * 6.7);
+        const waveB = 0.5 + 0.5 * Math.cos(t * 1.35 + u * 6.1 - v * 8.4);
+        const lum = (sd[i] * 0.299 + sd[i + 1] * 0.587 + sd[i + 2] * 0.114) / 255;
+        const il = (y * w + Math.max(0, x - 1)) * 4;
+        const ir = (y * w + Math.min(w - 1, x + 1)) * 4;
+        const iu = (Math.max(0, y - 1) * w + x) * 4;
+        const id = (Math.min(h - 1, y + 1) * w + x) * 4;
+        const lLum = (sd[il] * 0.299 + sd[il + 1] * 0.587 + sd[il + 2] * 0.114) / 255;
+        const rLum = (sd[ir] * 0.299 + sd[ir + 1] * 0.587 + sd[ir + 2] * 0.114) / 255;
+        const uLum = (sd[iu] * 0.299 + sd[iu + 1] * 0.587 + sd[iu + 2] * 0.114) / 255;
+        const dLum = (sd[id] * 0.299 + sd[id + 1] * 0.587 + sd[id + 2] * 0.114) / 255;
+        const contrast = Math.abs(lum - (lLum + rLum + uLum + dLum) * 0.25);
+        const sat = Math.max(sd[i], sd[i + 1], sd[i + 2]) - Math.min(sd[i], sd[i + 1], sd[i + 2]);
+        const satN = sat / 255;
+        const detailMask = clamp(Math.pow(lum, 0.95) * 0.52 + satN * 0.46 + contrast * 1.05 - 0.22, 0, 1);
+        const tint = gradMix * (0.55 + waveA * 0.45) * detailMask;
+        od[i] = clamp(sd[i] * (1 - tint) + gr * tint + sd[i + 2] * (0.02 + waveB * 0.03) * detailMask + sd[i] * waveA * amp * 0.08, 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * (1 - tint) + gg * tint + sd[i] * (0.02 + waveA * 0.03) * detailMask + sd[i + 1] * waveB * amp * 0.08, 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * (1 - tint) + gb * tint + sd[i + 1] * (0.02 + waveB * 0.03) * detailMask + sd[i + 2] * (1 - waveA) * amp * 0.08, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.06 + amount * 0.12, 0.06, 0.2);
+    masterFxCtx.filter = `blur(${0.8 + amount * 1.8 + speed * 1.2}px)`;
+    masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "luminous" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const t = tSec * (0.62 + speed * 0.86);
+    const amp = 0.44 + amount * (1.22 + speed * 0.62);
+    const mixAmt = clamp(0.16 + amount * 0.42, 0.16, 0.62);
+    for (let y = 0; y < h; y++) {
+      const v = y / Math.max(1, h - 1);
+      for (let x = 0; x < w; x++) {
+        const u = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const px = (u - 0.5) * 2;
+        const py = (v - 0.5) * 2;
+        const rr = Math.hypot(px, py);
+        const ang = Math.atan2(py, px);
+        const warp = Math.sin(ang * 5 + t * 1.75) * (0.1 + amount * 0.24) + Math.cos(rr * 8 - t * 1.25) * (0.08 + amount * 0.18);
+        // Avoid angular seam (-PI/PI) by using periodic sin/cos terms instead of raw angle.
+        const hue = fract01(0.62 + colorDrive * 0.24 + rr * 0.22 + Math.sin(ang) * 0.045 + Math.cos(ang * 1.3) * 0.03 + warp);
+        const satTone = clamp(0.72 + amount * 0.2, 0, 1);
+        const lit = clamp(0.5 + (0.5 - rr) * 0.26 + warp * 0.18, 0.16, 0.9);
+        const [pr, pg, pb] = hslToRgb(hue, satTone, lit);
+        const waveA = 0.5 + 0.5 * Math.sin(t * 1.24 + u * 8.8 + v * 6.3);
+        const waveB = 0.5 + 0.5 * Math.cos(t * 1.4 + u * 5.4 - v * 7.2);
+        const flow = 0.5 + 0.5 * Math.sin(t * 1.35 + rr * 6.4 - ang * 1.6);
+        const lum = (sd[i] * 0.299 + sd[i + 1] * 0.587 + sd[i + 2] * 0.114) / 255;
+        const il = (y * w + Math.max(0, x - 1)) * 4;
+        const ir = (y * w + Math.min(w - 1, x + 1)) * 4;
+        const iu = (Math.max(0, y - 1) * w + x) * 4;
+        const id = (Math.min(h - 1, y + 1) * w + x) * 4;
+        const lLum = (sd[il] * 0.299 + sd[il + 1] * 0.587 + sd[il + 2] * 0.114) / 255;
+        const rLum = (sd[ir] * 0.299 + sd[ir + 1] * 0.587 + sd[ir + 2] * 0.114) / 255;
+        const uLum = (sd[iu] * 0.299 + sd[iu + 1] * 0.587 + sd[iu + 2] * 0.114) / 255;
+        const dLum = (sd[id] * 0.299 + sd[id + 1] * 0.587 + sd[id + 2] * 0.114) / 255;
+        const contrast = Math.abs(lum - (lLum + rLum + uLum + dLum) * 0.25);
+        const satSpread = Math.max(sd[i], sd[i + 1], sd[i + 2]) - Math.min(sd[i], sd[i + 1], sd[i + 2]);
+        const satN = satSpread / 255;
+        const detailMask = clamp(Math.pow(lum, 0.92) * 0.5 + satN * 0.44 + contrast * 1.02 - 0.2, 0, 1);
+        const k = mixAmt * (0.48 + flow * 0.52) * detailMask;
+        od[i] = clamp(sd[i] * (1 - k) + pr * k + sd[i] * waveA * amp * 0.08 + sd[i + 2] * (0.02 + waveB * 0.02) * detailMask, 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * (1 - k) + pg * k + sd[i + 1] * waveB * amp * 0.08 + sd[i] * (0.02 + waveA * 0.02) * detailMask, 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * (1 - k) + pb * k + sd[i + 2] * (1 - waveA) * amp * 0.08 + sd[i + 1] * (0.02 + waveB * 0.02) * detailMask, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.05 + amount * 0.14, 0.05, 0.22);
+    masterFxCtx.filter = `blur(${0.7 + amount * 1.9 + speed * 1.2}px)`;
+    masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "visionpass" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    od.set(sd);
+    const t = tSec * (0.28 + speed * 0.46);
+    const edgeGain = 0.95 + amount * (1.9 + speed * 0.6);
+    for (let y = 1; y < h - 1; y++) {
+      const v = y / Math.max(1, h - 1);
+      for (let x = 1; x < w - 1; x++) {
+        const u = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const l = (sd[(y * w + (x - 1)) * 4] + sd[(y * w + (x - 1)) * 4 + 1] + sd[(y * w + (x - 1)) * 4 + 2]) / 3;
+        const r = (sd[(y * w + (x + 1)) * 4] + sd[(y * w + (x + 1)) * 4 + 1] + sd[(y * w + (x + 1)) * 4 + 2]) / 3;
+        const u1 = (sd[((y - 1) * w + x) * 4] + sd[((y - 1) * w + x) * 4 + 1] + sd[((y - 1) * w + x) * 4 + 2]) / 3;
+        const d1 = (sd[((y + 1) * w + x) * 4] + sd[((y + 1) * w + x) * 4 + 1] + sd[((y + 1) * w + x) * 4 + 2]) / 3;
+        const lum = (sd[i] + sd[i + 1] + sd[i + 2]) / 3;
+        const avg = (l + r + u1 + d1) * 0.25;
+        const hp = clamp(Math.abs(lum - avg) * edgeGain, 0, 255) / 255;
+        const px = (u - 0.5) * 2;
+        const py = (v - 0.5) * 2;
+        const rr = Math.hypot(px, py);
+        const ang = Math.atan2(py, px);
+        const wave = 0.5 + 0.5 * Math.sin(t * 1.1 + rr * (7 + amount * 5) - ang * 1.6);
+        const hue = fract01(0.63 + colorDrive * 0.2 + rr * 0.16 + Math.sin(ang * 1.5 + t * 0.35) * 0.03);
+        const [vr, vg, vb] = hslToRgb(hue, 0.92, 0.58);
+        const hpSoft = hp * hp * (3 - 2 * hp);
+        const k = clamp(hpSoft * (0.62 + wave * 0.38) * (0.58 + amount * 0.76), 0, 0.82);
+        const baseKeep = 1 - clamp(0.12 + amount * 0.18, 0.12, 0.3);
+        od[i] = clamp(sd[i] * baseKeep + vr * k * 0.95, 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * baseKeep + vg * k * 1.05, 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * baseKeep + vb * k * 1.12, 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.06 + amount * 0.16, 0.06, 0.22);
+    masterFxCtx.filter = `blur(${0.55 + amount * 1.3 + speed * 0.6}px)`;
+    masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
   } else if (fxMode === "flatfx" && amount > 0.001) {
     const src = masterFxCtx.getImageData(0, 0, w, h);
     const sd = src.data;
@@ -10203,6 +10586,39 @@ function applyMasterFxGlobal(tSec) {
     masterFxCtx.globalCompositeOperation = "screen";
     masterFxCtx.globalAlpha = clamp(0.22 + amount * 0.46, 0.22, 0.74);
     masterFxCtx.filter = `blur(${1 + amount * 6.4 + speed * 3.2}px)`;
+    masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
+    masterFxCtx.restore();
+  } else if (fxMode === "neongrad" && amount > 0.001) {
+    const src = masterFxCtx.getImageData(0, 0, w, h);
+    const out = masterFxCtx.createImageData(w, h);
+    const sd = src.data;
+    const od = out.data;
+    const edgeGain = 1 + amount * 2.4 + speed * 1.2;
+    const t = tSec * (0.55 + speed * 1.1);
+    for (let y = 1; y < h - 1; y++) {
+      const v = y / Math.max(1, h - 1);
+      for (let x = 1; x < w - 1; x++) {
+        const u = x / Math.max(1, w - 1);
+        const i = (y * w + x) * 4;
+        const l = (sd[((y * w + (x - 1)) * 4)] + sd[((y * w + (x - 1)) * 4) + 1] + sd[((y * w + (x - 1)) * 4) + 2]) / 3;
+        const r = (sd[((y * w + (x + 1)) * 4)] + sd[((y * w + (x + 1)) * 4) + 1] + sd[((y * w + (x + 1)) * 4) + 2]) / 3;
+        const u1 = (sd[(((y - 1) * w + x) * 4)] + sd[(((y - 1) * w + x) * 4) + 1] + sd[(((y - 1) * w + x) * 4) + 2]) / 3;
+        const d1 = (sd[(((y + 1) * w + x) * 4)] + sd[(((y + 1) * w + x) * 4) + 1] + sd[(((y + 1) * w + x) * 4) + 2]) / 3;
+        const edge = clamp((Math.abs(r - l) + Math.abs(d1 - u1)) * edgeGain, 0, 255);
+        const edgeK = edge / 255;
+        const gh = fract01(0.05 + colorDrive * 0.72 + u * 0.34 - v * 0.24 + Math.sin(t + (u + v) * 2.4) * 0.08);
+        const [gr, gg, gb] = hslToRgb(gh, 0.94, 0.58);
+        od[i] = clamp(sd[i] * 0.14 + gr * edgeK * (0.6 + amount * 1.1), 0, 255);
+        od[i + 1] = clamp(sd[i + 1] * 0.14 + gg * edgeK * (0.7 + amount * 1.2), 0, 255);
+        od[i + 2] = clamp(sd[i + 2] * 0.14 + gb * edgeK * (0.78 + amount * 1.3), 0, 255);
+        od[i + 3] = 255;
+      }
+    }
+    masterFxCtx.putImageData(out, 0, 0);
+    masterFxCtx.save();
+    masterFxCtx.globalCompositeOperation = "screen";
+    masterFxCtx.globalAlpha = clamp(0.24 + amount * 0.44, 0.24, 0.76);
+    masterFxCtx.filter = `blur(${1.2 + amount * 6 + speed * 2.8}px)`;
     masterFxCtx.drawImage(masterFxCanvas, 0, 0, w, h);
     masterFxCtx.restore();
   } else if (fxMode === "simsecho" && amount > 0.001) {
@@ -15079,9 +15495,13 @@ function cycle3dFxMode(step = 1) {
 
 function cycleMasterFxMode(step = 1) {
   if (!masterFxMode) return;
-  const cycle = ["none", "bloom", "chromatic", "trail", "crt", "psychedelic", "flatfx", "neon", "simsecho"];
+  const cycle = [...masterFxMode.options]
+    .map((o) => o.value)
+    .filter((v, i, arr) => v && arr.indexOf(v) === i);
+  if (cycle.length === 0) return;
   const idx = cycle.indexOf(masterFxMode.value);
-  masterFxMode.value = cycle[(idx + (step >= 0 ? 1 : -1) + cycle.length) % cycle.length];
+  const start = idx >= 0 ? idx : 0;
+  masterFxMode.value = cycle[(start + (step >= 0 ? 1 : -1) + cycle.length) % cycle.length];
   updateMasterFxSummaryStatus();
   if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
     masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
@@ -16563,11 +16983,6 @@ if (liveModeRandomBtn) {
     scheduleRender();
   });
 }
-if (liveModeSafeBtn) {
-  liveModeSafeBtn.addEventListener("click", () => {
-    applyLiveSafeBaseline({ keepMode: true });
-  });
-}
 if (liveGlitchIntensity) {
   liveGlitchIntensity.addEventListener("input", () => {
     applyLiveGlitchMacros();
@@ -16875,6 +17290,7 @@ if (live3dBgColorB) {
 }
 if (masterFxMode) {
   masterFxMode.addEventListener("change", () => {
+    masterFxSmoothMode = "";
     if (masterPrevCanvas.width > 0 && masterPrevCanvas.height > 0) {
       masterPrevCtx.clearRect(0, 0, masterPrevCanvas.width, masterPrevCanvas.height);
     }
@@ -18075,6 +18491,18 @@ window.addEventListener("keydown", (e) => {
   const active = document.activeElement;
   const tag = (active && active.tagName) || "";
   const inputType = active && active.tagName === "INPUT" ? (active.type || "").toLowerCase() : "";
+  if (e.code === "ArrowUp") {
+    e.preventDefault();
+    if (e.repeat) return;
+    cycleMasterFxMode(1);
+    return;
+  }
+  if (e.code === "ArrowDown") {
+    e.preventDefault();
+    if (e.repeat) return;
+    cycleMasterFxMode(-1);
+    return;
+  }
   const isTextInput =
     tag === "SELECT" ||
     tag === "TEXTAREA" ||
@@ -18097,18 +18525,6 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
     cameraKeyState.down = true;
     scheduleRender();
-    return;
-  }
-  if (e.code === "ArrowUp") {
-    e.preventDefault();
-    if (e.repeat) return;
-    cycleMasterFxMode(1);
-    return;
-  }
-  if (e.code === "ArrowDown") {
-    e.preventDefault();
-    if (e.repeat) return;
-    cycleMasterFxMode(-1);
     return;
   }
   if (e.code === "KeyA") {

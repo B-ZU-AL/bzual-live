@@ -87,7 +87,7 @@
                   <span data-i18n="theme_mode">Tema de interfaz</span>
                   <select id="themeModeSelect">
                     <option value="light" data-i18n="theme_light">Claro</option>
-                    <option value="dark" data-i18n="theme_dark">Oscuro</option>
+                    <option value="dark" data-i18n="theme_dark" selected>Oscuro</option>
                   </select>
                 </label>
               </div>
@@ -1158,6 +1158,11 @@
                 </div>
               </div>
             </div>
+            <div class="canvas-mini-meta" id="canvasMiniMeta">
+              <span id="canvasMiniResolution">Canvas 0x0</span>
+              <span id="canvasMiniFps">0 FPS</span>
+              <span id="canvasMiniLoad" class="perf-load-badge perf-load-low">Load LOW</span>
+            </div>
             <div id="moduleRouteHint" class="module-route-hint hidden">
               <div class="module-route-actions module-route-switch">
                 <button class="btn module-route-btn" data-module-route="glitch">
@@ -1186,18 +1191,10 @@
                 <button id="liveModeRandomBtn" class="btn module-route-random-btn">
                   <span class="live-mode-icon">R</span><span>Random (R)</span>
                 </button>
-                <button id="liveModeSafeBtn" class="btn module-route-safe-btn">
-                  <span class="live-mode-icon">B</span><span data-i18n="live_safe_btn">Live Safe (B)</span>
-                </button>
               </div>
             </div>
 
             <div class="deck-controls" id="cameraDeckControls">
-              <div class="canvas-mini-meta" id="canvasMiniMeta">
-                <span id="canvasMiniResolution">Canvas 0x0</span>
-                <span id="canvasMiniFps">0 FPS</span>
-                <span id="canvasMiniLoad" class="perf-load-badge perf-load-low">Load LOW</span>
-              </div>
               <label class="inline-select canvas-aspect-control">
                 <span data-i18n="aspect_ratio">Aspect Ratio</span>
                 <select id="aspectRatioSelect">
@@ -1219,14 +1216,18 @@
                     <span>Master FX</span>
                     <select id="masterFxMode">
                       <option value="none">None</option>
-                      <option value="bloom">Bloom</option>
                       <option value="chromatic">Chromatic</option>
-                      <option value="trail">Trail (Accented)</option>
+                      <option value="interlace">Interlace Drift</option>
+                      <option value="datamosh">Datamosh Trail</option>
+                      <option value="pixelart">Pixel Art</option>
                       <option value="crt">CRT</option>
+                      <option value="trail">Trail (Accented)</option>
                       <option value="psychedelic">Psychedelic</option>
-                      <option value="flatfx">Flat FX</option>
+                      <option value="psygrad">Psy Gradient</option>
+                      <option value="luminous">Luminous Flux</option>
+                      <option value="visionpass">Visionary High Pass</option>
                       <option value="neon">Neon Glow</option>
-                      <option value="simsecho">Sims Echo</option>
+                      <option value="neongrad">Neon Gradient</option>
                     </select>
                   </label>
                   <label class="slider">
