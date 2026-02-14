@@ -3838,40 +3838,14 @@ function openMobileSetupPanel() {
   }
 }
 
-function createMobilePriorityBar() {
-  const bar = el("section", "mobile-priority-bar");
-  const rowEntry = el("div", "mobile-priority-row");
-  rowEntry.appendChild(el("span", "mobile-priority-label", "Entrada"));
-  const imgBtn = el("button", "btn mini mobile-priority-btn", "Imagen");
-  imgBtn.addEventListener("click", () => {
-    if (canvasOverlayImageBtn) canvasOverlayImageBtn.click();
-    vibrateTap();
-  });
-  const camBtn = el("button", "btn mini mobile-priority-btn", "Webcam");
-  camBtn.addEventListener("click", () => {
-    if (canvasOverlayWebcamBtn) canvasOverlayWebcamBtn.click();
-    vibrateTap();
-  });
-  const noInputBtn = el("button", "btn mini mobile-priority-btn", "N/I");
-  noInputBtn.addEventListener("click", () => {
-    if (canvasOverlayNoInputBtn) canvasOverlayNoInputBtn.click();
-    vibrateTap();
-  });
-  rowEntry.append(imgBtn, camBtn, noInputBtn);
-
-  const rowAudio = el("div", "mobile-priority-row");
-  rowAudio.appendChild(el("span", "mobile-priority-label", "Audio"));
-  const audioBtn = el("button", "btn mini mobile-priority-btn", "Audio");
+function createMobileUtilityBar() {
+  const bar = el("section", "mobile-utility-bar");
+  const audioBtn = el("button", "btn mini mobile-utility-btn", "Audio");
   audioBtn.addEventListener("click", () => {
     if (liveAudioStartBtn) liveAudioStartBtn.click();
     vibrateTap();
   });
-  const loadBtn = el("button", "btn mini mobile-priority-btn", "Load");
-  loadBtn.addEventListener("click", () => {
-    if (liveAudioPauseBtn) liveAudioPauseBtn.click();
-    vibrateTap();
-  });
-  const skipBtn = el("button", "btn mini mobile-priority-btn", "Skip");
+  const skipBtn = el("button", "btn mini mobile-utility-btn", "Skip");
   skipBtn.addEventListener("click", () => {
     stopAudioFileInput();
     if (audioInputSource) {
@@ -3880,25 +3854,19 @@ function createMobilePriorityBar() {
     }
     vibrateTap();
   });
-  rowAudio.append(audioBtn, loadBtn, skipBtn);
-
-  const rowControls = el("div", "mobile-priority-row mobile-priority-controls");
-  rowControls.appendChild(el("span", "mobile-priority-label", "Aspect"));
-  const aspect = el("select", "mobile-select mobile-priority-aspect");
+  const aspect = el("select", "mobile-select mobile-utility-aspect");
   copySelectOptions(aspectRatioSelect, aspect);
   aspect.addEventListener("change", () => {
     if (!aspectRatioSelect) return;
     aspectRatioSelect.value = aspect.value;
     aspectRatioSelect.dispatchEvent(new Event("change", { bubbles: true }));
   });
-  const setupBtn = el("button", "btn mini mobile-priority-setup", "Setup");
+  const setupBtn = el("button", "btn mini mobile-utility-setup", "Setup");
   setupBtn.addEventListener("click", () => {
     openMobileSetupPanel();
     vibrateTap();
   });
-  rowControls.append(aspect, setupBtn);
-
-  bar.append(rowEntry, rowAudio, rowControls);
+  bar.append(audioBtn, skipBtn, aspect, setupBtn);
   return bar;
 }
 
@@ -4216,12 +4184,12 @@ function createMobileLiveShell() {
   const root = el("section", "mobile-live-shell mobile-live-phone");
   root.classList.add("sheet-collapsed");
   const canvasStage = el("div", "mobile-canvas-stage");
-  const priorityBar = createMobilePriorityBar();
+  const utilityBar = createMobileUtilityBar();
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const dock = createBottomDock();
   const sheet = createBottomSheet();
-  canvasStage.append(priorityBar, modules, quick, dock, sheet);
+  canvasStage.append(utilityBar, modules, quick, dock, sheet);
   root.appendChild(canvasStage);
   syncMobileDock();
   renderMobileSheetPanel();
@@ -4234,7 +4202,7 @@ function createTabletLiveShell() {
   const left = el("aside", "tablet-col tablet-scenes");
   left.append(el("h3", "tablet-col-title", "Scenes"), createScenesGrid(true));
   const center = el("section", "tablet-col tablet-canvas-overlay");
-  const priorityBar = createMobilePriorityBar();
+  const utilityBar = createMobileUtilityBar();
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const tabs = el("div", "tablet-tabs");
@@ -4256,7 +4224,7 @@ function createTabletLiveShell() {
     mobileLiveBuilderPanel.hidden = !mobileLiveBuilderPanel.hidden;
   });
   mobileLiveBuilderPanel = el("div", "tablet-builder");
-  center.append(priorityBar, modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
+  center.append(utilityBar, modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
   const right = el("aside", "tablet-col tablet-macros");
   right.append(el("h3", "tablet-col-title", "Macros"), createMacrosPanel(true));
   grid.append(left, center, right);

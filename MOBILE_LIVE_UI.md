@@ -16,10 +16,8 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 
 ## iPhone
 - `MobileLiveShell` with:
-  - Compact top bar focused on canvas-first flow:
-    1. `Entrada` first (`Imagen`, `Webcam`, `N/I`).
-    2. `Audio` optional (`Audio`, `Load`, `Skip`).
-    3. `Aspect` selector + small `Setup` button.
+  - Canvas entry is the same desktop overlay (`Start Input` with Image/Webcam/No Input) and remains the primary first interaction.
+  - Small utility bar (non-blocking): `Audio`, `Skip`, `Aspect`, `Setup`.
   - `QuickActionsBar`: Freeze, Panic, Rec.
   - `Module Switcher` always near shortcuts:
     - Fast jump between modules (GL, FR, 3D, PT, LN, TN, IR, MO, MB, CD)
@@ -33,7 +31,7 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 
 ## iPad (landscape)
 - `TabletLiveShell` with 3-column layout:
-  - Same compact top bar (`Entrada` -> `Audio/Skip` -> `Aspect` + `Setup`) without blocking controls.
+  - Same non-blocking utility bar (`Audio`, `Skip`, `Aspect`, `Setup`) without replacing the canvas entry overlay.
   - Left: Scenes.
   - Center: Canvas + quick actions + optional Builder panel.
     - Includes same Module Switcher (modules + `RND` + `KAL`) near shortcuts.
