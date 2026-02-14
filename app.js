@@ -4,6 +4,7 @@ const canvasEntryOverlay = document.getElementById("canvasEntryOverlay");
 const canvasOverlayImageBtn = document.getElementById("canvasOverlayImageBtn");
 const canvasOverlayWebcamBtn = document.getElementById("canvasOverlayWebcamBtn");
 const canvasOverlayNoInputBtn = document.getElementById("canvasOverlayNoInputBtn");
+const canvasOverlayAudioBtn = document.getElementById("canvasOverlayAudioBtn");
 const canvasFullscreenBtn = document.getElementById("canvasFullscreenBtn");
 const moduleRouteHint = document.getElementById("moduleRouteHint");
 let moduleRouteButtons = [...document.querySelectorAll(".module-route-btn")];
@@ -1421,7 +1422,6 @@ let mobileLiveBuilderPanel = null;
 let mobileLiveTabs = [];
 let mobileLiveActiveTab = "scenes";
 let mobileLiveModuleButtons = [];
-let mobileLiveKaleidoBtn = null;
 let mobileLiveForcedValue = "auto";
 let mobileLiveKeyboardInset = 0;
 let mobileLiveMountedKind = "";
@@ -2477,11 +2477,12 @@ const extendedLocaleTexts = {
       "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(1)": "Geometría 3D / Movimiento",
       "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(2)": "Estética / FX de Luz",
       "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(3)": "Fondo 3D",
-      "#canvasEntryOverlay .canvas-entry-title": "Iniciar entrada",
-      "#canvasEntryOverlay .canvas-entry-sub": "Elige una entrada para comenzar el performance visual",
-      "#canvasOverlayImageBtn span:last-child": "Imagen",
-      "#canvasOverlayWebcamBtn span:last-child": "Webcam",
-      "#canvasOverlayNoInputBtn span:last-child": "Sin input",
+      "#canvasEntryOverlay .canvas-entry-title": "SELECT INPUT",
+      "#canvasEntryOverlay .canvas-entry-sub": "Choose input source to start visual engine",
+      "#canvasOverlayNoInputBtn span:last-child": "NO INPUT",
+      "#canvasOverlayImageBtn span:last-child": "IMPORT IMAGE",
+      "#canvasOverlayWebcamBtn span:last-child": "WEBCAM",
+      "#canvasOverlayAudioBtn": "AUDIO QUICK START",
       ".live-input-box-label": "Entrada activa",
       "#quickInputSelect option[value='image']": "Imagen",
       "#quickInputSelect option[value='webcam']": "Webcam",
@@ -3005,11 +3006,12 @@ const extendedLocaleTexts = {
       "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(1)": "3D Geometry / Motion",
       "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(2)": "Aesthetic / Light FX",
       "#panelStudio #depthControlsGroup .subgroup-title:nth-of-type(3)": "3D Background",
-      "#canvasEntryOverlay .canvas-entry-title": "Start Input",
-      "#canvasEntryOverlay .canvas-entry-sub": "Choose an input to begin visual performance",
-      "#canvasOverlayImageBtn span:last-child": "Image",
-      "#canvasOverlayWebcamBtn span:last-child": "Webcam",
-      "#canvasOverlayNoInputBtn span:last-child": "No Input",
+      "#canvasEntryOverlay .canvas-entry-title": "SELECT INPUT",
+      "#canvasEntryOverlay .canvas-entry-sub": "Choose input source to start visual engine",
+      "#canvasOverlayNoInputBtn span:last-child": "NO INPUT",
+      "#canvasOverlayImageBtn span:last-child": "IMPORT IMAGE",
+      "#canvasOverlayWebcamBtn span:last-child": "WEBCAM",
+      "#canvasOverlayAudioBtn": "AUDIO QUICK START",
       ".live-input-box-label": "Active input",
       "#quickInputSelect option[value='image']": "Image",
       "#quickInputSelect option[value='webcam']": "Webcam",
@@ -3739,9 +3741,6 @@ function syncMobileModuleSwitcher() {
   mobileLiveModuleButtons.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.mode === active);
   });
-  if (mobileLiveKaleidoBtn && kaleidoFxEnabled) {
-    mobileLiveKaleidoBtn.classList.toggle("active", Boolean(kaleidoFxEnabled.checked));
-  }
 }
 
 function vibrateTap(ms = 12) {
@@ -3751,30 +3750,85 @@ function vibrateTap(ms = 12) {
   } catch {}
 }
 
+function triggerRandomCurrentModule() {
+  cancelMorphTweensForCurrentMode();
+  randomizeActiveMode();
+  scheduleRender();
+}
+
+function triggerRandomGlobal() {
+  cancelMorphTweensForCurrentMode();
+  randomizeActiveMode();
+  randomizeBackground();
+  randomizeCurrentBackgroundColorsSmooth();
+  randomSeed = Math.floor(Math.random() * 100000);
+  scheduleRender();
+}
+
 function createQuickActionsBar() {
   const bar = el("div", "mobile-quick-actions");
-  const freeze = el("button", "btn mobile-action-btn", "Freeze");
-  const panic = el("button", "btn mobile-action-btn panic", "Panic");
-  const record = el("button", "btn mobile-action-btn", "Rec");
-  freeze.addEventListener("click", () => {
+  const mkBtn = (label, title, onClick, extraClass = "") => {
+    const btn = el("button", `btn mobile-action-btn ${extraClass}`.trim(), label);
+    btn.type = "button";
+    btn.title = title;
+    btn.setAttribute("aria-label", title);
+    btn.addEventListener("click", () => {
+      onClick();
+      vibrateTap();
+    });
+    return btn;
+  };
+  const random = mkBtn("R", "Random (módulo actual)", () => {
+    triggerRandomCurrentModule();
+    syncMobileModuleSwitcher();
+    syncMobileMacroPanel();
+  });
+  const randomGlobal = mkBtn("RG", "Random Global", () => {
+    triggerRandomGlobal();
+    syncMobileModuleSwitcher();
+    syncMobileMacroPanel();
+  });
+  const kaleidoToggle = mkBtn("K", "Kaleidoscope On/Off", () => {
+    if (!kaleidoFxEnabled) return;
+    kaleidoFxEnabled.checked = !kaleidoFxEnabled.checked;
+    kaleidoFxEnabled.dispatchEvent(new Event("change", { bubbles: true }));
+    syncMobileModuleSwitcher();
+  });
+  const kaleidoType = mkBtn("J", "Kaleido Type", () => {
+    if (!kaleidoFxEnabled) return;
+    if (!kaleidoFxEnabled.checked) {
+      kaleidoFxEnabled.checked = true;
+      kaleidoFxEnabled.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    cycleKaleidoFxType(1);
+    updateLiveQuickOutputs();
+    syncMobileModuleSwitcher();
+  });
+  const audio = mkBtn("AUD", "Audio Quick Start", () => {
+    if (liveAudioStartBtn) liveAudioStartBtn.click();
+  });
+  const freeze = mkBtn("FRZ", "Freeze", () => {
     toggleFreeze();
-    vibrateTap();
   });
-  panic.addEventListener("click", () => {
+  const panic = mkBtn("P", "Panic", () => {
     panicReset();
-    vibrateTap(16);
+  }, "panic");
+  const modules = mkBtn("MOD", "Abrir módulos", () => {
+    if (mobileLiveRootNode) mobileLiveRootNode.classList.remove("modules-collapsed");
   });
-  record.addEventListener("click", () => {
-    toggleLiveRecording();
-    vibrateTap();
-  });
-  bar.append(freeze, panic, record);
-  mobileLiveQuickActions = { freeze, panic, record };
+  bar.append(random, randomGlobal, kaleidoToggle, kaleidoType, audio, freeze, panic, modules);
+  mobileLiveQuickActions = { panic };
   return bar;
 }
 
 function createMobileModuleSwitcher() {
   const bar = el("div", "mobile-module-strip");
+  const close = el("button", "btn mini mobile-module-close", "×");
+  close.type = "button";
+  close.title = "Cerrar módulos";
+  close.addEventListener("click", () => {
+    if (mobileLiveRootNode) mobileLiveRootNode.classList.add("modules-collapsed");
+  });
   const scroll = el("div", "mobile-module-scroll");
   mobileLiveModuleButtons = [];
   const defs = [
@@ -3793,6 +3847,10 @@ function createMobileModuleSwitcher() {
     const btn = el("button", "btn mini mobile-module-btn", label);
     btn.dataset.mode = modeKey;
     btn.addEventListener("click", () => {
+      if (!hasActiveInput()) {
+        updateCanvasEntryOverlay();
+        return;
+      }
       setWorkspacePanel("live");
       setLiveModeTab(modeKey);
       scheduleRender();
@@ -3803,70 +3861,8 @@ function createMobileModuleSwitcher() {
     mobileLiveModuleButtons.push(btn);
     scroll.appendChild(btn);
   });
-  const randomBtn = el("button", "btn mini mobile-module-btn mobile-module-random", "RND");
-  randomBtn.addEventListener("click", () => {
-    cancelMorphTweensForCurrentMode();
-    randomizeActiveMode();
-    scheduleRender();
-    syncMobileModuleSwitcher();
-    syncMobileMacroPanel();
-    vibrateTap();
-  });
-  const kaleidoBtn = el("button", "btn mini mobile-module-btn mobile-module-kaleido", "KAL");
-  kaleidoBtn.addEventListener("click", () => {
-    if (!kaleidoFxEnabled) return;
-    kaleidoFxEnabled.checked = !kaleidoFxEnabled.checked;
-    kaleidoFxEnabled.dispatchEvent(new Event("change", { bubbles: true }));
-    syncMobileModuleSwitcher();
-    vibrateTap();
-  });
-  mobileLiveKaleidoBtn = kaleidoBtn;
-  bar.append(scroll, randomBtn, kaleidoBtn);
+  bar.append(close, scroll);
   syncMobileModuleSwitcher();
-  return bar;
-}
-
-function openMobileSetupPanel() {
-  mobileLiveActiveTab = "settings";
-  syncMobileDock();
-  renderMobileSheetPanel();
-  if (mobileLiveRootNode) mobileLiveRootNode.classList.remove("sheet-collapsed");
-  if (mobileLiveTabs.length) {
-    mobileLiveTabs.forEach((x) => x.classList.toggle("active", x.dataset.tab === "settings"));
-    if (mobileLiveBuilderPanel) mobileLiveBuilderPanel.hidden = false;
-    renderTabletBuilder();
-  }
-}
-
-function createMobileUtilityBar() {
-  const bar = el("section", "mobile-utility-bar");
-  const audioBtn = el("button", "btn mini mobile-utility-btn", "Audio");
-  audioBtn.addEventListener("click", () => {
-    if (liveAudioStartBtn) liveAudioStartBtn.click();
-    vibrateTap();
-  });
-  const skipBtn = el("button", "btn mini mobile-utility-btn", "Skip");
-  skipBtn.addEventListener("click", () => {
-    stopAudioFileInput();
-    if (audioInputSource) {
-      audioInputSource.value = "mic";
-      audioInputSource.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    vibrateTap();
-  });
-  const aspect = el("select", "mobile-select mobile-utility-aspect");
-  copySelectOptions(aspectRatioSelect, aspect);
-  aspect.addEventListener("change", () => {
-    if (!aspectRatioSelect) return;
-    aspectRatioSelect.value = aspect.value;
-    aspectRatioSelect.dispatchEvent(new Event("change", { bubbles: true }));
-  });
-  const setupBtn = el("button", "btn mini mobile-utility-setup", "Setup");
-  setupBtn.addEventListener("click", () => {
-    openMobileSetupPanel();
-    vibrateTap();
-  });
-  bar.append(audioBtn, skipBtn, aspect, setupBtn);
   return bar;
 }
 
@@ -4183,13 +4179,13 @@ function renderMobileSheetPanel() {
 function createMobileLiveShell() {
   const root = el("section", "mobile-live-shell mobile-live-phone");
   root.classList.add("sheet-collapsed");
+  root.classList.add("modules-collapsed");
   const canvasStage = el("div", "mobile-canvas-stage");
-  const utilityBar = createMobileUtilityBar();
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const dock = createBottomDock();
   const sheet = createBottomSheet();
-  canvasStage.append(utilityBar, modules, quick, dock, sheet);
+  canvasStage.append(modules, quick, dock, sheet);
   root.appendChild(canvasStage);
   syncMobileDock();
   renderMobileSheetPanel();
@@ -4198,11 +4194,11 @@ function createMobileLiveShell() {
 
 function createTabletLiveShell() {
   const root = el("section", "mobile-live-shell mobile-live-tablet");
+  root.classList.add("modules-collapsed");
   const grid = el("div", "tablet-live-grid");
   const left = el("aside", "tablet-col tablet-scenes");
   left.append(el("h3", "tablet-col-title", "Scenes"), createScenesGrid(true));
   const center = el("section", "tablet-col tablet-canvas-overlay");
-  const utilityBar = createMobileUtilityBar();
   const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const tabs = el("div", "tablet-tabs");
@@ -4224,7 +4220,7 @@ function createTabletLiveShell() {
     mobileLiveBuilderPanel.hidden = !mobileLiveBuilderPanel.hidden;
   });
   mobileLiveBuilderPanel = el("div", "tablet-builder");
-  center.append(utilityBar, modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
+  center.append(modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
   const right = el("aside", "tablet-col tablet-macros");
   right.append(el("h3", "tablet-col-title", "Macros"), createMacrosPanel(true));
   grid.append(left, center, right);
@@ -4266,7 +4262,6 @@ function unmountMobileLiveUi() {
   mobileLiveSheetTitle = null;
   mobileLiveQuickActions = {};
   mobileLiveModuleButtons = [];
-  mobileLiveKaleidoBtn = null;
   mobileLiveMountedKind = "";
 }
 
@@ -19397,17 +19392,22 @@ imageInput.addEventListener("change", (e) => {
 
 if (canvasOverlayImageBtn) {
   canvasOverlayImageBtn.addEventListener("click", () => {
-    if (imageInput) imageInput.click();
+    setInput("image");
   });
 }
 if (canvasOverlayWebcamBtn) {
   canvasOverlayWebcamBtn.addEventListener("click", () => {
-    toggleWebcam();
+    setInput("webcam");
   });
 }
 if (canvasOverlayNoInputBtn) {
   canvasOverlayNoInputBtn.addEventListener("click", () => {
-    activateNoInputMode();
+    setInput("noinput");
+  });
+}
+if (canvasOverlayAudioBtn) {
+  canvasOverlayAudioBtn.addEventListener("click", () => {
+    if (liveAudioStartBtn) liveAudioStartBtn.click();
   });
 }
 if (canvasFullscreenBtn) {
@@ -19418,20 +19418,26 @@ if (canvasFullscreenBtn) {
 function applyQuickInputSelection() {
   if (!quickInputSelect) return;
   const v = quickInputSelect.value;
-  if (v === "image") {
+  if (v === "image") return setInput("image");
+  if (v === "webcam") return setInput("webcam");
+  if (v === "noinput") return setInput("noinput");
+  if (v === "clear") {
+    clearVisualInput();
+  }
+}
+
+function setInput(kind) {
+  if (kind === "image") {
     if (imageInput) imageInput.click();
     return;
   }
-  if (v === "webcam") {
+  if (kind === "webcam") {
     toggleWebcam();
     return;
   }
-  if (v === "noinput") {
+  if (kind === "noinput") {
     activateNoInputMode();
-    return;
-  }
-  if (v === "clear") {
-    clearVisualInput();
+    scheduleRender();
   }
 }
 

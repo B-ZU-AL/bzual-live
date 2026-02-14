@@ -16,13 +16,15 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 
 ## iPhone
 - `MobileLiveShell` with:
-  - Canvas entry is the same desktop overlay (`Start Input` with Image/Webcam/No Input) and remains the primary first interaction.
-  - Small utility bar (non-blocking): `Audio`, `Skip`, `Aspect`, `Setup`.
-  - `QuickActionsBar`: Freeze, Panic, Rec.
+  - Canvas entry overlay is primary (`SELECT INPUT`):
+    - `NO INPUT`
+    - `IMPORT IMAGE`
+    - `WEBCAM`
+    - `AUDIO QUICK START` (secondary button)
+  - `QuickControls` (bottom-right, always visible, compact): `R`, `RG`, `K`, `J`, `AUD`, `FRZ`, `P`, `MOD`.
   - `Module Switcher` always near shortcuts:
     - Fast jump between modules (GL, FR, 3D, PT, LN, TN, IR, MO, MB, CD)
-    - `RND` button for frequent random usage
-    - `KAL` button to toggle Kaleidoscope on/off
+    - Hidden/collapsed by default, opened by `MOD`
   - `BottomDock`: Scenes, Macros, FX, Audio, Settings.
   - `BottomSheet`: one active panel at a time.
     - Starts collapsed by default to maximize canvas area.
@@ -31,10 +33,10 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 
 ## iPad (landscape)
 - `TabletLiveShell` with 3-column layout:
-  - Same non-blocking utility bar (`Audio`, `Skip`, `Aspect`, `Setup`) without replacing the canvas entry overlay.
+  - Same `SELECT INPUT` overlay and compact `QuickControls`.
   - Left: Scenes.
   - Center: Canvas + quick actions + optional Builder panel.
-    - Includes same Module Switcher (modules + `RND` + `KAL`) near shortcuts.
+    - Includes same collapsible `Module Switcher` near shortcuts.
   - Right: Macros.
 
 ## iOS behavior
