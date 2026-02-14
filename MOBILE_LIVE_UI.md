@@ -16,7 +16,15 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 
 ## iPhone
 - `MobileLiveShell` with:
+  - Startup flow obligatorio:
+    1. Elegir fuente inicial (`Audio` o `Imagen`).
+    2. Elegir `Aspect Ratio`.
+    3. Entrar a controles (shortcuts + dock/sheets).
   - `QuickActionsBar`: Freeze, Random, Panic, Rec.
+  - `Module Switcher` always near shortcuts:
+    - Fast jump between modules (GL, FR, 3D, PT, LN, TN, IR, MO, MB, CD)
+    - `RND` button for frequent random usage
+    - `KAL` button to toggle Kaleidoscope on/off
   - `BottomDock`: Scenes, Macros, FX, Audio, Settings.
   - `BottomSheet`: one active panel at a time.
 - `ScenesGrid`: tap to load, long-press (450ms) to save.
@@ -24,8 +32,10 @@ The preference is stored in `localStorage` under `bzual.mobileLiveUi`.
 
 ## iPad (landscape)
 - `TabletLiveShell` with 3-column layout:
+  - Startup flow obligatorio igual que iPhone antes de mostrar columnas de control.
   - Left: Scenes.
   - Center: Canvas + quick actions + optional Builder panel.
+    - Includes same Module Switcher (modules + `RND` + `KAL`) near shortcuts.
   - Right: Macros.
 
 ## iOS behavior

@@ -1420,10 +1420,18 @@ let mobileLiveBuilderToggle = null;
 let mobileLiveBuilderPanel = null;
 let mobileLiveTabs = [];
 let mobileLiveActiveTab = "scenes";
+let mobileLiveModuleButtons = [];
+let mobileLiveKaleidoBtn = null;
 let mobileLiveForcedValue = "auto";
 let mobileLiveKeyboardInset = 0;
 let mobileLiveMountedKind = "";
 let mobileLiveViewportBound = false;
+let mobileLiveStartupCard = null;
+let mobileLiveStartupSelect = null;
+let mobileLiveStartupContinue = null;
+let mobileLiveStartupSourceDone = false;
+let mobileLiveStartupAspectDone = false;
+let mobileLiveStartupCompleted = false;
 
 const i18n = {
   es: {
@@ -3731,6 +3739,25 @@ function syncMobileRecordingUi() {
   else recBtn.textContent = "Rec";
 }
 
+function syncMobileModuleSwitcher() {
+  if (!mobileLiveModuleButtons.length) return;
+  const active = normalizeLiveTab(mode);
+  mobileLiveModuleButtons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === active);
+  });
+  if (mobileLiveKaleidoBtn && kaleidoFxEnabled) {
+    mobileLiveKaleidoBtn.classList.toggle("active", Boolean(kaleidoFxEnabled.checked));
+  }
+}
+
+function hasMobileStartupSourceReady() {
+  return Boolean(hasAudioReactiveInput() || micActive || audioFileActive || loadedImage || webcamActive);
+}
+
+function syncMobileStartupStateFromRuntime() {
+  if (hasMobileStartupSourceReady()) mobileLiveStartupSourceDone = true;
+}
+
 function vibrateTap(ms = 12) {
   if (!navigator.vibrate) return;
   try {
@@ -3741,17 +3768,10 @@ function vibrateTap(ms = 12) {
 function createQuickActionsBar() {
   const bar = el("div", "mobile-quick-actions");
   const freeze = el("button", "btn mobile-action-btn", "Freeze");
-  const random = el("button", "btn mobile-action-btn", "Random");
   const panic = el("button", "btn mobile-action-btn panic", "Panic");
   const record = el("button", "btn mobile-action-btn", "Rec");
   freeze.addEventListener("click", () => {
     toggleFreeze();
-    vibrateTap();
-  });
-  random.addEventListener("click", () => {
-    cancelMorphTweensForCurrentMode();
-    randomizeActiveMode();
-    scheduleRender();
     vibrateTap();
   });
   panic.addEventListener("click", () => {
@@ -3762,9 +3782,123 @@ function createQuickActionsBar() {
     toggleLiveRecording();
     vibrateTap();
   });
-  bar.append(freeze, random, panic, record);
-  mobileLiveQuickActions = { freeze, random, panic, record };
+  bar.append(freeze, panic, record);
+  mobileLiveQuickActions = { freeze, panic, record };
   return bar;
+}
+
+function createMobileModuleSwitcher() {
+  const bar = el("div", "mobile-module-strip");
+  const scroll = el("div", "mobile-module-scroll");
+  mobileLiveModuleButtons = [];
+  const defs = [
+    ["glitch", "GL"],
+    ["fractal", "FR"],
+    ["depth", "3D"],
+    ["particles", "PT"],
+    ["lines", "LN"],
+    ["tunnel", "TN"],
+    ["interior", "IR"],
+    ["atlas", "MO"],
+    ["materia", "MB"],
+    ["code", "CD"],
+  ];
+  defs.forEach(([modeKey, label]) => {
+    const btn = el("button", "btn mini mobile-module-btn", label);
+    btn.dataset.mode = modeKey;
+    btn.addEventListener("click", () => {
+      setWorkspacePanel("live");
+      setLiveModeTab(modeKey);
+      scheduleRender();
+      syncMobileModuleSwitcher();
+      syncMobileMacroPanel();
+      vibrateTap();
+    });
+    mobileLiveModuleButtons.push(btn);
+    scroll.appendChild(btn);
+  });
+  const randomBtn = el("button", "btn mini mobile-module-btn mobile-module-random", "RND");
+  randomBtn.addEventListener("click", () => {
+    cancelMorphTweensForCurrentMode();
+    randomizeActiveMode();
+    scheduleRender();
+    syncMobileModuleSwitcher();
+    syncMobileMacroPanel();
+    vibrateTap();
+  });
+  const kaleidoBtn = el("button", "btn mini mobile-module-btn mobile-module-kaleido", "KAL");
+  kaleidoBtn.addEventListener("click", () => {
+    if (!kaleidoFxEnabled) return;
+    kaleidoFxEnabled.checked = !kaleidoFxEnabled.checked;
+    kaleidoFxEnabled.dispatchEvent(new Event("change", { bubbles: true }));
+    syncMobileModuleSwitcher();
+    vibrateTap();
+  });
+  mobileLiveKaleidoBtn = kaleidoBtn;
+  bar.append(scroll, randomBtn, kaleidoBtn);
+  syncMobileModuleSwitcher();
+  return bar;
+}
+
+function updateMobileStartupUi() {
+  if (!mobileLiveRootNode) return;
+  const ready = mobileLiveStartupSourceDone && mobileLiveStartupAspectDone;
+  const completed = mobileLiveStartupCompleted || ready;
+  mobileLiveRootNode.classList.toggle("mobile-startup-required", !completed);
+  if (mobileLiveStartupCard) mobileLiveStartupCard.hidden = completed;
+  if (mobileLiveStartupContinue) mobileLiveStartupContinue.disabled = !ready;
+}
+
+function createMobileStartupCard() {
+  const card = el("section", "mobile-startup-card");
+  const title = el("h3", "mobile-startup-title", "Live Start");
+  const subtitle = el("p", "mobile-startup-subtitle", "1) Audio o Imagen · 2) Relacion de aspecto");
+  const sourceWrap = el("div", "mobile-startup-step");
+  const sourceLabel = el("div", "mobile-field-label", "Paso 1: fuente");
+  const sourceButtons = el("div", "mobile-startup-actions");
+  const audioBtn = el("button", "btn mobile-startup-btn", "Audio");
+  const imageBtn = el("button", "btn mobile-startup-btn", "Imagen");
+  audioBtn.addEventListener("click", () => {
+    if (liveAudioStartBtn) liveAudioStartBtn.click();
+    mobileLiveStartupSourceDone = true;
+    updateMobileStartupUi();
+    vibrateTap();
+  });
+  imageBtn.addEventListener("click", () => {
+    if (canvasOverlayImageBtn) canvasOverlayImageBtn.click();
+    mobileLiveStartupSourceDone = true;
+    updateMobileStartupUi();
+    vibrateTap();
+  });
+  sourceButtons.append(audioBtn, imageBtn);
+  sourceWrap.append(sourceLabel, sourceButtons);
+
+  const aspectWrap = el("div", "mobile-startup-step");
+  const aspectLabel = el("div", "mobile-field-label", "Paso 2: relacion de aspecto");
+  const aspect = el("select", "mobile-select");
+  copySelectOptions(aspectRatioSelect, aspect);
+  aspect.addEventListener("change", () => {
+    if (!aspectRatioSelect) return;
+    aspectRatioSelect.value = aspect.value;
+    aspectRatioSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    mobileLiveStartupAspectDone = true;
+    updateMobileStartupUi();
+  });
+  mobileLiveStartupSelect = aspect;
+  aspectWrap.append(aspectLabel, aspect);
+
+  const enterBtn = el("button", "btn mobile-startup-enter", "Entrar controles");
+  enterBtn.disabled = true;
+  enterBtn.addEventListener("click", () => {
+    mobileLiveStartupCompleted = true;
+    updateMobileStartupUi();
+  });
+  mobileLiveStartupContinue = enterBtn;
+  card.append(title, subtitle, sourceWrap, aspectWrap, enterBtn);
+  mobileLiveStartupCard = card;
+  syncMobileStartupStateFromRuntime();
+  updateMobileStartupUi();
+  return card;
 }
 
 function createScenesGrid(register = true) {
@@ -4080,13 +4214,16 @@ function renderMobileSheetPanel() {
 function createMobileLiveShell() {
   const root = el("section", "mobile-live-shell mobile-live-phone");
   const canvasStage = el("div", "mobile-canvas-stage");
+  const startup = createMobileStartupCard();
+  const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const dock = createBottomDock();
   const sheet = createBottomSheet();
-  canvasStage.append(quick, dock, sheet);
+  canvasStage.append(startup, modules, quick, dock, sheet);
   root.appendChild(canvasStage);
   syncMobileDock();
   renderMobileSheetPanel();
+  updateMobileStartupUi();
   return root;
 }
 
@@ -4096,6 +4233,8 @@ function createTabletLiveShell() {
   const left = el("aside", "tablet-col tablet-scenes");
   left.append(el("h3", "tablet-col-title", "Scenes"), createScenesGrid(true));
   const center = el("section", "tablet-col tablet-canvas-overlay");
+  const startup = createMobileStartupCard();
+  const modules = createMobileModuleSwitcher();
   const quick = createQuickActionsBar();
   const tabs = el("div", "tablet-tabs");
   mobileLiveTabs = [];
@@ -4110,19 +4249,20 @@ function createTabletLiveShell() {
     mobileLiveTabs.push(b);
     tabs.appendChild(b);
   });
-  mobileLiveBuilderToggle = el("button", "btn mini", "Builder");
+  mobileLiveBuilderToggle = el("button", "btn mini mobile-live-builder-toggle", "Builder");
   mobileLiveBuilderToggle.addEventListener("click", () => {
     if (!mobileLiveBuilderPanel) return;
     mobileLiveBuilderPanel.hidden = !mobileLiveBuilderPanel.hidden;
   });
   mobileLiveBuilderPanel = el("div", "tablet-builder");
-  center.append(quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
+  center.append(startup, modules, quick, tabs, mobileLiveBuilderToggle, mobileLiveBuilderPanel);
   const right = el("aside", "tablet-col tablet-macros");
   right.append(el("h3", "tablet-col-title", "Macros"), createMacrosPanel(true));
   grid.append(left, center, right);
   root.appendChild(grid);
   mobileLiveTabs.forEach((x) => x.classList.toggle("active", x.dataset.tab === mobileLiveActiveTab));
   renderTabletBuilder();
+  updateMobileStartupUi();
   return root;
 }
 
@@ -4157,11 +4297,19 @@ function unmountMobileLiveUi() {
   mobileLiveSheetBody = null;
   mobileLiveSheetTitle = null;
   mobileLiveQuickActions = {};
+  mobileLiveModuleButtons = [];
+  mobileLiveKaleidoBtn = null;
   mobileLiveMountedKind = "";
+  mobileLiveStartupCard = null;
+  mobileLiveStartupSelect = null;
+  mobileLiveStartupContinue = null;
 }
 
 function mountMobileLiveUi(profile) {
   if (!mobileLiveRoot) return;
+  mobileLiveStartupSourceDone = hasMobileStartupSourceReady();
+  mobileLiveStartupAspectDone = false;
+  mobileLiveStartupCompleted = false;
   if (mobileLiveRootNode && mobileLiveRootNode.parentNode) mobileLiveRootNode.parentNode.removeChild(mobileLiveRootNode);
   mobileLiveRootNode = profile.isPhone ? createMobileLiveShell() : createTabletLiveShell();
   mobileLiveRoot.innerHTML = "";
@@ -4175,6 +4323,7 @@ function mountMobileLiveUi(profile) {
   syncMobileScenesGrid();
   syncMobileMacroPanel();
   syncMobileRecordingUi();
+  syncMobileModuleSwitcher();
   installMobileLiveViewportHandlers();
 }
 
@@ -4197,6 +4346,9 @@ function syncMobileLiveUi() {
     syncMobileScenesGrid();
     syncMobileMacroPanel();
     syncMobileRecordingUi();
+    syncMobileModuleSwitcher();
+    syncMobileStartupStateFromRuntime();
+    updateMobileStartupUi();
   }
 }
 
@@ -6296,6 +6448,7 @@ function syncLiveModeTabsFromMode() {
   if (livePaneCode) livePaneCode.hidden = tab !== "code";
   if (livePaneSynth) livePaneSynth.hidden = true;
   syncMobileMacroPanel();
+  syncMobileModuleSwitcher();
 }
 
 function setLiveModeTab(tabName) {
@@ -6327,6 +6480,7 @@ function setLiveModeTab(tabName) {
     applyLive3dEntryDefaults();
   }
   syncMobileMacroPanel();
+  syncMobileModuleSwitcher();
 }
 
 function cycleLiveModeTab(direction) {
