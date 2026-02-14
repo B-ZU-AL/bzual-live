@@ -239,6 +239,8 @@ const liveCodeLetters = document.getElementById("liveCodeLetters");
 const liveCodeFigure = document.getElementById("liveCodeFigure");
 const liveCodeLanguage = document.getElementById("liveCodeLanguage");
 const liveCodeGlow = document.getElementById("liveCodeGlow");
+const liveCodeBrightness = document.getElementById("liveCodeBrightness");
+const liveCodeCamTolerance = document.getElementById("liveCodeCamTolerance");
 const liveCodeAudio = document.getElementById("liveCodeAudio");
 const liveCodeAudioAmount = document.getElementById("liveCodeAudioAmount");
 const liveFractalPreset = document.getElementById("liveFractalPreset");
@@ -1035,7 +1037,9 @@ let codeRainCamX = 0;
 let codeRainCamY = 0;
 let codeRainCamXTarget = 0;
 let codeRainCamYTarget = 0;
+let codeRainEnergySmooth = 0;
 let codeRainFigurePhase = 0;
+let codeRainPresetTween = null;
 let codeRainTextMaskCanvas = null;
 let codeRainTextMaskCtx = null;
 let codeRainTextMaskW = 0;
@@ -4299,7 +4303,7 @@ function estimateActiveModuleLoad() {
     score += n(liveCodeZoom ? liveCodeZoom.value : 38) * 0.46;
     score += n(liveCodeLetters ? liveCodeLetters.value : 62) * 0.86;
     score += n(liveCodeFigure ? liveCodeFigure.value : 62) * 0.66;
-    score += n(liveCodeLanguage ? liveCodeLanguage.value : 66) * 0.34;
+    score += n(liveCodeLanguage ? liveCodeLanguage.value : 52) * 0.34;
     score += n(liveCodeGlow ? liveCodeGlow.value : 54) * 0.46;
     score += n(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72) * 0.34;
     score /= 4.72;
@@ -4763,6 +4767,7 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveCodeFigure", liveCodeFigure ? liveCodeFigure.value : 0);
   updateQuickOutputById("liveCodeLanguage", liveCodeLanguage ? liveCodeLanguage.value : 0);
   updateQuickOutputById("liveCodeGlow", liveCodeGlow ? liveCodeGlow.value : 0);
+  updateQuickOutputById("liveCodeBrightness", liveCodeBrightness ? liveCodeBrightness.value : 0);
   updateQuickOutputById("liveCodeAudioAmount", liveCodeAudioAmount ? liveCodeAudioAmount.value : 0);
   updateQuickOutputById("studioParticlesOrder", studioParticlesOrder ? studioParticlesOrder.value : 0);
   updateQuickOutputById("studioParticlesDrift", studioParticlesDrift ? studioParticlesDrift.value : 0);
@@ -8163,8 +8168,9 @@ function applyLiveSafeBaseline(options = {}) {
     setVal(liveCodeZoom, 38);
     setVal(liveCodeLetters, 62);
     setVal(liveCodeFigure, 62);
-    setVal(liveCodeLanguage, 66);
+    setVal(liveCodeLanguage, 52);
     setVal(liveCodeGlow, 54);
+    setVal(liveCodeBrightness, 68);
     setVal(liveCodeAudioAmount, 72);
   }
 
@@ -10536,7 +10542,11 @@ function applyMasterFxGlobal(tSec) {
   const outW = canvas.width;
   const outH = canvas.height;
   if (outW <= 2 || outH <= 2) return;
-  const fxScale = getAdaptivePostFxScale();
+  const baseFxScale = getAdaptivePostFxScale();
+  const matrixPerfScale = fxMode === "matrix"
+    ? (fps < 18 ? 0.62 : fps < 24 ? 0.72 : 0.84)
+    : 1;
+  const fxScale = clamp(baseFxScale * matrixPerfScale, 0.22, 1);
   const w = Math.max(2, Math.round(outW * fxScale));
   const h = Math.max(2, Math.round(outH * fxScale));
   const amountTarget = clamp(Number(masterFxAmount.value) / 100, 0, 1);
@@ -11048,37 +11058,56 @@ function applyMasterFxGlobal(tSec) {
     const sd = src.data;
     const od = out.data;
     const pd = prev.data;
-    const trailPx = Math.max(1, Math.round(1 + amount * 6 + speed * 4));
+    const audioDrive = hasAudioReactiveInput()
+      ? clamp(audioFeatures.rms * 0.95 + audioFeatures.transient * 0.52 + (audioFeatures.bands[1] || 0) * 0.42, 0, 1.8)
+      : 0;
+    const trailPx = Math.max(1, Math.round(1 + amount * 6 + speed * 4 + audioDrive * 2.2));
     const tintMix = clamp(0.42 + amount * 0.42, 0.32, 0.88);
-    const glowMix = clamp(0.14 + amount * 0.34 + colorDrive * 0.18, 0.14, 0.74);
+    const glowMix = clamp(0.14 + amount * 0.34 + colorDrive * 0.18 + audioDrive * 0.08, 0.14, 0.8);
     const jitterAmp = amount * (0.2 + speed * 0.34);
-    for (let y = 0; y < h; y++) {
+    const block = fps < 18 || amount > 0.66 ? 3 : fps < 26 || amount > 0.42 ? 2 : 1;
+    for (let y = 0; y < h; y += block) {
       const v = y / Math.max(1, h - 1);
-      const rainLine = 0.5 + 0.5 * Math.sin(tSec * (1.6 + speed * 2.4) + y * 0.065);
-      for (let x = 0; x < w; x++) {
+      const rainLine = 0.5 + 0.5 * Math.sin(tSec * (1.6 + speed * 2.4 + audioDrive * 0.8) + y * 0.065);
+      for (let x = 0; x < w; x += block) {
         const u = x / Math.max(1, w - 1);
         const i = (y * w + x) * 4;
         const lum = (sd[i] * 0.299 + sd[i + 1] * 0.587 + sd[i + 2] * 0.114) / 255;
         const trailY = clamp(y - trailPx, 0, h - 1);
         const pi = (trailY * w + x) * 4;
         const prevLum = (pd[pi] * 0.299 + pd[pi + 1] * 0.587 + pd[pi + 2] * 0.114) / 255;
-        const edgeL = (sd[(y * w + Math.max(0, x - 1)) * 4] * 0.299 + sd[(y * w + Math.max(0, x - 1)) * 4 + 1] * 0.587 + sd[(y * w + Math.max(0, x - 1)) * 4 + 2] * 0.114) / 255;
-        const edgeR = (sd[(y * w + Math.min(w - 1, x + 1)) * 4] * 0.299 + sd[(y * w + Math.min(w - 1, x + 1)) * 4 + 1] * 0.587 + sd[(y * w + Math.min(w - 1, x + 1)) * 4 + 2] * 0.114) / 255;
-        const edgeU = (sd[(Math.max(0, y - 1) * w + x) * 4] * 0.299 + sd[(Math.max(0, y - 1) * w + x) * 4 + 1] * 0.587 + sd[(Math.max(0, y - 1) * w + x) * 4 + 2] * 0.114) / 255;
-        const edgeD = (sd[(Math.min(h - 1, y + 1) * w + x) * 4] * 0.299 + sd[(Math.min(h - 1, y + 1) * w + x) * 4 + 1] * 0.587 + sd[(Math.min(h - 1, y + 1) * w + x) * 4 + 2] * 0.114) / 255;
+        const xl = Math.max(0, x - 1);
+        const xr = Math.min(w - 1, x + 1);
+        const yu = Math.max(0, y - 1);
+        const yd = Math.min(h - 1, y + 1);
+        const il = (y * w + xl) * 4;
+        const ir = (y * w + xr) * 4;
+        const iu = (yu * w + x) * 4;
+        const id = (yd * w + x) * 4;
+        const edgeL = (sd[il] * 0.299 + sd[il + 1] * 0.587 + sd[il + 2] * 0.114) / 255;
+        const edgeR = (sd[ir] * 0.299 + sd[ir + 1] * 0.587 + sd[ir + 2] * 0.114) / 255;
+        const edgeU = (sd[iu] * 0.299 + sd[iu + 1] * 0.587 + sd[iu + 2] * 0.114) / 255;
+        const edgeD = (sd[id] * 0.299 + sd[id + 1] * 0.587 + sd[id + 2] * 0.114) / 255;
         const edge = clamp(Math.abs(edgeR - edgeL) * 0.68 + Math.abs(edgeD - edgeU) * 1.12, 0, 1);
         const colPhase = tSec * (0.5 + speed * 0.8) + u * 7.4 - v * 5.8;
         const rainMask = clamp(rainLine * 0.5 + (0.5 + 0.5 * Math.sin(colPhase)) * 0.5, 0, 1);
         const signal = clamp(lum * 0.64 + prevLum * 0.24 + edge * 0.52 + rainMask * 0.14, 0, 1);
         const jitter = Math.sin(tSec * 8.2 + y * 0.08 + x * 0.05) * jitterAmp;
-        const base = clamp(signal + jitter * 0.03, 0, 1);
-        const g = clamp(base * (110 + tintMix * 130), 0, 255);
+        const base = clamp(signal + jitter * 0.03 + audioDrive * 0.06, 0, 1);
+        const g = clamp(base * (110 + tintMix * 130 + audioDrive * 20), 0, 255);
         const r = clamp(base * (8 + tintMix * 28) + edge * 30, 0, 255);
-        const b = clamp(base * (10 + tintMix * 34) + rainMask * 18, 0, 255);
-        od[i] = r;
-        od[i + 1] = g;
-        od[i + 2] = b;
-        od[i + 3] = 255;
+        const b = clamp(base * (10 + tintMix * 34) + rainMask * (18 + audioDrive * 6), 0, 255);
+        const yMax = Math.min(h, y + block);
+        const xMax = Math.min(w, x + block);
+        for (let yy = y; yy < yMax; yy++) {
+          for (let xx = x; xx < xMax; xx++) {
+            const oi = (yy * w + xx) * 4;
+            od[oi] = r;
+            od[oi + 1] = g;
+            od[oi + 2] = b;
+            od[oi + 3] = 255;
+          }
+        }
       }
     }
     masterFxCtx.putImageData(out, 0, 0);
@@ -11095,7 +11124,7 @@ function applyMasterFxGlobal(tSec) {
     masterFxCtx.restore();
     masterFxCtx.save();
     masterFxCtx.globalCompositeOperation = "source-over";
-    masterFxCtx.globalAlpha = clamp(0.07 + amount * 0.22, 0.07, 0.34);
+    masterFxCtx.globalAlpha = clamp(0.07 + amount * 0.22 + audioDrive * 0.03, 0.07, 0.38);
     masterFxCtx.fillStyle = "rgba(18,255,114,0.32)";
     const scanStep = Math.max(2, Math.round(2 + (1 - speed) * 3));
     for (let y = 0; y < h; y += scanStep) masterFxCtx.fillRect(0, y, w, 1);
@@ -14737,71 +14766,53 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   const zoom = clamp(Number(liveCodeZoom ? liveCodeZoom.value : 38) / 100, 0, 1);
   const letters = clamp(Number(liveCodeLetters ? liveCodeLetters.value : 62) / 100, 0, 1);
   const figure = clamp(Number(liveCodeFigure ? liveCodeFigure.value : 62) / 100, 0, 1);
-  const language = clamp(Number(liveCodeLanguage ? liveCodeLanguage.value : 66) / 100, 0, 1);
+  const languageRaw = clamp(Number(liveCodeLanguage ? liveCodeLanguage.value : 52), 0, 65);
+  const language = languageRaw / 65;
   const glow = clamp(Number(liveCodeGlow ? liveCodeGlow.value : 54) / 100, 0, 1);
+  const brightness = clamp(Number(liveCodeBrightness ? liveCodeBrightness.value : 68) / 100, 0, 1);
   const audioOn = !liveCodeAudio || liveCodeAudio.checked;
   const audioAmount = clamp(Number(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72) / 100, 0, 1);
   const preset = liveCodePreset ? (liveCodePreset.value || "matrix") : "matrix";
   const audioState = getReactiveAudioState(settings, audioOn, audioAmount);
   const bands = audioState.bands || [0, 0, 0, 0];
-  const energy = clamp(audioState.level * 0.82 + audioState.transient * 1.1 + bands[2] * 0.42, 0, 2.1);
-  const webcamReactive = Boolean(
+  const energyRaw = clamp(audioState.level * 0.82 + audioState.transient * 1.1 + bands[2] * 0.42, 0, 2.1);
+  const energyFollow = audioOn ? 0.06 : 0.14;
+  codeRainEnergySmooth += (energyRaw - codeRainEnergySmooth) * energyFollow;
+  const energy = codeRainEnergySmooth;
+  const webcamOverlayActive = Boolean(
     webcamActive &&
     baseImageData &&
     baseImageData.data &&
     baseImageData.width > 2 &&
     baseImageData.height > 2
   );
-  const srcData = webcamReactive ? baseImageData.data : null;
-  const srcW = webcamReactive ? baseImageData.width : 0;
-  const srcH = webcamReactive ? baseImageData.height : 0;
-  const webcamMotion = webcamReactive ? clamp(visualFeatures.motion * 1.9, 0, 1.8) : 0;
+  const srcData = webcamOverlayActive ? baseImageData.data : null;
+  const srcW = webcamOverlayActive ? baseImageData.width : 0;
+  const srcH = webcamOverlayActive ? baseImageData.height : 0;
+  const matrixClassicLock = false;
+  const densityBoost = 0;
+  const lettersBoost = 0;
+  const glowBoost = 0;
+  const densityK = clamp(density + densityBoost, 0, 1);
+  const lettersK = clamp(letters + lettersBoost, 0, 1);
+  const glowK = clamp(glow + glowBoost, 0, 1);
 
-  let faceCx = 0.5;
-  let faceCy = 0.5;
-  if (webcamReactive && detectedFaces.length > 0) {
-    let fx = 0;
-    let fy = 0;
-    let fw = 0;
-    detectedFaces.forEach((f) => {
-      const area = clamp(f.width * f.height, 0.001, 1);
-      fx += (f.x + f.width * 0.5) * area;
-      fy += (f.y + f.height * 0.5) * area;
-      fw += area;
-    });
-    if (fw > 0.0001) {
-      faceCx = clamp(fx / fw, 0, 1);
-      faceCy = clamp(fy / fw, 0, 1);
-    }
-  }
-
-  codeRainCharStep = clamp(Math.round(20 - density * 6.5 - letters * 5 + zoom * 6), 8, 26);
+  codeRainCharStep = clamp(Math.round(20 - densityK * 6.8 - lettersK * 5.4 + zoom * 5.6), 8, 24);
   codeRainFontPx = clamp(Math.round(codeRainCharStep * 0.92), 9, 17);
   const colsBase = Math.floor(w / Math.max(7, codeRainCharStep * 0.86));
   const camColsK = camMode === "macro" ? 0.52 : camMode === "chase" ? 0.74 : 1;
-  const cols = clamp(Math.round(colsBase * (0.46 + letters * 1.28) * camColsK), 14, 320);
+  const cols = clamp(Math.round(colsBase * (0.46 + lettersK * 1.32) * camColsK * (matrixClassicLock ? 1.22 : 1)), 14, 360);
   ensureCodeRainColumns(cols, h, speed, density);
 
-  codeRainCamX += (codeRainCamXTarget - codeRainCamX) * 0.08;
-  codeRainCamY += (codeRainCamYTarget - codeRainCamY) * 0.08;
-  if (webcamReactive) {
-    codeRainCamXTarget = clamp(codeRainCamXTarget * 0.92 + (faceCx - 0.5) * (0.55 + webcamMotion * 0.22), -1, 1);
-    codeRainCamYTarget = clamp(codeRainCamYTarget * 0.92 + (faceCy - 0.5) * (0.58 + webcamMotion * 0.24), -1, 1);
-  }
+  codeRainCamX += (codeRainCamXTarget - codeRainCamX) * 0.035;
+  codeRainCamY += (codeRainCamYTarget - codeRainCamY) * 0.035;
   const stepX = w / cols;
   const chaseCol = clamp(Math.floor((tSec * (1.1 + speed * 3.3)) % cols), 0, cols - 1);
   const chaseY = codeRainDrops[chaseCol] || 0;
-  const chaseX = chaseCol * stepX + stepX * 0.5;
-  const driftXBase =
-    Math.sin(tSec * (0.22 + speed * 0.42)) * (6 + figure * 12) +
-    codeRainCamX * 18 +
-    (webcamReactive ? (faceCx - 0.5) * (14 + webcamMotion * 20) : 0);
-  const driftYBase =
-    Math.cos(tSec * (0.18 + speed * 0.36)) * (4 + figure * 9) +
-    codeRainCamY * 14 +
-    (webcamReactive ? (faceCy - 0.5) * (10 + webcamMotion * 18) : 0);
-  const driftX = camMode === "chase" ? driftXBase + (w * 0.5 - chaseX) * (0.3 + zoom * 0.42) : driftXBase;
-  const driftY = camMode === "chase" ? driftYBase + (h * 0.42 - chaseY) * (0.22 + zoom * 0.46) : driftYBase;
+  const driftXBase = codeRainCamX * 8;
+  const driftYBase = codeRainCamY * 7;
+  const driftX = driftXBase;
+  const driftY = camMode === "chase" ? driftYBase + (h * 0.42 - chaseY) * (0.18 + zoom * 0.34) : driftYBase;
   codeRainFigurePhase = fract01(codeRainFigurePhase + (0.00085 + speed * 0.0014 + energy * 0.0009));
 
   ensureCodeRainTextMask(w, h, tSec);
@@ -14821,8 +14832,8 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   ctx.save();
   if (camMode === "macro") {
     const k = 1 + zoom * 1.95;
-    const focusX = chaseX + Math.sin(tSec * 0.7) * w * 0.04;
-    const focusY = chaseY + Math.cos(tSec * 0.66) * h * 0.05;
+    const focusX = matrixClassicLock ? chaseX : chaseX + Math.sin(tSec * 0.7) * w * 0.04;
+    const focusY = matrixClassicLock ? chaseY : chaseY + Math.cos(tSec * 0.66) * h * 0.05;
     ctx.translate(w * 0.5, h * 0.5);
     ctx.scale(k, k);
     ctx.translate(-focusX, -focusY);
@@ -14842,7 +14853,7 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const baseTrail = Math.round(6 + density * 11 + letters * 10 + glow * 10 + energy * 5);
+  const baseTrail = Math.round(7 + densityK * 13 + lettersK * 12 + glowK * 11 + energy * 5 + (matrixClassicLock ? 6 : 0));
   const timeScale = 0.95 + speed * 2.2 + energy * 0.6;
   for (let i = 0; i < cols; i++) {
     const drop = codeRainDrops[i];
@@ -14862,7 +14873,7 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
       const figMask = sampleCodeFigureMask(u, v, tSec, figureK, maskData, codeRainTextMaskW, codeRainTextMaskH);
       let webcamLum = 0.5;
       let faceMask = 0;
-      if (webcamReactive && srcData) {
+      if (webcamOverlayActive && srcData) {
         const sx = clamp(Math.round(u * (srcW - 1)), 0, srcW - 1);
         const sy = clamp(Math.round(v * (srcH - 1)), 0, srcH - 1);
         const si = (sy * srcW + sx) * 4;
@@ -14878,61 +14889,110 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
             const nx = (u - cx) / Math.max(0.001, f.width * 0.78);
             const ny = (v - cy) / Math.max(0.001, f.height * 0.86);
             const falloff = clamp(1 - Math.hypot(nx, ny), 0, 1);
-            faceMask = Math.max(faceMask, falloff * (0.82 + webcamMotion * 0.24));
+            faceMask = Math.max(faceMask, falloff * 0.96);
           }
         }
       }
       const head = j === 0 ? 1 : 0;
       const fade = Math.pow(1 - j / Math.max(1, baseTrail), 1.35);
-      const sig = clamp(
-        figMask * (0.48 + figure * 0.74) +
-        head * 0.34 +
-        (webcamReactive ? (webcamLum * 0.34 + faceMask * 0.86) * (0.45 + letters * 0.5) : 0),
-        0,
-        1.8
-      );
-      const alpha = clamp(fade * (0.12 + glow * 0.32 + sig * 0.46), 0.04, 0.98);
-      const langSelector = clamp(language + sig * 0.14 + Math.sin(tSec * 0.7 + i * 0.03) * 0.08, 0, 1);
+      const figDrive = matrixClassicLock ? figMask * (0.14 + figure * 0.22) : figMask * (0.48 + figure * 0.74);
+      const sig = clamp(figDrive + head * 0.34, 0, 1.8);
+      const signal = clamp(sig + (webcamOverlayActive ? (webcamLum * 0.08 + faceMask * 0.12) : 0), 0, 1.8);
+      const alpha = clamp(fade * (0.26 + glowK * 0.44 + signal * 0.54 + brightness * 0.36), 0.14, 1);
+      const langSelector = clamp(language + signal * 0.14 + (matrixClassicLock ? 0 : Math.sin(tSec * 0.7 + i * 0.03) * 0.08), 0, 1);
       const poolIndex = clamp(Math.floor(langSelector * glyphSets.length), 0, glyphSets.length - 1);
       const pool = glyphSets[poolIndex];
-      const seed = codeRainSeeds[i] + j * 17 + tSec * (4.2 + speed * 8.2);
+      const seed = codeRainSeeds[i] + j * 17 + tSec * (matrixClassicLock ? (1.4 + speed * 2.6) : (4.2 + speed * 8.2));
       const ch = (faceMask > 0.52 || (figMask > 0.68 && figureK > 0.66))
         ? phrase[Math.abs(Math.floor(seed * 1.37 + i + j)) % phrase.length]
         : pool[Math.abs(Math.floor(seed * 2.13 + i * 3 + j * 5)) % pool.length];
-      // Pseudo depth map: face + webcam + figure signal => near/far layer.
+      // Keep Matrix columns strict/vertical; depth only modulates light.
       const depthNear = clamp(
         faceMask * 0.78 +
-        (webcamReactive ? webcamLum * 0.22 : 0) +
-        sig * 0.14 +
+        (webcamOverlayActive ? webcamLum * 0.22 : 0) +
+        signal * 0.14 +
         head * 0.1,
         0,
-        1
+        1.8
       );
-      const depthNoise = 0.5 + 0.5 * Math.sin(seed * 0.041 + tSec * (0.6 + speed));
-      const zN = clamp(depthNear * 0.84 + depthNoise * 0.16, 0, 1);
-      const persp = 0.62 + zN * 1.48;
-      const px = (x - w * 0.5) * persp + w * 0.5 + Math.sin(seed * 0.013 + tSec * 0.9) * (1 + zN * 8);
-      const py = (y - h * 0.5) * persp + h * 0.5 - zN * (8 + faceMask * 14);
-      const a3d = alpha * clamp(0.22 + zN * 0.96, 0.18, 1);
-      const g = clamp(74 + fade * 58 + sig * 86 + zN * 146 + energy * 34 + faceMask * 66, 46, 255);
-      const r = clamp(2 + sig * 12 + zN * 18 + (preset === "oracle" ? 8 : 0), 1, 64);
-      const b = clamp(3 + sig * 26 + (1 - zN) * 30 + (preset === "glyph" ? 10 : 0), 2, 90);
+      const depthK = clamp(depthNear / 1.8, 0, 1);
+      const depthNoise = randHash(i, j, codeRainSeeds[i] * 0.013);
+      const zN = clamp(depthK * 0.84 + depthNoise * 0.16, 0, 1);
+      const px = x;
+      const py = y;
+      const a3d = alpha * clamp(0.42 + zN * 0.62 + brightness * 0.22, 0.28, 1);
+      const g = clamp(98 + fade * 72 + signal * 102 + zN * 162 + energy * 36 + faceMask * 78 + brightness * 34, 72, 255);
+      const r = clamp(4 + signal * 14 + zN * 16 + brightness * 8 + (preset === "oracle" ? 8 : 0), 2, 72);
+      const b = clamp(6 + signal * 24 + (1 - zN) * 24 + brightness * 10 + (preset === "glyph" ? 10 : 0), 4, 92);
       ctx.fillStyle = `rgba(${r},${g},${b},${a3d})`;
       ctx.fillText(ch, px, py);
-      // Near chars get subtle halo so close depth feels neon in space.
-      if (zN > 0.64) {
-        ctx.fillStyle = `rgba(${Math.round(r * 0.4)},${Math.min(255, g + 35)},${Math.round(b * 0.5)},${clamp(a3d * 0.32, 0.04, 0.34)})`;
-        ctx.fillText(ch, px + 0.35 + zN * 0.6, py + 0.35 + zN * 0.4);
-      }
+      // Halo offset removed to preserve strict vertical Matrix rain.
     }
   }
   ctx.restore();
 
-  if (glow > 0.01) {
+  // Webcam reacts as a separate neon/high-pass light layer (no geometry deformation).
+  if (webcamOverlayActive && srcData) {
+    const cell = clamp(Math.round(codeRainCharStep * 1.15), 10, 24);
+    const neonGain = 0.18 + glowK * 0.28 + brightness * 0.24;
+    const facePulse = 0.82 + (0.5 + 0.5 * Math.sin(tSec * 1.35)) * 0.28;
+    const fallOffset = (tSec * (28 + speed * 72)) % cell;
+    const overlaySet = glyphSets[Math.min(glyphSets.length - 1, Math.floor(language * glyphSets.length))] || glyphSets[0];
     ctx.save();
     ctx.globalCompositeOperation = "screen";
-    ctx.globalAlpha = clamp(0.1 + glow * 0.28 + energy * 0.08, 0.08, 0.52);
-    ctx.filter = `blur(${0.6 + glow * 2.8 + energy * 0.8}px)`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `700 ${Math.round(cell * 0.86)}px Share Tech Mono, Orbitron, monospace`;
+    for (let y = 0; y < h; y += cell) {
+      const v = clamp(y / Math.max(1, h - 1), 0, 1);
+      const sy = clamp(Math.round(v * (srcH - 1)), 0, srcH - 1);
+      const sy2 = clamp(sy + 1, 0, srcH - 1);
+      for (let x = 0; x < w; x += cell) {
+        const u = clamp(x / Math.max(1, w - 1), 0, 1);
+        const sx = clamp(Math.round(u * (srcW - 1)), 0, srcW - 1);
+        const sx2 = clamp(sx + 1, 0, srcW - 1);
+        const i0 = (sy * srcW + sx) * 4;
+        const ix = (sy * srcW + sx2) * 4;
+        const iy = (sy2 * srcW + sx) * 4;
+        const lum0 = (srcData[i0] * 0.299 + srcData[i0 + 1] * 0.587 + srcData[i0 + 2] * 0.114) / 255;
+        const lumX = (srcData[ix] * 0.299 + srcData[ix + 1] * 0.587 + srcData[ix + 2] * 0.114) / 255;
+        const lumY = (srcData[iy] * 0.299 + srcData[iy + 1] * 0.587 + srcData[iy + 2] * 0.114) / 255;
+        const edge = clamp(Math.abs(lum0 - lumX) + Math.abs(lum0 - lumY), 0, 1);
+        let faceBoost = 0;
+        if (detectedFaces.length > 0) {
+          for (let fi = 0; fi < detectedFaces.length; fi++) {
+            const f = detectedFaces[fi];
+            const px = (u - (f.x + f.width * 0.5)) / Math.max(0.001, f.width * 0.9);
+            const py = (v - (f.y + f.height * 0.5)) / Math.max(0.001, f.height * 0.95);
+            faceBoost = Math.max(faceBoost, clamp(1 - Math.hypot(px, py), 0, 1) * facePulse);
+          }
+        }
+        const neon = clamp((edge - 0.05) * 3.3 + faceBoost * 0.5, 0, 1.5);
+        if (neon < 0.08) continue;
+        const a = clamp(neon * neonGain, 0.06, 0.62);
+        const g = Math.round(clamp(140 + neon * 112 + faceBoost * 28 + brightness * 18, 108, 255));
+        const rx = Math.floor(x / cell);
+        const ry = Math.floor((y + fallOffset) / cell);
+        const seed = rx * 37 + ry * 57 + Math.floor(tSec * (2 + speed * 3));
+        const ch = (faceBoost > 0.52)
+          ? phrase[Math.abs(seed) % phrase.length]
+          : overlaySet[Math.abs(seed) % overlaySet.length];
+        const py = ((y + fallOffset) % (h + cell)) - cell * 0.5;
+        ctx.fillStyle = `rgba(28,${g},94,${a})`;
+        ctx.fillText(ch, x, py);
+      }
+    }
+    ctx.globalAlpha = clamp(0.24 + glowK * 0.18 + brightness * 0.14, 0.18, 0.56);
+    ctx.filter = `blur(${1.4 + glowK * 2.8}px)`;
+    ctx.drawImage(canvas, 0, 0, w, h);
+    ctx.restore();
+  }
+
+  if (glowK > 0.01 || brightness > 0.01) {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = clamp(0.16 + glowK * 0.3 + brightness * 0.2 + energy * 0.06, 0.12, 0.68);
+    ctx.filter = `blur(${0.8 + glowK * 2.9 + brightness * 1.7 + energy * 0.6}px)`;
     ctx.drawImage(canvas, 0, 0, w, h);
     ctx.restore();
   }
@@ -14947,8 +15007,9 @@ function applyCodePreset(presetId, withRender = true) {
     if (liveCodeZoom) liveCodeZoom.value = "34";
     if (liveCodeLetters) liveCodeLetters.value = "78";
     if (liveCodeFigure) liveCodeFigure.value = "78";
-    if (liveCodeLanguage) liveCodeLanguage.value = "84";
+    if (liveCodeLanguage) liveCodeLanguage.value = "60";
     if (liveCodeGlow) liveCodeGlow.value = "62";
+    if (liveCodeBrightness) liveCodeBrightness.value = "74";
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = "74";
   } else if (id === "oracle") {
     if (liveCodeCameraMode) liveCodeCameraMode.value = "macro";
@@ -14957,8 +15018,9 @@ function applyCodePreset(presetId, withRender = true) {
     if (liveCodeZoom) liveCodeZoom.value = "82";
     if (liveCodeLetters) liveCodeLetters.value = "34";
     if (liveCodeFigure) liveCodeFigure.value = "92";
-    if (liveCodeLanguage) liveCodeLanguage.value = "58";
+    if (liveCodeLanguage) liveCodeLanguage.value = "48";
     if (liveCodeGlow) liveCodeGlow.value = "48";
+    if (liveCodeBrightness) liveCodeBrightness.value = "66";
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = "64";
   } else {
     if (liveCodeCameraMode) liveCodeCameraMode.value = "wide";
@@ -14967,8 +15029,9 @@ function applyCodePreset(presetId, withRender = true) {
     if (liveCodeZoom) liveCodeZoom.value = "38";
     if (liveCodeLetters) liveCodeLetters.value = "62";
     if (liveCodeFigure) liveCodeFigure.value = "62";
-    if (liveCodeLanguage) liveCodeLanguage.value = "66";
+    if (liveCodeLanguage) liveCodeLanguage.value = "52";
     if (liveCodeGlow) liveCodeGlow.value = "54";
+    if (liveCodeBrightness) liveCodeBrightness.value = "68";
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = "72";
   }
   if (liveCodeAudio) liveCodeAudio.checked = true;
@@ -16483,8 +16546,9 @@ function randomizeActiveMode() {
     if (liveCodeZoom) liveCodeZoom.value = String(clamp(Number(liveCodeZoom.value) + pick(-24, 24), 0, 100));
     if (liveCodeLetters) liveCodeLetters.value = String(clamp(Number(liveCodeLetters.value) + pick(-24, 24), 0, 100));
     if (liveCodeFigure) liveCodeFigure.value = String(clamp(Number(liveCodeFigure.value) + pick(-26, 26), 0, 100));
-    if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(Number(liveCodeLanguage.value) + pick(-20, 24), 0, 100));
+    if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(Number(liveCodeLanguage.value) + pick(-12, 12), 0, 65));
     if (liveCodeGlow) liveCodeGlow.value = String(clamp(Number(liveCodeGlow.value) + pick(-20, 20), 0, 100));
+    if (liveCodeBrightness) liveCodeBrightness.value = String(clamp(Number(liveCodeBrightness.value) + pick(-16, 18), 0, 100));
     if (liveCodeAudio) liveCodeAudio.checked = Math.random() > 0.08;
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = String(clamp(Number(liveCodeAudioAmount.value) + pick(-24, 24), 0, 100));
     codeRainFigurePhase = fract01(codeRainFigurePhase + Math.random() * 0.8);
@@ -17758,6 +17822,7 @@ function setMode(newMode) {
     codeRainCamY = 0;
     codeRainCamXTarget = 0;
     codeRainCamYTarget = 0;
+    codeRainEnergySmooth = 0;
     codeRainFigurePhase = 0;
     codeRainCols = 0;
     codeRainDrops = new Float32Array(0);
@@ -17770,8 +17835,10 @@ function setMode(newMode) {
     if (liveCodeZoom && !liveCodeZoom.value) liveCodeZoom.value = "38";
     if (liveCodeLetters && !liveCodeLetters.value) liveCodeLetters.value = "62";
     if (liveCodeFigure && !liveCodeFigure.value) liveCodeFigure.value = "62";
-    if (liveCodeLanguage && !liveCodeLanguage.value) liveCodeLanguage.value = "66";
+    if (liveCodeLanguage && !liveCodeLanguage.value) liveCodeLanguage.value = "52";
+    if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(Number(liveCodeLanguage.value), 0, 65));
     if (liveCodeGlow && !liveCodeGlow.value) liveCodeGlow.value = "54";
+    if (liveCodeBrightness && !liveCodeBrightness.value) liveCodeBrightness.value = "68";
     if (liveCodeAudioAmount && !liveCodeAudioAmount.value) liveCodeAudioAmount.value = "72";
     if (liveCodeAudio) liveCodeAudio.checked = true;
     applyCodePreset(liveCodePreset ? liveCodePreset.value : "matrix", false);
@@ -19766,6 +19833,7 @@ if (liveCodeAudio) {
   liveCodeFigure,
   liveCodeLanguage,
   liveCodeGlow,
+  liveCodeBrightness,
   liveCodeAudioAmount,
 ].forEach((control) => {
   if (!control) return;
@@ -19967,9 +20035,6 @@ canvas.addEventListener("mousemove", (e) => {
         interiorCamDistTarget = clamp(0.74 + nx * 1.1 + (0.5 - ny) * 0.2, 0.68, 2.2);
       } else if (mode === "atlas") {
         atlasCamDistTarget = clamp(0.72 + nx * 1.02 + (0.5 - ny) * 0.22, 0.62, 2.2);
-      } else if (mode === "code") {
-        codeRainCamXTarget = clamp((nx - 0.5) * 2, -1, 1);
-        codeRainCamYTarget = clamp((ny - 0.5) * 2, -1, 1);
       } else {
         materiaCamDistTarget = clamp(0.56 + nx * 1.16 + (0.5 - ny) * 0.24, 0.46, 2.4);
       }
@@ -20844,8 +20909,9 @@ window.addEventListener("keydown", (e) => {
     else if (mode === "atlas") randomizeAtlasCameraViewSmooth();
     else if (mode === "materia") randomizeMateriaCameraViewSmooth();
     else if (mode === "code") {
-      codeRainCamXTarget = clamp(codeRainCamXTarget + (Math.random() * 2 - 1) * 0.7, -1, 1);
-      codeRainCamYTarget = clamp(codeRainCamYTarget + (Math.random() * 2 - 1) * 0.7, -1, 1);
+      const drift = 0.22;
+      codeRainCamXTarget = clamp(codeRainCamXTarget * 0.88 + (Math.random() * 2 - 1) * drift, -1, 1);
+      codeRainCamYTarget = clamp(codeRainCamYTarget * 0.88 + (Math.random() * 2 - 1) * drift, -1, 1);
       scheduleRender();
     }
     else randomize3dCameraViewSmooth();
@@ -20861,8 +20927,9 @@ window.addEventListener("keydown", (e) => {
     else if (mode === "atlas") randomizeAtlasCameraView();
     else if (mode === "materia") randomizeMateriaCameraView();
     else if (mode === "code") {
-      codeRainCamXTarget = (Math.random() * 2 - 1);
-      codeRainCamYTarget = (Math.random() * 2 - 1);
+      const drift = 0.38;
+      codeRainCamXTarget = clamp(codeRainCamXTarget * 0.72 + (Math.random() * 2 - 1) * drift, -1, 1);
+      codeRainCamYTarget = clamp(codeRainCamYTarget * 0.72 + (Math.random() * 2 - 1) * drift, -1, 1);
       scheduleRender();
     }
     else randomize3dCameraView();
