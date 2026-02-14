@@ -41,6 +41,7 @@ Usa este checklist antes de publicar cambios en `main`.
 ## G. Shortcuts
 
 - [ ] `R` random general.
+- [ ] `B` baseline Live Safe (reestablece stack estable del modulo activo).
 - [ ] `F` fondo random (sin romper modo flat/light).
 - [ ] `G`, `T`, `Y`, `V`, `X`, `Z`, `U`, `M`, `C`, `Q` funcionan sin conflictos.
 
@@ -48,3 +49,9 @@ Usa este checklist antes de publicar cambios en `main`.
 
 - [ ] 21:9 por defecto.
 - [ ] 1:1 y 9:16 no deforman imagen.
+
+## I. Mobile / iPad
+
+- [ ] En iPad (Safari), la UI táctil carga en modo compacto sin solapar canvas.
+- [ ] Rotar vertical/horizontal no rompe layout ni deja canvas estirado.
+- [ ] En modo `auto`, FPS percibido se mantiene estable al activar webcam + módulo live.

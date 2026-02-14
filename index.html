@@ -98,6 +98,9 @@
                 <label><input type="radio" name="mode" value="fractal" /> <span data-i18n="mode_fractal">Fractal</span></label>
                 <label><input type="radio" name="mode" value="depth" /> <span data-i18n="mode_depth">3D Stage</span></label>
                 <label><input type="radio" name="mode" value="particles" /> <span data-i18n="mode_particles">Particles</span></label>
+                <label><input type="radio" name="mode" value="lines" /> <span>Lines</span></label>
+                <label><input type="radio" name="mode" value="tunnel" /> <span>Tunnel</span></label>
+                <label><input type="radio" name="mode" value="interior" /> <span>Interior</span></label>
               </div>
 
               <div class="control preset-control">
@@ -130,7 +133,7 @@
                   <select id="audioTarget">
                     <option value="points" data-i18n="audio_target_points">Points</option>
                     <option value="mesh" data-i18n="audio_target_mesh">Mesh</option>
-                    <option value="both" data-i18n="audio_target_both" selected>Both</option>
+                    <option value="all" data-i18n="audio_target_both" selected>All modules</option>
                   </select>
                 </label>
                 <label class="inline-select">
@@ -179,16 +182,17 @@
               <div class="group live-audio-rack">
                 <h2 data-i18n="live_audio_quick">Audio Quick Start</h2>
                 <div class="live-audio-actions">
-                  <button id="liveAudioToggleBtn" class="btn btn-audio-react">
+                  <button id="liveAudioStartBtn" class="btn btn-audio-react">
                     <span class="action-icon action-icon-wave">AUD</span>
-                    <span class="action-label" data-i18n="live_audio_toggle">Enable Audio React</span>
+                    <span class="action-label" data-i18n="audio_input">Entrada de audio</span>
+                    <span class="audio-live-dot" aria-hidden="true"></span>
                   </button>
-                  <button id="liveAudioLoadBtn" class="btn btn-audio-load">
+                  <button id="liveAudioPauseBtn" class="btn btn-audio-load">
                     <span class="action-icon action-icon-folder">LOAD</span>
-                    <span class="action-label" data-i18n="live_audio_load">Load Audio File</span>
+                    <span class="action-label" data-i18n="load_audio">Cargar audio</span>
                   </button>
                 </div>
-                <label class="inline-select">
+                <label class="inline-select" id="liveAudioInputPicker" hidden>
                   <span data-i18n="audio_input">Audio Input</span>
                   <select id="liveAudioInputQuick">
                     <option value="mic" data-i18n="audio_input_mic">Microphone</option>
@@ -201,7 +205,7 @@
                   <select id="liveAudioTargetQuick">
                     <option value="points" data-i18n="audio_target_points">Points</option>
                     <option value="mesh" data-i18n="audio_target_mesh">Mesh</option>
-                    <option value="both" data-i18n="audio_target_both">Both</option>
+                    <option value="all" data-i18n="audio_target_both">All modules</option>
                   </select>
                 </label>
                 <label class="slider">
@@ -296,6 +300,23 @@
                   </select>
                 </label>
                 <label class="inline-select">
+                  <span>Behavior</span>
+                  <select id="liveFractalBehavior">
+                    <option value="stable" selected>Stable</option>
+                    <option value="performance">Performance</option>
+                    <option value="aggressive">Aggressive</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Audio Motion</span>
+                  <select id="liveFractalAudioMode">
+                    <option value="balanced" selected>Balanced</option>
+                    <option value="bass">Bass Pulse</option>
+                    <option value="spectral">Spectral Flow</option>
+                    <option value="rhythmic">Rhythmic</option>
+                  </select>
+                </label>
+                <label class="inline-select">
                   <span>Fractal Camera</span>
                   <select id="liveFractalCameraMode">
                     <option value="orbit">Orbit Planet</option>
@@ -310,17 +331,22 @@
                     <option value="dome-equirect">Dome Equirect</option>
                   </select>
                 </label>
+                <label class="inline-select">
+                  <span>Fractal Variant</span>
+                  <select id="liveFractalVariant">
+                    <option value="a" selected>Variant A</option>
+                    <option value="b">Variant B</option>
+                  </select>
+                </label>
                 <label class="slider"><span>Camera Speed</span><input type="range" id="liveFractalCamSpeed" min="0" max="100" value="0" /><output for="liveFractalCamSpeed">0</output></label>
                 <label class="slider"><span>Camera Distance</span><input type="range" id="liveFractalDistance" min="20" max="180" value="76" /><output for="liveFractalDistance">76</output></label>
                 <label class="inline-select">
                   <span>Math Shape</span>
-                  <select id="liveFractalShape">
+                  <select id="liveFractalShapeB">
                     <option value="mandel" selected>Mandelbulb</option>
-                    <option value="torus">Torus Field</option>
-                    <option value="gyroid">Gyroid Field</option>
-                    <option value="poly">Polyhedral</option>
                   </select>
                 </label>
+                <label class="slider"><span>Shape Morph</span><input type="range" id="liveFractalShapeMorph" min="0" max="100" value="0" /><output for="liveFractalShapeMorph">0</output></label>
                 <label class="slider"><span>Symmetry</span><input type="range" id="liveFractalSymmetry" min="8" max="24" value="14" step="1" /><output for="liveFractalSymmetry">14</output></label>
                 <label class="slider"><span>Fractal Power</span><input type="range" id="liveFractalPower" min="60" max="120" value="84" /><output for="liveFractalPower">84</output></label>
                 <label class="slider"><span>Fog Density</span><input type="range" id="liveFractalFog" min="0" max="80" value="24" /><output for="liveFractalFog">24</output></label>
@@ -328,6 +354,7 @@
                 <label class="slider"><span>Light Intensity</span><input type="range" id="liveFractalLight" min="20" max="300" value="120" /><output for="liveFractalLight">120</output></label>
                 <label class="slider"><span>Spin</span><input type="range" id="liveFractalSpin" min="0" max="100" value="0" /><output for="liveFractalSpin">0</output></label>
                 <label class="slider"><span>Breath</span><input type="range" id="liveFractalBreath" min="0" max="100" value="0" /><output for="liveFractalBreath">0</output></label>
+                <label class="slider"><span>Flow Smooth</span><input type="range" id="liveFractalFlow" min="0" max="100" value="62" /><output for="liveFractalFlow">62</output></label>
                 <label class="slider"><span>Color Warmth</span><input type="range" id="liveFractalWarmth" min="0" max="100" value="66" /><output for="liveFractalWarmth">66</output></label>
                 <label class="inline-select">
                   <span>Fractal Texture</span>
@@ -335,33 +362,67 @@
                     <option value="smooth">Smooth</option>
                     <option value="crystal">Crystal</option>
                     <option value="ink">Ink Lines</option>
-                    <option value="contour">Contour</option>
+                    <option value="contour" selected>Contour</option>
                   </select>
                 </label>
                 <label class="inline-select">
                   <span>Texture Layer 2</span>
                   <select id="liveFractalTexture2">
-                    <option value="none" selected>None</option>
-                    <option value="noise">Noise Veil</option>
+                    <option value="none">None</option>
+                    <option value="noise" selected>Noise Veil</option>
                     <option value="ripples">Ripples</option>
                     <option value="cells">Cellular</option>
                   </select>
                 </label>
-                <label class="slider"><span>Texture Layer Mix</span><input type="range" id="liveFractalTextureMix" min="0" max="100" value="42" /><output for="liveFractalTextureMix">42</output></label>
+                <label class="inline-select">
+                  <span>Texture Blend</span>
+                  <select id="liveFractalTextureBlend">
+                    <option value="add">Add</option>
+                    <option value="screen" selected>Screen</option>
+                    <option value="multiply">Multiply</option>
+                    <option value="difference">Difference</option>
+                  </select>
+                </label>
+                <label class="toggle"><input type="checkbox" id="liveFractalOverlayLock" checked /><span>Lock Overlay on Random</span></label>
+                <label class="slider"><span>Texture Layer Mix</span><input type="range" id="liveFractalTextureMix" min="0" max="100" value="62" /><output for="liveFractalTextureMix">62</output></label>
+                <label class="inline-select">
+                  <span>Palette</span>
+                  <select id="liveFractalPalette">
+                    <option value="warm">Warm Sacred</option>
+                    <option value="neon">Neon</option>
+                    <option value="cosmic" selected>Cosmic</option>
+                    <option value="mono">Mono Ink</option>
+                    <option value="input">Input Driven</option>
+                  </select>
+                </label>
                 <label class="inline-select">
                   <span>Fractal Render</span>
                   <select id="liveFractalRenderMode">
                     <option value="shaded">Shaded</option>
                     <option value="wire">Wire Mesh</option>
                     <option value="points">Point Map</option>
-                    <option value="hybrid">Mesh + Points</option>
+                    <option value="hybrid" selected>Mesh + Points</option>
                   </select>
                 </label>
                 <label class="inline-select">
+                  <span>Optical Pack</span>
+                  <select id="liveFractalOptical">
+                    <option value="off" selected>Off</option>
+                    <option value="moire">Moire Lines</option>
+                    <option value="tunnel">Tunnel Rings</option>
+                    <option value="sacred">Sacred Mandala</option>
+                    <option value="opart">Op Art Grid</option>
+                  </select>
+                </label>
+                <label class="slider"><span>Optical Amount</span><input type="range" id="liveFractalOpticalAmount" min="0" max="100" value="0" /><output for="liveFractalOpticalAmount">0</output></label>
+                <label class="slider"><span>Polygonize</span><input type="range" id="liveFractalPolygonize" min="0" max="100" value="0" /><output for="liveFractalPolygonize">0</output></label>
+                <label class="slider"><span>Wire Strength</span><input type="range" id="liveFractalWireStrength" min="0" max="100" value="62" /><output for="liveFractalWireStrength">62</output></label>
+                <label class="slider"><span>Point Overlay</span><input type="range" id="liveFractalPointOverlay" min="0" max="100" value="38" /><output for="liveFractalPointOverlay">38</output></label>
+                <label class="inline-select">
                   <span>Fractal Style</span>
                   <select id="liveFractalStyle">
-                    <option value="lit">Lit</option>
-                    <option value="flat" selected>Flat / Illustration</option>
+                    <option value="lit" selected>Lit</option>
+                    <option value="flat">Flat / Illustration</option>
                   </select>
                 </label>
                 <label class="inline-select">
@@ -629,6 +690,117 @@
                 </label>
                 <p class="micro-tip">Tip: módulo independiente con partículas XYZ audio-reactivas y auto performance.</p>
               </div>
+              <div id="livePaneLines" class="group live-pane" hidden>
+                <h2>Lines Essentials</h2>
+                <label class="inline-select">
+                  <span>Lines Preset</span>
+                  <select id="liveLinesPreset">
+                    <option value="ambient" selected>Ambient Flow</option>
+                    <option value="techno">Techno Grid</option>
+                    <option value="vocal">Vocal Contour</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Lines Style</span>
+                  <select id="liveLinesStyle" disabled>
+                    <option value="minimal" selected>Minimal</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Pattern</span>
+                  <select id="liveLinesPattern" disabled>
+                    <option value="flow" selected>Flow</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Geometry Mode</span>
+                  <select id="liveLinesGeometry">
+                    <option value="ribbon" selected>Ribbon Flow</option>
+                    <option value="grid">Grid Warp</option>
+                    <option value="constellation">Constellation</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Lines Camera</span>
+                  <select id="liveLinesCameraMode">
+                    <option value="orbit" selected>Orbit</option>
+                    <option value="inside">Fly Inside</option>
+                    <option value="static">Static</option>
+                  </select>
+                </label>
+                <label class="toggle"><input type="checkbox" id="liveLinesBeatFlip" checked /><span>Beat Flip</span></label>
+                <label class="slider"><span>Performance Macro</span><input type="range" id="liveLinesMacro" min="0" max="100" value="42" /><output for="liveLinesMacro">42</output></label>
+                <label class="slider"><span>Line Density</span><input type="range" id="liveLinesDensity" min="6" max="30" value="12" /><output for="liveLinesDensity">12</output></label>
+                <label class="slider"><span>Line Thickness</span><input type="range" id="liveLinesThickness" min="1" max="24" value="5" /><output for="liveLinesThickness">5</output></label>
+                <label class="slider"><span>Curvature</span><input type="range" id="liveLinesCurvature" min="0" max="100" value="34" /><output for="liveLinesCurvature">34</output></label>
+                <label class="slider"><span>Depth Z</span><input type="range" id="liveLinesDepth" min="0" max="100" value="54" /><output for="liveLinesDepth">54</output></label>
+                <label class="slider"><span>Layer Offset</span><input type="range" id="liveLinesLayerOffset" min="0" max="100" value="48" /><output for="liveLinesLayerOffset">48</output></label>
+                <label class="slider"><span>Color Shift</span><input type="range" id="liveLinesColorShift" min="0" max="360" value="120" /><output for="liveLinesColorShift">120</output></label>
+                <label class="slider"><span>Flow Speed</span><input type="range" id="liveLinesSpeed" min="0" max="100" value="42" /><output for="liveLinesSpeed">42</output></label>
+                <label class="slider"><span>Camera Drift</span><input type="range" id="liveLinesCamDrift" min="0" max="100" value="28" /><output for="liveLinesCamDrift">28</output></label>
+                <label class="slider"><span>Inside Depth</span><input type="range" id="liveLinesInsideDepth" min="0" max="100" value="62" /><output for="liveLinesInsideDepth">62</output></label>
+                <label class="slider"><span>String Vibe Sensitivity</span><input type="range" id="liveLinesStringVibe" min="0" max="200" value="58" /><output for="liveLinesStringVibe">58</output></label>
+                <label class="slider"><span>Constellation Mix</span><input type="range" id="liveLinesConstellation" min="0" max="100" value="32" /><output for="liveLinesConstellation">32</output></label>
+                <p class="micro-tip">Tip: arrastra el canvas para mover cámara 3D y usa rueda/trackpad para zoom fluido.</p>
+              </div>
+              <div id="livePaneTunnel" class="group live-pane" hidden>
+                <h2>Tunnel Essentials</h2>
+                <label class="inline-select">
+                  <span>Tunnel Preset</span>
+                  <select id="liveTunnelPreset">
+                    <option value="deep" selected>Deep Mesh</option>
+                    <option value="pulse">Pulse Points</option>
+                    <option value="vortex">Vortex Spiral</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Tunnel Camera</span>
+                  <select id="liveTunnelCameraMode">
+                    <option value="orbit" selected>Orbit</option>
+                    <option value="inside">Inside Fly</option>
+                    <option value="sweep">Sweep</option>
+                    <option value="static">Static</option>
+                  </select>
+                </label>
+                <label class="toggle"><input type="checkbox" id="liveTunnelAudio" checked /><span>Audio Reactive</span></label>
+                <label class="slider"><span>Tunnel Density</span><input type="range" id="liveTunnelDensity" min="8" max="44" value="22" /><output for="liveTunnelDensity">22</output></label>
+                <label class="slider"><span>Tunnel Depth</span><input type="range" id="liveTunnelDepth" min="20" max="100" value="74" /><output for="liveTunnelDepth">74</output></label>
+                <label class="slider"><span>Tunnel Speed</span><input type="range" id="liveTunnelSpeed" min="0" max="100" value="42" /><output for="liveTunnelSpeed">42</output></label>
+                <label class="slider"><span>Tunnel Twist</span><input type="range" id="liveTunnelTwist" min="0" max="100" value="36" /><output for="liveTunnelTwist">36</output></label>
+                <label class="slider"><span>Mesh Amount</span><input type="range" id="liveTunnelMesh" min="0" max="100" value="78" /><output for="liveTunnelMesh">78</output></label>
+                <label class="slider"><span>Points Amount</span><input type="range" id="liveTunnelPoints" min="0" max="100" value="68" /><output for="liveTunnelPoints">68</output></label>
+                <label class="slider"><span>Glow</span><input type="range" id="liveTunnelGlow" min="0" max="100" value="38" /><output for="liveTunnelGlow">38</output></label>
+                <label class="slider"><span>Audio Amount</span><input type="range" id="liveTunnelAudioAmount" min="0" max="100" value="70" /><output for="liveTunnelAudioAmount">70</output></label>
+                <p class="micro-tip">Tip: O = morph del tunel, T/Y = camara rapida/suave.</p>
+              </div>
+              <div id="livePaneInterior" class="group live-pane" hidden>
+                <h2>Interior Black Essentials</h2>
+                <label class="inline-select">
+                  <span>Interior Preset</span>
+                  <select id="liveInteriorPreset">
+                    <option value="abyss" selected>Abyss Chamber</option>
+                    <option value="pulse">Pulse Corridor</option>
+                    <option value="ruin">Digital Ruin</option>
+                  </select>
+                </label>
+                <label class="inline-select">
+                  <span>Interior Camera</span>
+                  <select id="liveInteriorCameraMode">
+                    <option value="orbit" selected>Orbit</option>
+                    <option value="dive">Dive</option>
+                    <option value="static">Static</option>
+                  </select>
+                </label>
+                <label class="toggle"><input type="checkbox" id="liveInteriorAudio" checked /><span>Audio Reactive</span></label>
+                <label class="slider"><span>Corridor Density</span><input type="range" id="liveInteriorDensity" min="8" max="48" value="22" /><output for="liveInteriorDensity">22</output></label>
+                <label class="slider"><span>Corridor Depth</span><input type="range" id="liveInteriorDepth" min="20" max="100" value="78" /><output for="liveInteriorDepth">78</output></label>
+                <label class="slider"><span>Drift Speed</span><input type="range" id="liveInteriorSpeed" min="0" max="100" value="34" /><output for="liveInteriorSpeed">34</output></label>
+                <label class="slider"><span>Wave Amount</span><input type="range" id="liveInteriorWave" min="0" max="100" value="56" /><output for="liveInteriorWave">56</output></label>
+                <label class="slider"><span>Glitch Amount</span><input type="range" id="liveInteriorGlitch" min="0" max="100" value="42" /><output for="liveInteriorGlitch">42</output></label>
+                <label class="slider"><span>Glow</span><input type="range" id="liveInteriorGlow" min="0" max="100" value="44" /><output for="liveInteriorGlow">44</output></label>
+                <label class="slider"><span>Audio Amount</span><input type="range" id="liveInteriorAudioAmount" min="0" max="100" value="68" /><output for="liveInteriorAudioAmount">68</output></label>
+                <p class="micro-tip">Tip: O = morph interior, T/Y = camara rapida/suave.</p>
+              </div>
               <div id="liveOutputGroup" class="group">
                 <h2>Output View</h2>
                 <label class="inline-select">
@@ -639,7 +811,20 @@
                   </select>
                 </label>
                 <details class="advanced-only" open>
-                  <summary id="liveDomeSummary">Dome View Module</summary>
+                  <summary id="liveDomeSummary">Dome Master (All Filters)</summary>
+                  <label class="inline-select">
+                    <span>Dome Preset</span>
+                    <select id="domePreset">
+                      <option value="custom" selected>Custom</option>
+                      <option value="live-safe">Live Safe</option>
+                      <option value="glitch">Glitch</option>
+                      <option value="depth">3D Live</option>
+                      <option value="particles">Particles</option>
+                      <option value="fractal">Fractal</option>
+                      <option value="equirect180">360 -> 180 Dome</option>
+                    </select>
+                  </label>
+                  <label class="toggle"><input type="checkbox" id="domeAutoTuneByMode" checked /><span>Auto Tune by module</span></label>
                   <label class="inline-select">
                     <span>Dome Source Map</span>
                     <select id="domeSourceMap">
@@ -647,7 +832,20 @@
                       <option value="equirect">360 Equirect -> 180 Dome</option>
                     </select>
                   </label>
+                  <label class="inline-select">
+                    <span>Dome Projection</span>
+                    <select id="domeProjection">
+                      <option value="equisolid" selected>Equisolid (Fulldome)</option>
+                      <option value="equidistant">Equidistant</option>
+                      <option value="stereographic">Stereographic</option>
+                      <option value="orthographic">Orthographic</option>
+                    </select>
+                  </label>
                   <label class="slider"><span>Dome Warp</span><input type="range" id="domeWarp" min="0" max="100" value="70" /><output for="domeWarp">70</output></label>
+                  <label class="slider"><span>Dome Overscan</span><input type="range" id="domeOverscan" min="0" max="20" value="6" /><output for="domeOverscan">6</output></label>
+                  <label class="slider"><span>Dome Edge Feather</span><input type="range" id="domeEdgeFeather" min="0" max="100" value="18" /><output for="domeEdgeFeather">18</output></label>
+                  <label class="slider"><span>Dome Rim Clamp</span><input type="range" id="domeRimClamp" min="0" max="100" value="28" /><output for="domeRimClamp">28</output></label>
+                  <label class="slider"><span>Dome Seam Blend</span><input type="range" id="domeSeamBlend" min="0" max="100" value="22" /><output for="domeSeamBlend">22</output></label>
                   <label class="slider"><span>Dome Tilt</span><input type="range" id="domeTilt" min="-100" max="100" value="0" /><output for="domeTilt">0</output></label>
                   <label class="slider"><span>Dome Rotation</span><input type="range" id="domeRotate" min="-180" max="180" value="0" /><output for="domeRotate">0</output></label>
                   <label class="toggle"><input type="checkbox" id="domeAutoRotate" /><span>Dome Auto Rotate</span></label>
@@ -788,6 +986,14 @@
                 <p class="subgroup-title">Psychedelic Color</p>
                 <label class="slider"><span>Psychedelic</span><input type="range" id="psychedelic" min="0" max="100" value="0" /><output for="psychedelic">0</output></label>
                 <label class="slider"><span>Color Cycle</span><input type="range" id="colorCycle" min="0" max="360" value="0" /><output for="colorCycle">0</output></label>
+                <div class="pad-label" id="studioFractalPadALabel">FRA A Pad (X=Symmetry / Y=Power)</div>
+                <div id="studioFractalPadA" class="depth-pad">
+                  <div id="studioFractalPadADot" class="depth-pad-dot"></div>
+                </div>
+                <div class="pad-label" id="studioFractalPadBLabel">FRA B Pad (X=Glow / Y=Optical)</div>
+                <div id="studioFractalPadB" class="depth-pad">
+                  <div id="studioFractalPadBDot" class="depth-pad-dot"></div>
+                </div>
               </div>
 
               <div class="group mode-group" id="depthControlsGroup" data-modes="depth" data-studio-group="depth" hidden>
@@ -966,10 +1172,24 @@
                 <button class="btn module-route-btn" data-module-route="particles">
                   <span class="live-mode-icon">PT</span><span>Particles</span>
                 </button>
+                <button class="btn module-route-btn" data-module-route="lines">
+                  <span class="live-mode-icon">LN</span><span>Lines</span>
+                </button>
+                <button class="btn module-route-btn" data-module-route="tunnel">
+                  <span class="live-mode-icon">TN</span><span>Tunnel</span>
+                </button>
+                <button class="btn module-route-btn" data-module-route="interior">
+                  <span class="live-mode-icon">IR</span><span>Interior</span>
+                </button>
               </div>
-              <button id="liveModeRandomBtn" class="btn module-route-random-btn">
-                <span class="live-mode-icon">R</span><span>Random (R)</span>
-              </button>
+              <div class="module-route-utility">
+                <button id="liveModeRandomBtn" class="btn module-route-random-btn">
+                  <span class="live-mode-icon">R</span><span>Random (R)</span>
+                </button>
+                <button id="liveModeSafeBtn" class="btn module-route-safe-btn">
+                  <span class="live-mode-icon">B</span><span data-i18n="live_safe_btn">Live Safe (B)</span>
+                </button>
+              </div>
             </div>
 
             <div class="deck-controls" id="cameraDeckControls">
@@ -1006,6 +1226,7 @@
                       <option value="psychedelic">Psychedelic</option>
                       <option value="flatfx">Flat FX</option>
                       <option value="neon">Neon Glow</option>
+                      <option value="simsecho">Sims Echo</option>
                     </select>
                   </label>
                   <label class="slider">
@@ -1248,6 +1469,7 @@
             <li data-i18n="learn_shortcut_k">K: Activar/Desactivar Kaleidoscopio.</li>
             <li data-i18n="learn_shortcut_arrows_ud">Flechas Arriba/Abajo: Cambiar Master FX.</li>
             <li data-i18n="learn_shortcut_arrows_lr">Flechas Izquierda/Derecha: Cambiar módulo Live.</li>
+            <li data-i18n="learn_shortcut_b">B: Baseline Live Safe (estable).</li>
             <li data-i18n="learn_shortcut_space">Espacio: Freeze/Unfreeze.</li>
             <li data-i18n="learn_shortcut_p">P: Panic reset seguro.</li>
             <li data-i18n="learn_shortcut_snap">1-8: Cargar sesión · Shift+1-8: Guardar sesión.</li>
