@@ -4305,6 +4305,7 @@ function estimateActiveModuleLoad() {
     score += n(liveCodeFigure ? liveCodeFigure.value : 62) * 0.66;
     score += n(liveCodeLanguage ? liveCodeLanguage.value : 52) * 0.34;
     score += n(liveCodeGlow ? liveCodeGlow.value : 54) * 0.46;
+    score += n(liveCodeCamTolerance ? liveCodeCamTolerance.value : 38) * 0.24;
     score += n(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72) * 0.34;
     score /= 4.72;
   } else if (mode === "synth") {
@@ -4768,6 +4769,7 @@ function updateLiveQuickOutputs() {
   updateQuickOutputById("liveCodeLanguage", liveCodeLanguage ? liveCodeLanguage.value : 0);
   updateQuickOutputById("liveCodeGlow", liveCodeGlow ? liveCodeGlow.value : 0);
   updateQuickOutputById("liveCodeBrightness", liveCodeBrightness ? liveCodeBrightness.value : 0);
+  updateQuickOutputById("liveCodeCamTolerance", liveCodeCamTolerance ? liveCodeCamTolerance.value : 0);
   updateQuickOutputById("liveCodeAudioAmount", liveCodeAudioAmount ? liveCodeAudioAmount.value : 0);
   updateQuickOutputById("studioParticlesOrder", studioParticlesOrder ? studioParticlesOrder.value : 0);
   updateQuickOutputById("studioParticlesDrift", studioParticlesDrift ? studioParticlesDrift.value : 0);
@@ -8171,6 +8173,7 @@ function applyLiveSafeBaseline(options = {}) {
     setVal(liveCodeLanguage, 52);
     setVal(liveCodeGlow, 54);
     setVal(liveCodeBrightness, 68);
+    setVal(liveCodeCamTolerance, 38);
     setVal(liveCodeAudioAmount, 72);
   }
 
@@ -14770,6 +14773,7 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   const language = languageRaw / 65;
   const glow = clamp(Number(liveCodeGlow ? liveCodeGlow.value : 54) / 100, 0, 1);
   const brightness = clamp(Number(liveCodeBrightness ? liveCodeBrightness.value : 68) / 100, 0, 1);
+  const camTolerance = clamp(Number(liveCodeCamTolerance ? liveCodeCamTolerance.value : 38) / 100, 0, 1);
   const audioOn = !liveCodeAudio || liveCodeAudio.checked;
   const audioAmount = clamp(Number(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72) / 100, 0, 1);
   const preset = liveCodePreset ? (liveCodePreset.value || "matrix") : "matrix";
@@ -14809,6 +14813,7 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   const stepX = w / cols;
   const chaseCol = clamp(Math.floor((tSec * (1.1 + speed * 3.3)) % cols), 0, cols - 1);
   const chaseY = codeRainDrops[chaseCol] || 0;
+  const chaseX = chaseCol * stepX + stepX * 0.5;
   const driftXBase = codeRainCamX * 8;
   const driftYBase = codeRainCamY * 7;
   const driftX = driftXBase;
@@ -14853,8 +14858,8 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const baseTrail = Math.round(7 + densityK * 13 + lettersK * 12 + glowK * 11 + energy * 5 + (matrixClassicLock ? 6 : 0));
-  const timeScale = 0.95 + speed * 2.2 + energy * 0.6;
+  const baseTrail = Math.round(7 + densityK * 13 + lettersK * 12 + glowK * 11 + energy * 2.8 + (matrixClassicLock ? 6 : 0));
+  const timeScale = 0.95 + speed * 2.2 + energy * 0.28;
   for (let i = 0; i < cols; i++) {
     const drop = codeRainDrops[i];
     const colSpeed = codeRainSpeeds[i] * timeScale;
@@ -14897,7 +14902,8 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
       const fade = Math.pow(1 - j / Math.max(1, baseTrail), 1.35);
       const figDrive = matrixClassicLock ? figMask * (0.14 + figure * 0.22) : figMask * (0.48 + figure * 0.74);
       const sig = clamp(figDrive + head * 0.34, 0, 1.8);
-      const signal = clamp(sig + (webcamOverlayActive ? (webcamLum * 0.08 + faceMask * 0.12) : 0), 0, 1.8);
+      const camGain = 1.22 - camTolerance * 0.86;
+      const signal = clamp(sig + (webcamOverlayActive ? (webcamLum * 0.08 + faceMask * 0.12) * camGain : 0), 0, 1.8);
       const alpha = clamp(fade * (0.26 + glowK * 0.44 + signal * 0.54 + brightness * 0.36), 0.14, 1);
       const langSelector = clamp(language + signal * 0.14 + (matrixClassicLock ? 0 : Math.sin(tSec * 0.7 + i * 0.03) * 0.08), 0, 1);
       const poolIndex = clamp(Math.floor(langSelector * glyphSets.length), 0, glyphSets.length - 1);
@@ -14935,6 +14941,8 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   if (webcamOverlayActive && srcData) {
     const cell = clamp(Math.round(codeRainCharStep * 1.15), 10, 24);
     const neonGain = 0.18 + glowK * 0.28 + brightness * 0.24;
+    const edgeCut = 0.03 + camTolerance * 0.2;
+    const neonGainCam = 1.2 - camTolerance * 0.7;
     const facePulse = 0.82 + (0.5 + 0.5 * Math.sin(tSec * 1.35)) * 0.28;
     const fallOffset = (tSec * (28 + speed * 72)) % cell;
     const overlaySet = glyphSets[Math.min(glyphSets.length - 1, Math.floor(language * glyphSets.length))] || glyphSets[0];
@@ -14967,7 +14975,7 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
             faceBoost = Math.max(faceBoost, clamp(1 - Math.hypot(px, py), 0, 1) * facePulse);
           }
         }
-        const neon = clamp((edge - 0.05) * 3.3 + faceBoost * 0.5, 0, 1.5);
+        const neon = clamp((edge - edgeCut) * (2.4 + neonGainCam * 1.6) + faceBoost * (0.4 + neonGainCam * 0.24), 0, 1.5);
         if (neon < 0.08) continue;
         const a = clamp(neon * neonGain, 0.06, 0.62);
         const g = Math.round(clamp(140 + neon * 112 + faceBoost * 28 + brightness * 18, 108, 255));
@@ -14998,29 +15006,144 @@ function renderCodeRainMode(baseImageData, tSec, settings) {
   }
 }
 
+function getCodePresetProfile(presetId) {
+  const id = String(presetId || "matrix");
+  if (id === "glyph") {
+    return {
+      camMode: "chase",
+      density: 66,
+      speed: 54,
+      zoom: 68,
+      letters: 78,
+      figure: 78,
+      language: 60,
+      glow: 62,
+      brightness: 74,
+      camTolerance: 34,
+      audioAmount: 74,
+      camX: 0.06,
+      camY: -0.08,
+    };
+  }
+  if (id === "oracle") {
+    return {
+      camMode: "macro",
+      density: 42,
+      speed: 32,
+      zoom: 94,
+      letters: 34,
+      figure: 92,
+      language: 48,
+      glow: 48,
+      brightness: 66,
+      camTolerance: 44,
+      audioAmount: 64,
+      camX: 0.16,
+      camY: -0.24,
+    };
+  }
+  return {
+    camMode: "wide",
+    density: 58,
+    speed: 44,
+    zoom: 38,
+    letters: 62,
+    figure: 62,
+    language: 52,
+    glow: 54,
+    brightness: 68,
+    camTolerance: 38,
+    audioAmount: 72,
+    camX: 0,
+    camY: 0,
+  };
+}
+
+function triggerCodePresetCameraTween(step = 1) {
+  const order = ["matrix", "glyph", "oracle"];
+  const current = liveCodePreset ? (liveCodePreset.value || "matrix") : "matrix";
+  let idx = order.indexOf(current);
+  if (idx < 0) idx = 0;
+  const next = order[(idx + step + order.length) % order.length];
+  const to = getCodePresetProfile(next);
+  codeRainPresetTween = {
+    start: performance.now(),
+    duration: 1350,
+    phaseSwitchAt: 0.34,
+    from: {
+      camMode: liveCodeCameraMode ? (liveCodeCameraMode.value || "wide") : "wide",
+      density: Number(liveCodeDensity ? liveCodeDensity.value : 58),
+      speed: Number(liveCodeSpeed ? liveCodeSpeed.value : 44),
+      zoom: Number(liveCodeZoom ? liveCodeZoom.value : 38),
+      letters: Number(liveCodeLetters ? liveCodeLetters.value : 62),
+      figure: Number(liveCodeFigure ? liveCodeFigure.value : 62),
+      language: clamp(Number(liveCodeLanguage ? liveCodeLanguage.value : 52), 0, 65),
+      glow: Number(liveCodeGlow ? liveCodeGlow.value : 54),
+      brightness: Number(liveCodeBrightness ? liveCodeBrightness.value : 68),
+      camTolerance: Number(liveCodeCamTolerance ? liveCodeCamTolerance.value : 38),
+      audioAmount: Number(liveCodeAudioAmount ? liveCodeAudioAmount.value : 72),
+      camX: codeRainCamXTarget,
+      camY: codeRainCamYTarget,
+    },
+    to,
+    nextPreset: next,
+  };
+  if (liveCodePreset) liveCodePreset.value = next;
+  scheduleRender();
+}
+
+function applyCodePresetTween() {
+  if (!codeRainPresetTween) return;
+  const now = performance.now();
+  const kRaw = clamp((now - codeRainPresetTween.start) / Math.max(1, codeRainPresetTween.duration), 0, 1);
+  const k = kRaw * kRaw * (3 - 2 * kRaw);
+  const mix = (a, b) => Math.round(a + (b - a) * k);
+  const from = codeRainPresetTween.from;
+  const to = codeRainPresetTween.to;
+  if (liveCodeDensity) liveCodeDensity.value = String(clamp(mix(from.density, to.density), 0, 100));
+  if (liveCodeSpeed) liveCodeSpeed.value = String(clamp(mix(from.speed, to.speed), 0, 100));
+  if (liveCodeZoom) liveCodeZoom.value = String(clamp(mix(from.zoom, to.zoom), 0, 100));
+  if (liveCodeLetters) liveCodeLetters.value = String(clamp(mix(from.letters, to.letters), 0, 100));
+  if (liveCodeFigure) liveCodeFigure.value = String(clamp(mix(from.figure, to.figure), 0, 100));
+  if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(mix(from.language, to.language), 0, 65));
+  if (liveCodeGlow) liveCodeGlow.value = String(clamp(mix(from.glow, to.glow), 0, 100));
+  if (liveCodeBrightness) liveCodeBrightness.value = String(clamp(mix(from.brightness, to.brightness), 0, 100));
+  if (liveCodeCamTolerance) liveCodeCamTolerance.value = String(clamp(mix(from.camTolerance, to.camTolerance), 0, 100));
+  if (liveCodeAudioAmount) liveCodeAudioAmount.value = String(clamp(mix(from.audioAmount, to.audioAmount), 0, 100));
+  if (liveCodeCameraMode) {
+    liveCodeCameraMode.value = k >= (codeRainPresetTween.phaseSwitchAt || 0.34) ? to.camMode : from.camMode;
+  }
+  codeRainCamXTarget = clamp(from.camX + (to.camX - from.camX) * k, -1, 1);
+  codeRainCamYTarget = clamp(from.camY + (to.camY - from.camY) * k, -1, 1);
+  updateLiveQuickOutputs();
+  if (kRaw >= 1) codeRainPresetTween = null;
+}
+
 function applyCodePreset(presetId, withRender = true) {
   const id = String(presetId || "matrix");
   if (id === "glyph") {
-    if (liveCodeCameraMode) liveCodeCameraMode.value = "wide";
+    if (liveCodeCameraMode) liveCodeCameraMode.value = "chase";
     if (liveCodeDensity) liveCodeDensity.value = "66";
     if (liveCodeSpeed) liveCodeSpeed.value = "54";
-    if (liveCodeZoom) liveCodeZoom.value = "34";
+    if (liveCodeZoom) liveCodeZoom.value = "68";
     if (liveCodeLetters) liveCodeLetters.value = "78";
     if (liveCodeFigure) liveCodeFigure.value = "78";
     if (liveCodeLanguage) liveCodeLanguage.value = "60";
     if (liveCodeGlow) liveCodeGlow.value = "62";
     if (liveCodeBrightness) liveCodeBrightness.value = "74";
+    if (liveCodeCamTolerance) liveCodeCamTolerance.value = "34";
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = "74";
   } else if (id === "oracle") {
     if (liveCodeCameraMode) liveCodeCameraMode.value = "macro";
     if (liveCodeDensity) liveCodeDensity.value = "42";
     if (liveCodeSpeed) liveCodeSpeed.value = "32";
-    if (liveCodeZoom) liveCodeZoom.value = "82";
+    if (liveCodeZoom) liveCodeZoom.value = "94";
     if (liveCodeLetters) liveCodeLetters.value = "34";
     if (liveCodeFigure) liveCodeFigure.value = "92";
     if (liveCodeLanguage) liveCodeLanguage.value = "48";
     if (liveCodeGlow) liveCodeGlow.value = "48";
     if (liveCodeBrightness) liveCodeBrightness.value = "66";
+    if (liveCodeCamTolerance) liveCodeCamTolerance.value = "44";
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = "64";
   } else {
     if (liveCodeCameraMode) liveCodeCameraMode.value = "wide";
@@ -15032,6 +15155,7 @@ function applyCodePreset(presetId, withRender = true) {
     if (liveCodeLanguage) liveCodeLanguage.value = "52";
     if (liveCodeGlow) liveCodeGlow.value = "54";
     if (liveCodeBrightness) liveCodeBrightness.value = "68";
+    if (liveCodeCamTolerance) liveCodeCamTolerance.value = "38";
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = "72";
   }
   if (liveCodeAudio) liveCodeAudio.checked = true;
@@ -15924,6 +16048,7 @@ function renderFrame() {
   applyDepthMorphTween();
   applyFractalMorphTween();
   applyFractalCameraTween();
+  applyCodePresetTween();
   applyKaleidoMorphTween();
   const keyPanMoved = applyCameraKeyPanning();
   const smoothCameraMoved = applySmoothCameraTargets();
@@ -16159,6 +16284,7 @@ function renderFrame() {
       isDomeAutoRotateActive() ||
       isMasterFxAnimated() ||
       Boolean(kaleidoMorphTween) ||
+      Boolean(codeRainPresetTween) ||
       Number(liveCodeSpeed ? liveCodeSpeed.value : 0) > 0;
     if (codeAlwaysOn) scheduleRender();
     return;
@@ -16536,11 +16662,11 @@ function randomizeActiveMode() {
   if (mode === "code") {
     const pick = (min, max) => Math.round(min + Math.random() * (max - min));
     const presets = ["matrix", "glyph", "oracle"];
-    const cams = ["wide", "chase", "macro"];
     const p = presets[Math.floor(Math.random() * presets.length)];
+    const keepCamMode = liveCodeCameraMode ? (liveCodeCameraMode.value || "wide") : "wide";
     if (liveCodePreset) liveCodePreset.value = p;
     applyCodePreset(p, false);
-    if (liveCodeCameraMode) liveCodeCameraMode.value = cams[Math.floor(Math.random() * cams.length)];
+    if (liveCodeCameraMode) liveCodeCameraMode.value = keepCamMode;
     if (liveCodeDensity) liveCodeDensity.value = String(clamp(Number(liveCodeDensity.value) + pick(-20, 20), 0, 100));
     if (liveCodeSpeed) liveCodeSpeed.value = String(clamp(Number(liveCodeSpeed.value) + pick(-22, 24), 0, 100));
     if (liveCodeZoom) liveCodeZoom.value = String(clamp(Number(liveCodeZoom.value) + pick(-24, 24), 0, 100));
@@ -16549,6 +16675,7 @@ function randomizeActiveMode() {
     if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(Number(liveCodeLanguage.value) + pick(-12, 12), 0, 65));
     if (liveCodeGlow) liveCodeGlow.value = String(clamp(Number(liveCodeGlow.value) + pick(-20, 20), 0, 100));
     if (liveCodeBrightness) liveCodeBrightness.value = String(clamp(Number(liveCodeBrightness.value) + pick(-16, 18), 0, 100));
+    if (liveCodeCamTolerance) liveCodeCamTolerance.value = String(clamp(Number(liveCodeCamTolerance.value) + pick(-14, 14), 0, 100));
     if (liveCodeAudio) liveCodeAudio.checked = Math.random() > 0.08;
     if (liveCodeAudioAmount) liveCodeAudioAmount.value = String(clamp(Number(liveCodeAudioAmount.value) + pick(-24, 24), 0, 100));
     codeRainFigurePhase = fract01(codeRainFigurePhase + Math.random() * 0.8);
@@ -16982,6 +17109,10 @@ function cancelMorphTweensForCurrentMode() {
   }
   if (mode === "materia") {
     materiaMorphTween = null;
+    return;
+  }
+  if (mode === "code") {
+    codeRainPresetTween = null;
     return;
   }
   if (mode === "depth" || mode === "mix") {
@@ -17829,7 +17960,7 @@ function setMode(newMode) {
     codeRainSpeeds = new Float32Array(0);
     codeRainSeeds = new Float32Array(0);
     if (liveCodePreset && !liveCodePreset.value) liveCodePreset.value = "matrix";
-    if (liveCodeCameraMode && !liveCodeCameraMode.value) liveCodeCameraMode.value = "wide";
+    if (liveCodeCameraMode) liveCodeCameraMode.value = "wide";
     if (liveCodeDensity && !liveCodeDensity.value) liveCodeDensity.value = "58";
     if (liveCodeSpeed && !liveCodeSpeed.value) liveCodeSpeed.value = "44";
     if (liveCodeZoom && !liveCodeZoom.value) liveCodeZoom.value = "38";
@@ -17839,6 +17970,7 @@ function setMode(newMode) {
     if (liveCodeLanguage) liveCodeLanguage.value = String(clamp(Number(liveCodeLanguage.value), 0, 65));
     if (liveCodeGlow && !liveCodeGlow.value) liveCodeGlow.value = "54";
     if (liveCodeBrightness && !liveCodeBrightness.value) liveCodeBrightness.value = "68";
+    if (liveCodeCamTolerance && !liveCodeCamTolerance.value) liveCodeCamTolerance.value = "38";
     if (liveCodeAudioAmount && !liveCodeAudioAmount.value) liveCodeAudioAmount.value = "72";
     if (liveCodeAudio) liveCodeAudio.checked = true;
     applyCodePreset(liveCodePreset ? liveCodePreset.value : "matrix", false);
@@ -19834,6 +19966,7 @@ if (liveCodeAudio) {
   liveCodeLanguage,
   liveCodeGlow,
   liveCodeBrightness,
+  liveCodeCamTolerance,
   liveCodeAudioAmount,
 ].forEach((control) => {
   if (!control) return;
@@ -20908,12 +21041,7 @@ window.addEventListener("keydown", (e) => {
     else if (mode === "interior") randomizeInteriorCameraViewSmooth();
     else if (mode === "atlas") randomizeAtlasCameraViewSmooth();
     else if (mode === "materia") randomizeMateriaCameraViewSmooth();
-    else if (mode === "code") {
-      const drift = 0.22;
-      codeRainCamXTarget = clamp(codeRainCamXTarget * 0.88 + (Math.random() * 2 - 1) * drift, -1, 1);
-      codeRainCamYTarget = clamp(codeRainCamYTarget * 0.88 + (Math.random() * 2 - 1) * drift, -1, 1);
-      scheduleRender();
-    }
+    else if (mode === "code") triggerCodePresetCameraTween(1);
     else randomize3dCameraViewSmooth();
     return;
   }
