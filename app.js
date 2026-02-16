@@ -3631,9 +3631,8 @@ function getMobileLiveProfile() {
 }
 
 function shouldEnableMobileLiveUi(profile) {
-  if (mobileLiveForcedValue === "on") return true;
-  if (mobileLiveForcedValue === "off") return false;
-  return Boolean(profile.isPhone || profile.isTablet);
+  // Mobile custom shell disabled: keep desktop-like layout on touch devices.
+  return false;
 }
 
 function el(tag, className, text) {

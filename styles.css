@@ -2300,6 +2300,25 @@ body.touch-ui .topbar-brand-right {
   }
 }
 
+/* Mobile desktop-like mode: keep core desktop sections visible, compacted. */
+body.touch-ui .right-panel .output-zone,
+body.touch-ui .right-panel .performance-bar,
+body.touch-ui .right-panel .deck-footer {
+  display: block;
+}
+
+@media (max-width: 980px) {
+  .right-panel .deck-controls,
+  .right-panel .output-zone,
+  .right-panel .performance-bar {
+    display: block;
+  }
+
+  #canvas {
+    max-height: 56vh;
+  }
+}
+
 :root {
   --mobile-live-keyboard-inset: 0px;
 }
